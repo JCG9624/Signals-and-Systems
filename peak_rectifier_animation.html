@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Peak rectifier: waveform, harmonics and capacitor state</title>
+<style>
+:root{--ink:#17283b;--muted:#536174;--blue:#1769aa;--red:#c83c40;--green:#178064;--gold:#b27b13;--line:#dce4ec;--panel:#eef6fb}
+*{box-sizing:border-box}body{margin:0;background:#fff;color:var(--ink);font:16px/1.45 system-ui,-apple-system,sans-serif}main{max-width:1440px;margin:auto;padding:22px 28px 30px}h1{font-size:27px;line-height:1.2;margin:0 0 7px;font-weight:650}h2{font-size:18px;margin:0 0 8px}p{margin:7px 0}button,select,input{font:inherit}button,select{padding:7px 12px;border:1px solid #b9c8d5;border-radius:5px;background:white;color:var(--ink)}button{cursor:pointer}button:hover{background:var(--panel)}button.primary{background:#003865;color:white;border-color:#003865}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #e7aa2b;outline-offset:3px}button[aria-pressed=true]{border-color:#003865;background:var(--panel)}.sub{color:var(--muted);font-size:14px}.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin:15px 0}.toolbar label{display:flex;gap:7px;align-items:center}.controls{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:10px 22px;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.field label{display:flex;justify-content:space-between;gap:6px;font-size:14px}.field input[type=range]{width:100%;accent-color:#003865}.field output{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}.top{display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:center;margin:14px 0}.circuit{width:100%;height:172px}.state{padding:10px 15px;background:var(--panel);border-left:4px solid var(--green)}.state strong{font-size:19px}.state .numbers{display:flex;gap:25px;flex-wrap:wrap;font-variant-numeric:tabular-nums;margin-top:8px}.charts{display:grid;grid-template-columns:1.5fr 1fr;gap:24px}.chart{min-width:0}canvas{width:100%;height:305px;display:block}#spectrum{height:305px}.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;min-height:24px}.legend span:before{content:'';display:inline-block;width:23px;height:3px;margin-right:6px;vertical-align:middle;background:var(--c)}.legend .dash:before{background:repeating-linear-gradient(to right,var(--c) 0 5px,transparent 5px 8px)}.playbar{display:flex;gap:9px;align-items:center;margin:12px 0;flex-wrap:wrap}.playbar input{flex:1;min-width:120px;accent-color:#003865}.detail{display:grid;grid-template-columns:1.5fr 1fr;gap:24px;font-size:14px;margin-top:10px}.equation{background:#f6f8fa;padding:10px 13px;border-radius:4px;font-family:Georgia,serif;font-size:17px}.detail small{color:var(--muted)}.foot{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;margin-top:15px}.check{display:inline-flex;align-items:center;gap:5px}#harmonicDetail{font-variant-numeric:tabular-nums;min-height:44px}.note{color:var(--muted);font-size:13px;min-height:22px}svg text{fill:var(--ink);font:16px system-ui,sans-serif}svg .wire{stroke:var(--muted);stroke-width:2;fill:none}svg .active{stroke:var(--green);stroke-width:3;fill:none}svg .flow{stroke:var(--green);stroke-width:3;fill:none;stroke-dasharray:9 7}.flow.running{animation:flow .6s linear infinite}@keyframes flow{to{stroke-dashoffset:-32}}@media(prefers-reduced-motion:reduce){.flow.running{animation:none}}@media(max-width:900px){.charts,.top,.detail{grid-template-columns:1fr}.controls{grid-template-columns:repeat(2,minmax(120px,1fr))}.circuit{height:150px}main{padding:18px}.top{gap:10px}.charts{gap:18px}canvas,#spectrum{height:290px}}@media(max-width:430px){h1{font-size:23px}main{padding:14px}.controls{gap:8px 14px}.toolbar select{max-width:100%}.toolbar label{flex-wrap:wrap}.state .numbers{gap:12px}canvas,#spectrum{height:270px}}
+</style>
+</head>
+<body><main>
+<h1>Peak rectifier: waveform, harmonics and capacitor state</h1>
+<p class="sub">Diode followed by a parallel RC load. Ideal voltage source. Constant-drop diode model. All calculations run offline.</p>
+<div class="toolbar">
+ <label for="preset">Example <select id="preset"><option value="medium">Pure sinusoid: 5 Hz</option><option value="slow">Pure sinusoid: 0.5 Hz</option><option value="fast">Pure sinusoid: 50 Hz</option><option value="third0">Third harmonic: phase 0°</option><option value="third180">Third harmonic: phase 180°</option><option value="both">Second and third harmonics</option></select></label>
+ <label for="initial">Initialisation <select id="initial"><option value="steady">Periodic steady state</option><option value="startup">Start with an uncharged capacitor</option></select></label>
+ <button type="button" id="full">Full screen</button>
+</div>
+<div class="controls">
+ <div class="field"><label for="freq">Input frequency <output id="freqValue"></output></label><input id="freq" type="range" min="-0.30103" max="1.69897" step="0.005" value="0.69897"></div>
+ <div class="field"><label for="rc">RC time constant <output id="rcValue"></output></label><input id="rc" type="range" min="0.02" max="0.4" step="0.005" value="0.1"></div>
+ <div class="field"><label for="amp">Fundamental amplitude <output id="ampValue"></output></label><input id="amp" type="range" min="0.5" max="8" step="0.1" value="5"></div>
+ <div class="field"><label for="drop">Diode forward drop <output id="dropValue"></output></label><input id="drop" type="range" min="0" max="0.9" step="0.05" value="0"></div>
+ <div class="field"><label for="h2">Second harmonic / A <output id="h2Value"></output></label><input id="h2" type="range" min="0" max="0.5" step="0.01" value="0"></div>
+ <div class="field"><label for="h3">Third harmonic / A <output id="h3Value"></output></label><input id="h3" type="range" min="0" max="0.5" step="0.01" value="0"></div>
+ <div class="field"><label for="phi">Third harmonic phase <output id="phiValue"></output></label><input id="phi" type="range" min="0" max="360" step="5" value="0"></div>
+ <div class="field"><label for="terms">Fourier sum: highest k <output id="termsValue"></output></label><input id="terms" type="range" min="0" max="24" step="1" value="8"></div>
+</div>
+<div class="top">
+ <svg class="circuit" viewBox="0 0 590 175" role="img" aria-labelledby="circuitTitle circuitDesc">
+ <title id="circuitTitle">Peak rectifier circuit</title><desc id="circuitDesc">A voltage source drives a diode. A capacitor and load resistor are connected in parallel at the output. The capacitor voltage is the state.</desc>
+ <g class="wire"><path d="M65 52H165M205 52H365M65 52V71M65 119V146H445V52H365M290 52V88M290 103V146M445 52V80M445 119V146"/><circle cx="65" cy="95" r="24"/><path d="M55 86H75M65 76V96M56 108H74M274 88H306M274 103H306M445 80l-8 5 16 8-16 8 16 8-8 10"/></g>
+ <g id="diode" class="active"><path d="M165 38L193 52 165 66Z"/><path d="M197 36V68M197 52H205"/></g>
+ <path id="flow" class="flow" d="M88 52H150M213 52H273"/>
+ <g id="resistorFlow" class="active"><path d="M469 81V112m-5-7 5 8 5-8"/></g>
+ <circle cx="290" cy="52" r="3" fill="#536174"/><circle cx="290" cy="146" r="3" fill="#536174"/>
+ <text x="8" y="98">vᵢₙ</text><text x="174" y="25">D</text><text x="311" y="102">C</text><text x="463" y="102">R</text><text x="500" y="60">+</text><text x="500" y="144">−</text><text x="500" y="102">vₒᵤₜ = x</text><text x="112" y="169" id="componentLabel"></text>
+ </svg>
+ <div class="state" id="stateBox">
+  <strong id="diodeStatus">Diode off</strong><div id="modeLaw">Capacitor supplies the load.</div>
+  <div class="numbers"><span>vᵢₙ = <b id="instantInput"></b> V</span><span>x = v<sub>C</sub> = <b id="instantState"></b> V</span><span>i<sub>D</sub> = <b id="instantCurrent"></b> mA</span></div>
+ </div>
+</div>
+<div class="charts">
+ <section class="chart"><h2>Time domain</h2>
+ <div class="legend"><span style="--c:var(--blue)">Input</span><span style="--c:var(--red)">Capacitor voltage</span><span class="dash" style="--c:var(--green)" id="recLegend">Fourier sum of steady state</span></div>
+ <canvas id="wave" role="img" aria-label="Input and output waveforms, with a movable time cursor and diode conduction shading"></canvas>
+ </section>
+ <section class="chart"><h2>Frequency domain: periodic steady state</h2>
+ <div class="legend"><span style="--c:var(--blue)">Input</span><span style="--c:var(--red)">Output</span></div>
+ <canvas id="spectrum" role="img" aria-label="One-sided Fourier amplitude spectra of the input and periodic steady-state output"></canvas>
+ </section>
+</div>
+<div class="playbar"><button type="button" class="primary" id="play">Play</button><button type="button" id="step">Step</button><button type="button" id="rewind">Rewind</button><label for="scrub">Time cursor</label><input id="scrub" type="range" min="0" max="2" step="0.002" value="0"><output id="cursorLabel"></output></div>
+<div class="toolbar">
+ <label class="check"><input type="checkbox" id="showFourier" checked> Show Fourier sum</label>
+ <label class="check"><input type="checkbox" id="showCandidates"> Show a few decaying candidates</label>
+ <label for="axis">Time axis <select id="axis"><option value="cycles">Periods</option><option value="seconds">Seconds</option></select></label>
+ <label for="selected">Inspect harmonic <select id="selected"></select></label>
+</div>
+<div class="detail">
+ <div><div class="equation" id="inputLaw"></div><p id="shapeDetail"></p><div class="note" id="startupNote"></div></div>
+ <div><div id="harmonicDetail" aria-live="polite"></div><small>DC height = c₀. Other heights = 2|cₖ|, the peak cosine amplitudes. Negative-frequency lines are their complex conjugates.</small></div>
+</div>
+<p class="foot">The model uses x<sub>n</sub> = max(e<sup>−Δt/(RC)</sup>x<sub>n−1</sub>, v<sub>in,n</sub> − V<sub>γ</sub>), with 8192 samples per input period. This converges to the continuous-time decaying-maximum model. R = 10 kΩ. The capacitor starts at zero only in startup mode. Spectra and Fourier sums always use the periodic steady-state waveform. Animation advances in input periods, independently of the physical frequency. Space: play/pause. ← / →: step. No network connection or installation is needed.</p>
+</main>
+<script>
+'use strict';
+(() => {
+const $=id=>document.getElementById(id);
+const N=8192,TAU=2*Math.PI,R=10000,colors={ink:'#17283b',muted:'#536174',blue:'#1769aa',red:'#c83c40',green:'#178064',gold:'#b27b13',grid:'#dce4ec'};
+let p={},data={},cursor=0,playing=false,last=null;
+const inputs=['freq','rc','amp','drop','h2','h3','phi','terms'];
+for(let k=0;k<=24;k++){let opt=document.createElement('option');opt.value=k;opt.textContent=k===0?'DC':`k = ${k}`;$('selected').append(opt)}
+$('selected').value=1;
+function input(c){let q=TAU*c;return p.A*(Math.cos(q)+p.h2*Math.cos(2*q)+p.h3*Math.cos(3*q+p.phi))}
+function inputPrime(c){let q=TAU*c;return p.A*(-Math.sin(q)-2*p.h2*Math.sin(2*q)-3*p.h3*Math.sin(3*q+p.phi))}
+function fft(re,im){
+ const n=re.length;
+ for(let i=1,j=0;i<n;i++){let b=n>>1;for(;j&b;b>>=1)j^=b;j^=b;if(i<j){[re[i],re[j]]=[re[j],re[i]];[im[i],im[j]]=[im[j],im[i]]}}
+ for(let len=2;len<=n;len*=2){let a=-TAU/len,wr=Math.cos(a),wi=Math.sin(a);for(let i=0;i<n;i+=len){let cr=1,ci=0;for(let j=0;j<len/2;j++){let at=i+j,bt=at+len/2,tr=cr*re[bt]-ci*im[bt],ti=cr*im[bt]+ci*re[bt];re[bt]=re[at]-tr;im[bt]=im[at]-ti;re[at]+=tr;im[at]+=ti;let nr=cr*wr-ci*wi;ci=cr*wi+ci*wr;cr=nr}}}
+}
+function sample(arr,c){let v=((c%1)+1)%1*N,i=Math.floor(v),r=v-i;return arr[i]*(1-r)+arr[(i+1)%N]*r}
+function actualAt(q){if($('initial').value==='steady')return sample(data.ss,q-.5);let i=q*N,j=Math.min(data.start.length-2,Math.floor(i));return data.start[j]+(data.start[j+1]-data.start[j])*(i-j)}
+function calc(){
+ p={f:10**Number($('freq').value),rc:Number($('rc').value),A:Number($('amp').value),vg:Number($('drop').value),h2:Number($('h2').value),h3:Number($('h3').value),phi:Number($('phi').value)*Math.PI/180,terms:Number($('terms').value)};p.beta=TAU*p.f*p.rc;
+ for(const [id,val] of Object.entries({freq:p.f.toFixed(2)+' Hz',rc:(p.rc*1000).toFixed(0)+' ms',amp:p.A.toFixed(1)+' V',drop:p.vg.toFixed(2)+' V',h2:p.h2.toFixed(2),h3:p.h3.toFixed(2),phi:$('phi').value+'°',terms:p.terms}))$(id+'Value').textContent=val;
+ const d=Math.exp(-1/(p.f*p.rc*N));let x=0;
+ for(let i=0;i<=N;i++)x=Math.max(x*d,input(i/N)-p.vg);
+ const ss=new Float64Array(N),on=new Uint8Array(N);
+ for(let i=0;i<N;i++){if(i)x=Math.max(x*d,input(i/N)-p.vg);ss[i]=x;on[i]=(Math.abs(x-(input(i/N)-p.vg))<1e-8&&p.beta*inputPrime(i/N)+x>=-1e-7)?1:0}
+ const re=Float64Array.from(ss),im=new Float64Array(N);fft(re,im);
+ for(let i=0;i<N;i++){re[i]/=N;im[i]/=N}
+ const start=new Float64Array(2*N+1);x=0;
+ for(let i=0;i<start.length;i++){x=Math.max(x*d,input(-.5+i/N)-p.vg);start[i]=x}
+ const rec=new Float64Array(N);for(let i=0;i<N;i++){let a=TAU*i/N,v=re[0];for(let k=1;k<=p.terms;k++)v+=2*(re[k]*Math.cos(k*a)-im[k]*Math.sin(k*a));rec[i]=v}
+ let vmin=Infinity,vmax=-Infinity;for(let i=0;i<N;i++){vmin=Math.min(vmin,ss[i]);vmax=Math.max(vmax,ss[i])}
+ data={ss,on,re,im,start,rec,vmin,vmax};
+ $('componentLabel').textContent=`R = 10 kΩ     C = ${(p.rc/R*1e6).toFixed(1)} μF     RC = ${(p.rc*1000).toFixed(0)} ms`;
+ $('inputLaw').textContent=`vᵢₙ(t) = ${p.A.toFixed(1)} [cos θ + ${p.h2.toFixed(2)} cos 2θ + ${p.h3.toFixed(2)} cos(3θ + ${$('phi').value}°)] V,   θ = 2πf₀t`;
+ $('shapeDetail').textContent=`β = 2πf₀RC = ${p.beta.toFixed(3)}.  DC output = ${re[0].toFixed(3)} V.  Peak-to-peak ripple = ${(vmax-vmin).toFixed(3)} V.`;
+ $('startupNote').textContent=$('initial').value==='startup'?'Red: startup from x(−T/2)=0. Dashed grey: periodic steady state. Green sum and spectrum describe steady state.':'Green shading marks intervals of diode conduction. A cosine input can keep the diode conducting briefly after its peak.';
+ draw();
+}
+function setupCanvas(id){let c=$(id),rect=c.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);c.width=Math.round(rect.width*dpr);c.height=Math.round(rect.height*dpr);let ctx=c.getContext('2d');ctx.scale(dpr,dpr);ctx.font='13px system-ui';ctx.lineJoin='round';return {ctx,w:rect.width,h:rect.height}}
+function axes(ctx,w,h,xmin,xmax,ymin,ymax,xlabel,ylabel,xticks,yticks){
+ let left=57,right=17,top=20,bottom=49;
+ const X=v=>left+(w-left-right)*(v-xmin)/(xmax-xmin),Y=v=>h-bottom-(h-top-bottom)*(v-ymin)/(ymax-ymin);
+ ctx.strokeStyle=colors.grid;ctx.lineWidth=1;ctx.fillStyle=colors.muted;ctx.font='12px system-ui';ctx.textAlign='right';
+ for(const v of yticks){ctx.beginPath();ctx.moveTo(left,Y(v));ctx.lineTo(w-right,Y(v));ctx.stroke();ctx.fillText(v.toFixed(Math.abs(v)%1?1:0),left-8,Y(v)+4)}
+ ctx.textAlign='center';for(const v of xticks){ctx.fillText(Math.abs(v)<1e-9?'0':Number(v.toPrecision(3)).toString(),X(v),h-bottom+20)}
+ ctx.strokeStyle='#91a0ac';ctx.strokeRect(left,top,w-left-right,h-top-bottom);ctx.fillStyle=colors.ink;ctx.font='13px system-ui';ctx.fillText(xlabel,(left+w-right)/2,h-7);
+ ctx.save();ctx.translate(14,(top+h-bottom)/2);ctx.rotate(-Math.PI/2);ctx.fillText(ylabel,0,0);ctx.restore();return {X,Y,left,right,top,bottom};
+}
+function curve(ctx,X,Y,fn,color,dash=[]){ctx.strokeStyle=color;ctx.lineWidth=2;ctx.setLineDash(dash);ctx.beginPath();for(let j=0;j<=1150;j++){let q=2*j/1150;let x=X(q),y=Y(fn(q));if(j)ctx.lineTo(x,y);else ctx.moveTo(x,y)}ctx.stroke();ctx.setLineDash([])}
+function drawWave(){
+ let {ctx,w,h}=setupCanvas('wave'),peak=p.A*(1+p.h2+p.h3),lim=Math.max(1,peak*1.12),ticks=[-peak,0,peak],seconds=$('axis').value==='seconds';
+ let a=axes(ctx,w,h,0,2,-lim,lim,seconds?'Time t (s)':'Time / input period', 'Voltage (V)',[0,.5,1,1.5,2],ticks);
+ const {X,Y}=a;
+ if(seconds){ctx.clearRect(a.left-10,h-a.bottom+4,w-a.left+15,24);ctx.fillStyle=colors.muted;ctx.font='12px system-ui';ctx.textAlign='center';for(let q of [0,.5,1,1.5,2])ctx.fillText(((q-.5)/p.f).toFixed(p.f<2?2:3),X(q),h-a.bottom+20)}
+ else {ctx.clearRect(a.left-10,h-a.bottom+4,w-a.left+15,24);ctx.fillStyle=colors.muted;ctx.font='12px system-ui';ctx.textAlign='center';for(let q of [0,.5,1,1.5,2])ctx.fillText((q-.5).toFixed(1),X(q),h-a.bottom+20)}
+ ctx.save();ctx.beginPath();ctx.rect(a.left,a.top,w-a.left-a.right,h-a.top-a.bottom);ctx.clip();
+ ctx.fillStyle='rgba(23,128,100,.09)';for(let j=0;j<650;j++){let q=2*j/650,c=q-.5;if(sample(data.on,c)>.5 && ($('initial').value==='steady'||Math.abs(actualAt(q)-(input(c)-p.vg))<1e-3))ctx.fillRect(X(q),a.top,Math.max(1,X(q+2/650)-X(q)),h-a.top-a.bottom)}
+ if($('showCandidates').checked){for(let s=.1;s<2;s+=.18){let v=input(s-.5)-p.vg;if(v<=0)continue;ctx.strokeStyle='rgba(178,123,19,.4)';ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.beginPath();for(let j=0;j<=100;j++){let q=s+(2-s)*j/100,x=X(q),y=Y(v*Math.exp(-(q-s)/(p.f*p.rc)));if(j)ctx.lineTo(x,y);else ctx.moveTo(x,y)}ctx.stroke()}ctx.setLineDash([])}
+ curve(ctx,X,Y,q=>input(q-.5),colors.blue);
+ if($('initial').value==='startup')curve(ctx,X,Y,q=>sample(data.ss,q-.5),'#91a0ac',[3,4]);
+ curve(ctx,X,Y,actualAt,colors.red);
+ if($('showFourier').checked)curve(ctx,X,Y,q=>sample(data.rec,q-.5),colors.green,[6,4]);
+ ctx.strokeStyle=colors.muted;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(X(cursor),a.top);ctx.lineTo(X(cursor),h-a.bottom);ctx.stroke();ctx.fillStyle=colors.red;ctx.beginPath();ctx.arc(X(cursor),Y(actualAt(cursor)),5,0,TAU);ctx.fill();ctx.restore();
+}
+function drawSpectrum(){let {ctx,w,h}=setupCanvas('spectrum'),K=12,maxAmp=Math.max(p.A,data.re[0],p.A*p.h2,p.A*p.h3)*1.13;
+ let {X,Y,left,right,top,bottom}=axes(ctx,w,h,-.6,K+.6,0,maxAmp,'Frequency f (Hz)','Cosine amplitude (V)',[0,3,6,9,12], [0,maxAmp/2,maxAmp]);
+ ctx.clearRect(left-15,h-bottom+4,w-left+16,24);ctx.fillStyle=colors.muted;ctx.font='12px system-ui';ctx.textAlign='center';for(let k of [0,3,6,9,12])ctx.fillText(Number((k*p.f).toPrecision(3)).toString(),X(k),h-bottom+20);
+ let selected=Number($('selected').value);
+ if(selected<=K){ctx.fillStyle='rgba(178,123,19,.1)';ctx.fillRect(X(selected)-9,top,18,h-top-bottom)}
+ for(let k=0;k<=K;k++){let va=k===0?data.re[0]:2*Math.hypot(data.re[k],data.im[k]),iv=k===1?p.A:k===2?p.A*p.h2:k===3?p.A*p.h3:0;for(let [v,col,off] of [[iv,colors.blue,-3],[va,colors.red,3]]){let x=X(k)+off;ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,Y(0));ctx.lineTo(x,Y(v));ctx.stroke();ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,Y(v),3,0,TAU);ctx.fill()}}
+}
+function detail(){let k=Number($('selected').value),r=data.re[k],i=data.im[k],amp=k?2*Math.hypot(r,i):r,phase=Math.atan2(i,r)*180/Math.PI;
+ $('harmonicDetail').textContent=k===0?`DC: c₀ = ${r.toFixed(4)} V, at f = 0 Hz.`:`k = ${k}: frequency ${(k*p.f).toFixed(2)} Hz; amplitude ${amp.toFixed(4)} V; phase ${amp<1e-6?'undefined (zero amplitude)':phase.toFixed(1)+'°'}.  cₖ = ${r.toFixed(4)} ${i<0?'−':'+'} j${Math.abs(i).toFixed(4)} V.`;
+}
+function updateState(){let c=cursor-.5,u=input(c),x=actualAt(cursor),drive=p.beta*inputPrime(c)+x,on=Math.abs(x-(u-p.vg))<Math.max(.003,p.A*1e-4)&&drive>=-1e-4,current=on?Math.max(0,drive)/R:0;
+ $('diodeStatus').textContent=on?'Diode on':'Diode off';$('modeLaw').textContent=on?'x = vᵢₙ − Vγ. The source supplies the diode current.':'dx/dt = −x/(RC). The capacitor supplies the load.';
+ $('instantInput').textContent=u.toFixed(2);$('instantState').textContent=x.toFixed(2);$('instantCurrent').textContent=(1000*current).toFixed(3);
+ $('diode').setAttribute('class',on?'active':'wire');$('flow').style.visibility=on?'visible':'hidden';$('flow').classList.toggle('running',on&&playing);$('resistorFlow').style.opacity=x>1e-4?'1':'.2';$('stateBox').style.borderLeftColor=on?colors.green:colors.gold;
+ $('scrub').value=cursor;$('cursorLabel').textContent=`t/T = ${(cursor-.5).toFixed(2)}`;
+}
+function draw(){drawWave();drawSpectrum();detail();updateState();$('recLegend').style.visibility=$('showFourier').checked?'visible':'hidden'}
+function play(value){playing=value;last=null;$('play').textContent=playing?'Pause':'Play';if(playing)requestAnimationFrame(tick);updateState()}
+function tick(ts){if(!playing)return;if(last!==null)cursor+=(ts-last)/1000*.24;last=ts;if(cursor>=2){cursor=2;play(false)}drawWave();updateState();if(playing)requestAnimationFrame(tick)}
+for(let id of inputs)$(id).addEventListener('input',calc);
+for(let id of ['initial','showFourier','showCandidates','axis','selected'])$(id).addEventListener('change',calc);
+$('play').onclick=()=>{if(cursor>=2)cursor=0;play(!playing)};$('step').onclick=()=>{play(false);cursor=Math.min(2,cursor+.025);drawWave();updateState()};$('rewind').onclick=()=>{play(false);cursor=0;drawWave();updateState()};
+$('scrub').oninput=()=>{play(false);cursor=Number($('scrub').value);drawWave();updateState()};
+$('preset').onchange=()=>{const v=$('preset').value;$('freq').value=Math.log10(v==='slow'?.5:v==='fast'?50:5);$('rc').value=.1;$('amp').value=5;$('drop').value=0;$('h2').value=v==='both'?.25:0;$('h3').value=['third0','third180','both'].includes(v)?.35:0;$('phi').value=v==='third180'?180:0;cursor=0;play(false);calc()};
+$('full').onclick=()=>{if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen?.()};
+document.addEventListener('keydown',e=>{if(['INPUT','SELECT','BUTTON'].includes(document.activeElement.tagName))return;if(e.code==='Space'){e.preventDefault();if(cursor>=2)cursor=0;play(!playing)}else if(['ArrowLeft','ArrowRight'].includes(e.code)){e.preventDefault();play(false);cursor=Math.min(2,Math.max(0,cursor+(e.code==='ArrowRight'?.025:-.025)));drawWave();updateState()}});
+window.addEventListener('resize',draw);window.__peakRectifier={get state(){return {p,data,cursor,playing}},recalculate:calc};calc();
+})();
+</script></body></html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Interactive demonstrations for Signals and Systems teaching.">
+  <title>Signals &amp; Systems | Interactive Resources</title>
+  <style>
+    :root { color-scheme: light; --ink: #122338; --muted: #506277; --primary: #1456a1; --line: #dce6f0; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--ink); background: #f6f8fc; line-height: 1.55; }
+    header { background: linear-gradient(115deg, #102c55 0%, #245d9b 100%); color: #fff; padding: 3.75rem 1.25rem 4rem; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    .eyebrow { text-transform: uppercase; font-size: .78rem; letter-spacing: .13em; font-weight: 700; color: #b8d8ff; margin: 0 0 .7rem; }
+    h1 { font-size: clamp(2.1rem, 5vw, 3.25rem); line-height: 1.15; margin: 0 0 .7rem; letter-spacing: -.035em; }
+    header p:last-child { color: #e2efff; max-width: 55ch; font-size: 1.08rem; margin: 0; }
+    main { padding: 2.6rem 1.25rem 4rem; }
+    h2 { font-size: 1.35rem; margin: 0 0 .35rem; }
+    .intro { color: var(--muted); margin: 0 0 1.5rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 275px), 1fr)); gap: 1.15rem; }
+    .card { display: flex; flex-direction: column; padding: 1.55rem; background: #fff; border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 5px 18px rgba(22, 47, 84, .045); text-decoration: none; color: inherit; transition: box-shadow .15s, transform .15s, border-color .15s; }
+    .card:hover { transform: translateY(-3px); border-color: #91b7e2; box-shadow: 0 10px 26px rgba(22, 47, 84, .11); }
+    .card:focus-visible { outline: 3px solid #ffb648; outline-offset: 3px; }
+    .tag { font-size: .76rem; font-weight: 700; color: #245b94; text-transform: uppercase; letter-spacing: .075em; margin-bottom: 1rem; }
+    h3 { font-size: 1.22rem; line-height: 1.35; margin: 0 0 .65rem; }
+    .card p { color: var(--muted); font-size: .96rem; margin: 0 0 1.5rem; }
+    .open { color: var(--primary); font-size: .93rem; font-weight: 700; margin-top: auto; }
+    footer { padding: 1.4rem 1.25rem 2rem; text-align: center; border-top: 1px solid var(--line); color: var(--muted); font-size: .88rem; }
+    @media (prefers-reduced-motion: reduce) { .card { transition: none; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <p class="eyebrow">Interactive teaching resources</p>
+      <h1>Signals &amp; Systems</h1>
+      <p>Explore interactive demonstrations that accompany lectures in signals, systems and transforms.</p>
+    </div>
+  </header>
+  <main class="container">
+    <h2>Available demonstrations</h2>
+    <p class="intro">Select a topic to open its interactive page.</p>
+    <section class="grid" aria-label="Interactive demonstrations">
+      <a class="card" href="peak_rectifier_animation.html">
+        <span class="tag">Circuits &amp; systems</span>
+        <h3>Peak Rectifier Animation</h3>
+        <p>Explore the behaviour of a peak rectifier through an interactive demonstration.</p>
+        <span class="open">Open demonstration →</span>
+      </a>
+      <a class="card" href="Laplace_exponential_Fourier_joke_interactive.html">
+        <span class="tag">Transforms</span>
+        <h3>Laplace &amp; Fourier: Exponential</h3>
+        <p>An interactive illustration relating exponential signals and transforms.</p>
+        <span class="open">Open demonstration →</span>
+      </a>
+      <a class="card" href="Laplace_sinusoid_Fourier_joke_interactive.html">
+        <span class="tag">Transforms</span>
+        <h3>Laplace &amp; Fourier: Sinusoid</h3>
+        <p>An interactive illustration relating sinusoidal signals and transforms.</p>
+        <span class="open">Open demonstration →</span>
+      </a>
+    </section>
+  </main>
+  <footer>Signals &amp; Systems · Interactive learning materials</footer>
+</body>
+</html>

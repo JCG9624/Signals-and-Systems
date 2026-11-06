@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>From Fourier to Laplace — Growing exponential: convergence and Fourier spectrum</title>
+<style>
+:root{--ink:#172b40;--muted:#627990;--blue:#346386;--bg:#f5f8fc;--line:#dce6ee;--red:#c45157;--gold:#b88329;--green:#128971;--abs:#d7a345}
+*{box-sizing:border-box}body{font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;color:var(--ink);background:var(--bg);margin:0}
+main{max-width:1550px;margin:auto;padding:22px 28px 34px}
+.eyebrow{font-size:13px;letter-spacing:.09em;color:var(--blue);font-weight:800}
+h1{font-size:clamp(27px,3vw,39px);margin:5px 0 5px;letter-spacing:-.03em}
+.description{font-size:16px;color:#516c80;line-height:1.5;margin:6px 0 16px}
+.controls{background:#fff;border:1px solid var(--line);border-radius:13px;display:flex;flex-wrap:wrap;gap:15px;align-items:center;padding:14px 18px;margin-bottom:15px}
+#number{font-weight:800;color:var(--red);font-size:27px;min-width:140px;font-variant-numeric:tabular-nums}
+.slide{flex:1;min-width:200px}input[type=range]{width:100%;accent-color:#357292;cursor:pointer}
+.labels{display:flex;justify-content:space-between;color:#758aa0;font-size:12px}
+.buttons{display:flex;flex-wrap:wrap;gap:7px}button{padding:10px 12px;background:#fff;border-radius:8px;border:1px solid #c5d2df;font-size:13px;color:#31516d;cursor:pointer}
+button.primary{background:#2f6688;color:#fff;font-weight:750;border-color:#2f6688}button:hover{filter:brightness(.97)}
+.layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(315px,1fr);gap:15px}
+.stack{display:grid;grid-template-rows:auto auto;gap:15px}
+.panel{border-radius:13px;background:#fff;border:1px solid var(--line);padding:16px 17px 13px;min-width:0}
+.panel h2{font-size:17px;line-height:1.3;margin:0 0 4px}.formula{font-family:Georgia,"Times New Roman",serif;color:#506780;font-size:17px;line-height:1.4;margin-bottom:5px}
+canvas{width:100%;height:245px;display:block}.right canvas{height:215px}#spectrum{height:255px}
+.status{margin:9px 0 2px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+#state{font-weight:820;color:var(--red);font-size:16px}
+#explanation{color:#567085;font-size:13px;line-height:1.5;margin:5px 0 0}
+.spectrum-note{font-size:13px;color:#567085;margin:6px 0}
+.bottom{background:#eaf1f7;border-radius:11px;padding:13px 18px;margin-top:15px;font-size:15px;line-height:1.6}
+@media(max-width:950px){main{padding:13px}.layout{grid-template-columns:1fr}.panel{padding:14px}canvas{height:220px}}
+
+/* A short teaching aside: shown only upon entering the ROC. */
+.laplace-joke{position:fixed;left:50%;bottom:20px;transform:translate(-50%,18px);z-index:20;
+ width:min(785px,calc(100vw - 32px));padding:15px 52px 15px 21px;border-radius:12px;
+ background:#214c68;color:#fff;box-shadow:0 10px 35px rgba(19,47,69,.25);
+ border-left:5px solid #61ceb2;opacity:0;visibility:hidden;pointer-events:none;
+ transition:opacity .35s ease,transform .35s ease,visibility .35s ease;
+ font-size:clamp(13px,1.35vw,18px);line-height:1.4;text-align:center}
+.laplace-joke.show{opacity:1;visibility:visible;transform:translate(-50%,0);pointer-events:auto}
+.laplace-joke strong{font-weight:760}
+.laplace-joke .joke-sub{display:block;font-size:12px;color:#cde4eb;margin-top:5px;font-style:normal}
+.laplace-joke button{position:absolute;right:9px;top:8px;border:0;color:#effaff;background:transparent;
+ font-size:22px;line-height:1;min-height:36px;min-width:36px;padding:5px;cursor:pointer}
+@media(prefers-reduced-motion:reduce){.laplace-joke{transition:none;transform:translate(-50%,0)}}
+</style>
+</head>
+<body><main>
+<div class="eyebrow">SIGNALS AND SYSTEMS  ·  FROM FOURIER TO LAPLACE</div>
+<h1>Growing exponential: convergence and Fourier spectrum</h1>
+<p class="description">Original signal: <strong>x(t) = e<sup>t</sup>u(t)</strong>. Vary σ = Re(s) to see when its exponentially weighted version admits an ordinary Fourier transform.</p>
+<div class="controls">
+ <div id="number">σ = 0.00</div>
+ <div class="slide"><input type="range" id="sigma" min="-0.25" max="2.4" step="0.005" value="0" aria-label="Real part sigma of s"><div class="labels"><span>−0.25</span><span>0 · Fourier axis</span><span>1 · ROC boundary</span><span>2.4</span></div></div>
+ <div class="buttons"><button class="primary" id="play">▶ Animate</button><button data-s="0">Fourier axis</button><button data-s="1">Boundary</button><button data-s="1.15">Near boundary</button><button data-s="2">Inside ROC</button></div>
+</div>
+<div class="layout">
+ <div class="stack">
+  <section class="panel"><h2>Exponentially weighted signal</h2><div class="formula">x<sub>σ</sub>(t) = e<sup>(1−σ)t</sup></div><canvas id="wave" role="img" aria-label="Weighted time-domain signal"></canvas></section>
+  <section class="panel"><h2>Accumulated integral</h2><div class="formula">A<sub>σ</sub>(T) = ∫<sub>0</sub><sup>T</sup> e<sup>(1−σ)t</sup>dt</div><canvas id="integral" role="img" aria-label="Accumulated convergence integral"></canvas></section>
+ </div>
+ <div class="stack right">
+  <section class="panel"><h2>Region of convergence in the s-plane</h2><div class="formula">ROC: Re(s) &gt; 1</div><canvas id="plane" role="img" aria-label="Complex plane showing a moving vertical line for sigma"></canvas><div class="status"><strong id="state">DIVERGES</strong></div><p id="explanation"></p></section>
+  <section class="panel"><h2>Fourier magnitude of the weighted signal</h2><div class="formula">|X(σ + jω)| = |ℱ{e<sup>−σt</sup>x(t)}(ω)|</div><canvas id="spectrum" role="img" aria-label="Magnitude spectrum in the ROC; symbolic Dirac impulses and principal-value note at the boundary"></canvas><div class="spectrum-note" id="spectrum-note">No ordinary Fourier transform outside the ROC.</div></section>
+ </div>
+</div>
+<div class="bottom"><strong>Essential distinction:</strong> Neither original growing signal has an ordinary Fourier transform (σ = 0). For <strong>σ &gt; 1</strong>, the weighted signal <em>e<sup>−σt</sup>x(t)</em> is absolutely integrable and has an ordinary Fourier transform. At the <strong>boundary σ = 1</strong>, the usual integral does not converge, but a <strong>generalised Fourier transform</strong> exists and contains Dirac impulses <em>and</em> principal-value terms. The arrows shown at the boundary are symbolic, <strong>not</strong> a magnitude spectrum.</div>
+</main>
+<aside id="laplace-joke" class="laplace-joke" role="status" aria-live="polite" aria-atomic="true">
+ <strong>“If the mountain won't come to Fourier, Laplace will go to the mountain!”</strong>
+ <span class="joke-sub">…with a little exponential damping.</span>
+ <button id="close-joke" type="button" aria-label="Dismiss the teaching aside">×</button>
+</aside>
+
+<script>
+(()=>{
+const MODE='exp', sine=MODE==='sin';
+const $=id=>document.getElementById(id),PI=Math.PI,MAX=sine?4*PI:6;
+const cRed='#c45157',cGold='#b88329',cGreen='#128971',cAbs='#d1a045';
+let sigma=0,playing=false,raf=0,started=0;
+const smooth=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t)};
+const state=s=>Math.abs(s-1)<1e-7?'boundary':s>1?'converges':'diverges';
+const stateColor=k=>k==='converges'?cGreen:k==='boundary'?cGold:cRed;
+function areaSin(T,a){let n=Math.floor((T+1e-9)/PI),r=Math.max(0,T-n*PI);if(Math.abs(a)<1e-7)return 2*n+1-Math.cos(r);
+ let q=Math.exp(a*PI),full=(1+q)/(1+a*a)*Math.expm1(a*n*PI)/Math.expm1(a*PI);
+ return full+Math.exp(a*n*PI)*(1+Math.exp(a*r)*(a*Math.sin(r)-Math.cos(r)))/(1+a*a);
+}
+function data(t){let a=1-sigma,v=Math.exp(a*t)*(sine?Math.sin(t):1);
+ let sum=sine?areaSin(t,a):(Math.abs(a)<1e-7?t:Math.expm1(a*t)/a);
+ return {t,v,absv:Math.abs(v),sum}}
+function bound(){let b=sigma-1;if(b<=0)return Infinity;if(!sine)return 1/b;let q=Math.exp(-PI*b);return (1+q)/((1-q)*(1+b*b))}
+function fit(id){let el=$(id),r=el.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);el.width=Math.max(1,Math.floor(r.width*d));el.height=Math.max(1,Math.floor(r.height*d));let c=el.getContext('2d');c.setTransform(d,0,0,d,0,0);return {c,w:r.width,h:r.height}}
+function num(v){let a=Math.abs(v);return a>=1e6?(v/1e6).toFixed(1)+'M':a>=1e4?(v/1e3).toFixed(0)+'k':a>=1e3?(v/1e3).toFixed(1)+'k':a>=10?v.toFixed(0):a>=1?v.toFixed(1):v.toFixed(2)}
+function grid(id,xmin,xmax,ymin,ymax,xTicks,xlabels,yTicks,xLabel){let {c,w,h}=fit(id),p={l:54,r:13,t:18,b:34},W=w-p.l-p.r,H=h-p.t-p.b;
+ let px=x=>p.l+(x-xmin)/(xmax-xmin)*W,py=y=>p.t+(ymax-y)/(ymax-ymin)*H;
+ c.fillStyle='#fff';c.fillRect(0,0,w,h);c.strokeStyle='#e4eaf0';c.lineWidth=1;c.font='12px system-ui';c.fillStyle='#657a90';
+ for(let i=0;i<=yTicks;i++){let v=ymin+(ymax-ymin)*i/yTicks,y=py(v);c.beginPath();c.moveTo(p.l,y);c.lineTo(w-p.r,y);c.stroke();c.textAlign='right';c.fillText(num(v),p.l-9,y+4)}
+ for(let i=0;i<xTicks.length;i++){let x=px(xTicks[i]);c.beginPath();c.moveTo(x,p.t);c.lineTo(x,p.t+H);c.stroke();c.textAlign='center';c.fillText(xlabels[i],x,p.t+H+18)}
+ c.font='13px system-ui';c.textAlign='center';c.fillStyle='#4c6982';c.fillText(xLabel,p.l+W/2,h-4);
+ return {c,w,h,p,W,H,px,py}}
+function drawLine(G,values,getX,getY,col,width,dash){let {c,px,py,p,W,H}=G;c.save();c.beginPath();c.rect(p.l,p.t,W,H);c.clip();c.beginPath();values.forEach((v,i)=>{let x=px(getX(v)),y=py(getY(v));if(i===0)c.moveTo(x,y);else c.lineTo(x,y)});c.lineWidth=width;c.strokeStyle=col;c.lineJoin='round';c.setLineDash(dash||[]);c.stroke();c.restore()}
+function waveAndIntegral(){let arr=[],mx=0,im=0;for(let i=0;i<=460;i++){let d=data(MAX*i/460);arr.push(d);mx=Math.max(mx,d.absv);im=Math.max(im,d.sum)}
+ let top=sine?Math.max(1.2,mx*1.13):Math.max(1.2,mx*1.11),low=sine?-top:0;
+ let xs=sine?[0,PI,2*PI,3*PI,4*PI]:[0,1,2,3,4,5,6],lbl=sine?['0','π','2π','3π','4π']:xs.map(String);
+ let G=grid('wave',0,MAX,low,top,xs,lbl,4,'Time  t');
+ if(sine)drawLine(G,arr,d=>d.t,d=>d.absv,cAbs,2.2);
+ drawLine(G,arr,d=>d.t,d=>d.v,stateColor(state(sigma)),3.2);
+ let lim=bound(),intmax=Math.max(1.2,im*1.12,lim<1.45*im?lim*1.12:0);
+ G=grid('integral',0,MAX,-.035*intmax,intmax,xs,lbl,4,'Upper integration limit  T');
+ if(isFinite(lim)&&lim<intmax)drawLine(G,[{t:0,v:lim},{t:MAX,v:lim}],d=>d.t,d=>d.v,cGreen,1.8,[6,4]);
+ drawLine(G,arr,d=>d.t,d=>d.sum,stateColor(state(sigma)),3.2);
+}
+function plane(){let G=grid('plane',-.25,2.5,-1.05,1.05,[0,1,2],['0','1','2'],2,'Re(s) = σ');let {c,p,W,H,px,py}=G;
+ c.fillStyle='#d9f1e8';c.fillRect(px(1),p.t,p.l+W-px(1),H);
+ const vl=(v,col,width,dash)=>{c.beginPath();c.moveTo(px(v),p.t);c.lineTo(px(v),p.t+H);c.lineWidth=width;c.strokeStyle=col;c.setLineDash(dash||[]);c.stroke();c.setLineDash([])};
+ c.beginPath();c.moveTo(p.l,py(0));c.lineTo(p.l+W,py(0));c.lineWidth=1;c.strokeStyle='#91a5ba';c.stroke();
+ vl(0,'#829bb5',2,[2,3]);vl(1,cGold,2.2,[7,5]);vl(sigma,'#fff',8);vl(sigma,stateColor(state(sigma)),4.6);
+ c.save();c.translate(12,p.t+H/2);c.rotate(-PI/2);c.font='12px system-ui';c.textAlign='center';c.fillStyle='#506982';c.fillText('Im(s) = ω',0,0);c.restore();
+}
+function spectrum(){let k=state(sigma),vals=[];if(k==='converges'){let b=sigma-1;for(let i=0;i<=500;i++){let w=-4+8*i/500,y=sine?1/Math.hypot(b*b+1-w*w,2*b*w):1/Math.hypot(b,w);vals.push({w,y})}}
+ let ymax=k==='converges'?Math.max(.65,1.14*Math.max(...vals.map(v=>v.y))):2;
+ let G=grid('spectrum',-4,4,0,ymax,[-4,-2,0,2,4],['−4','−2','0','2','4'],4,'Angular frequency  ω');
+ if(k==='converges')drawLine(G,vals,d=>d.w,d=>d.y,cGreen,3.25);
+ else if(k==='boundary'){
+   let {c,p,W,H,px}=G;c.save();c.textAlign='center';c.fillStyle=cGold;
+   c.font='bold 12px system-ui';c.fillText('GENERALISED FOURIER TRANSFORM',p.l+W/2,p.t+20);
+   (sine?[-1,1]:[0]).forEach(w=>{let x=px(w),yTop=p.t+68,yBase=p.t+H-43;
+     c.beginPath();c.moveTo(x,yBase);c.lineTo(x,yTop);c.strokeStyle=cGold;c.lineWidth=3.5;c.stroke();
+     c.beginPath();c.moveTo(x,yTop-2);c.lineTo(x-7,yTop+12);c.lineTo(x+7,yTop+12);c.closePath();c.fillStyle=cGold;c.fill();
+     c.font='bold 18px Georgia,serif';c.fillText('δ',x,yTop-12);
+   });
+   c.font='12px system-ui';c.fillStyle='#526d82';c.fillText('Dirac terms + principal-value terms',p.l+W/2,p.t+H-12);c.restore();
+ }
+ else {let {c,p,W,H}=G;c.textAlign='center';c.font='bold 14px system-ui';c.fillStyle=stateColor(k);c.fillText('NO ORDINARY FOURIER TRANSFORM',p.l+W/2,p.t+H*.47);c.font='13px system-ui';c.fillText('Outside the ROC: σ must exceed 1',p.l+W/2,p.t+H*.60)}
+}
+function render(){const k=state(sigma),col=stateColor(k);$('number').textContent='σ = '+sigma.toFixed(2);$('number').style.color=col;
+ let msg=k==='converges'?'CONVERGES':k==='boundary'?'BOUNDARY: DIVERGES':'DIVERGES';$('state').textContent=msg;$('state').style.color=col;
+ const explanation=$('explanation'),note=$('spectrum-note');
+ if(k==='converges'){explanation.textContent='Absolute integral approaches '+num(bound())+' as T → ∞. The weighted signal has a Fourier transform.';
+ note.textContent='This is the Fourier transform of e^(−σt)x(t), NOT the Fourier transform of the original x(t).';}
+ else if(k==='boundary'){
+   explanation.textContent='At σ = 1, the weighted signal has no exponential damping. The absolute integral diverges.';
+   note.textContent=sine?'Generalised FT: Dirac impulses at ω = −1 and +1, plus principal-value terms. Arrows are symbolic, not a magnitude plot.':'Generalised FT: a Dirac impulse at ω = 0, plus a principal-value term. The arrow is symbolic, not a magnitude plot.';
+ }
+ else{explanation.textContent='The weighting is insufficient and the absolute integral diverges.';
+ note.textContent='Outside ROC: the ordinary Fourier integral is not defined.'}
+ waveAndIntegral();plane();spectrum();}
+function change(v){let previous=sigma;sigma=Math.max(-.25,Math.min(2.4,v));$('sigma').value=sigma;
+ if(previous<=1 && sigma>1)showJoke();
+ else if(previous>1 && sigma<=1)hideJoke();
+ render()}
+
+let jokeTimer=0;
+function hideJoke(){clearTimeout(jokeTimer);$('laplace-joke').classList.remove('show')}
+function showJoke(){clearTimeout(jokeTimer);$('laplace-joke').classList.add('show');jokeTimer=setTimeout(hideJoke,7200)}
+$('close-joke').addEventListener('click',hideJoke);
+
+function timeline(t){if(t<1.4)return 0;if(t<7)return smooth((t-1.4)/5.6);if(t<9.7)return 1;if(t<15.5)return 1+1.15*smooth((t-9.7)/5.8);if(t<18)return 2.15;if(t<22)return 2.15*(1-smooth((t-18)/4));return 0}
+function stop(){playing=false;cancelAnimationFrame(raf);$('play').textContent='▶ Animate'}
+function tick(now){if(!playing)return;change(timeline(((now-started)/1000)%22));raf=requestAnimationFrame(tick)}
+$('play').onclick=()=>{if(playing){stop();return}playing=true;$('play').textContent='Ⅱ Pause';started=performance.now();raf=requestAnimationFrame(tick)};
+$('sigma').oninput=e=>{stop();change(Number(e.target.value))};
+document.querySelectorAll('button[data-s]').forEach(b=>b.onclick=()=>{stop();change(Number(b.dataset.s))});
+window.addEventListener('resize',render);render();
+})();
+</script>
+</body></html>

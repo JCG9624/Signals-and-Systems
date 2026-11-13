@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Interactive series RLC capacitor-voltage response to a sinusoidal input: steady state, switching transient, and initial-condition response, with a static time slider.">
+<title>RLC Capacitor Voltage — Interactive Response</title>
+<style>
+:root{--navy:#133b62;--navy2:#235276;--teal:#008e9a;--orange:#e87528;--purple:#8155b6;--slate:#9aabba;--ink:#1b344a;--muted:#59758b;--line:#dbe6ed;--bg:#f6f9fc;--shadow:0 2px 13px rgba(20,61,96,.045)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.4}
+main{max-width:1420px;margin:auto;padding:25px 27px 40px}
+header{display:flex;gap:20px;justify-content:space-between;align-items:start;margin-bottom:15px}
+h1{font-size:clamp(23px,2.5vw,35px);font-weight:745;color:var(--navy);letter-spacing:-.045em;margin:0 0 5px}
+.eyebrow{color:#5987a3;letter-spacing:.16em;text-transform:uppercase;font-size:11px;font-weight:780;margin-bottom:6px}
+.subtitle{color:var(--muted);font-size:14px;max-width:880px;margin:0}
+.formula{background:#e9f4f9;border:1px solid #d0e8f4;border-radius:12px;padding:12px 16px;font-family:Georgia,"Times New Roman",serif;font-size:21px;color:var(--navy);text-align:center;min-width:315px;white-space:nowrap}
+.orange{color:var(--orange);font-style:italic}.frac{display:inline-flex;align-items:center;flex-direction:column;vertical-align:middle;line-height:1.2;margin:0 .1em}.frac .num{width:100%;border-bottom:1.6px solid currentColor;padding:0 6px 2px}.frac .den{padding:3px 4px 0}
+.panel{background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow)}
+.top-row{display:grid;grid-template-columns:1fr 310px;gap:14px;align-items:stretch;margin-bottom:14px}
+.controls{padding:14px 19px 13px}
+.section-name{font-size:13px;font-weight:785;color:var(--navy);margin:0 0 12px}
+.control-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px 23px}
+.control-head{display:flex;justify-content:space-between;align-items:center;gap:7px;margin-bottom:5px;min-height:32px}
+.control-head label{font-size:12px;color:var(--navy);font-weight:720}
+.number-wrap{display:flex;gap:5px;align-items:center;flex-shrink:0;color:#647f93;font-size:12px}
+.number-wrap input{width:72px;text-align:right;font-size:15px;padding:4px 5px;background:#f8fbfd;border:1px solid #ccdeea;color:var(--navy);border-radius:7px;font-variant-numeric:tabular-nums;font-weight:750}
+input[type=range]{cursor:pointer;width:100%;accent-color:var(--teal);height:18px;margin:0}
+.range-label{display:flex;justify-content:space-between;font-size:10px;color:#91a1af}
+.preset-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:13px;padding-top:11px;border-top:1px solid #edf2f6}
+.preset-title{font-size:11px;font-weight:740;color:#59758d;margin-right:3px}
+.preset{cursor:pointer;border:1px solid #cfdfeb;border-radius:8px;background:#f9fcfe;padding:6px 9px;font-size:11px;color:#245276;font-weight:730}
+.preset:hover,.preset:focus-visible{background:#e8f4f8;outline-color:#1b89b3}
+.preset.active{background:#e8f3f8;border-color:#95c8db}
+.statbar{display:flex;flex-wrap:wrap;gap:6px 11px;align-items:center;margin-top:10px}
+.stat{font-size:11px;color:#627f90}.stat b{color:var(--navy);font-weight:800;font-variant-numeric:tabular-nums}
+.regime{font-weight:780;font-size:11px;color:#174e6b;background:#e7f3f9;border-radius:7px;padding:4px 8px}
+.schematic{padding:13px 14px;display:flex;align-items:center;flex-direction:column;justify-content:center;gap:4px}
+.schematic svg{width:100%;max-width:278px;height:auto}
+.schematic-caption{font-size:11px;color:#5e7890;text-align:center}
+.chart-card{overflow:hidden}
+.chart-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:7px;padding:13px 21px 4px}
+.chart-head h2{font-size:15px;color:var(--navy);font-weight:780;margin:0}
+.chart-head span{font-size:11px;color:#8597a5}
+.legend{display:flex;gap:9px 18px;flex-wrap:wrap;align-items:center;padding:3px 21px 7px}
+.legend label{font-size:12px;color:#34546e;display:inline-flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.legend input{width:14px;height:14px;margin:0;accent-color:var(--teal)}
+.swatch{width:26px;height:0;display:inline-block;border-top:3px solid var(--color)}
+.swatch.dashed{border-top-style:dashed}.swatch.dotted{border-top-style:dotted}
+.chart-svg{display:block;width:100%;height:auto;background:#fff;touch-action:pan-y;cursor:crosshair}
+.chart-sep{height:1px;background:#eaf0f5;margin:3px 20px}
+.bottom-row{border-top:1px solid #e9f0f4;margin:0 20px;padding:10px 0 12px;display:flex;align-items:center;gap:13px;flex-wrap:wrap}
+.bottom-row label{font-size:12px;color:#526f86;font-weight:730;white-space:nowrap}
+.bottom-row input{min-width:170px;flex:1;max-width:650px}
+.time-read{color:var(--navy);font-variant-numeric:tabular-nums;font-size:13px;font-weight:790;min-width:71px}
+.bottom-hint{font-size:11px;color:#8398a8}
+.readouts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:0 20px 16px}
+.readout{border:1px solid #e4edf2;border-left:4px solid var(--color);padding:8px 10px 9px;border-radius:9px;background:#fbfdfe;min-width:0}
+.readout .key{font-size:11px;color:#648091;min-height:15px}.readout .value{font-size:18px;font-weight:775;color:var(--navy);font-variant-numeric:tabular-nums;letter-spacing:-.04em;white-space:nowrap}
+.equations{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.eqcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 16px 15px}
+.eqcard h3{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--navy);margin:0 0 7px;font-weight:780}
+.eqdot{width:9px;height:9px;display:inline-block;border-radius:50%;background:var(--color)}
+.eqtext{font-family:Georgia,"Times New Roman",serif;font-size:17px;color:#284d6c;overflow-wrap:break-word}
+.eqsub{font-size:11px;color:#6c8597;margin-top:5px}
+.explanation{font-size:13px;color:#637e8f;padding:13px 3px 3px}.explanation b{color:var(--navy)}
+footer{margin-top:14px;color:#8296a7;font-size:11px}
+@media(max-width:1040px){.top-row{grid-template-columns:1fr}.schematic{display:none}.control-grid{gap:13px}.formula{min-width:unset}}
+@media(max-width:680px){main{padding:13px 11px 28px}header{flex-direction:column;gap:12px}.control-grid{grid-template-columns:1fr 1fr}.controls{padding:13px 12px}.legend{padding:3px 12px 7px;gap:8px}.chart-head{padding:12px 12px 3px}.readouts{grid-template-columns:repeat(2,minmax(0,1fr));margin:0 11px 12px}.bottom-row{margin:0 11px}.equations{grid-template-columns:1fr}.formula{font-size:18px}}
+@media(max-width:420px){.control-grid{grid-template-columns:1fr}.readouts{grid-template-columns:1fr 1fr}.readout .value{font-size:16px}}
+</style>
+</head>
+<body>
+<main>
+<header>
+ <div><div class="eyebrow">Signals &amp; Systems · series RLC circuit</div><h1>Sinusoidal response of a series RLC circuit</h1><p class="subtitle">Output: capacitor voltage. Adjust the frequency, R, L, C and initial conditions to explore oscillatory, critically damped and overdamped responses. The full curves update immediately; use the static slider to inspect any instant.</p></div>
+ <div class="formula"><span class="orange">H</span>(s) = <span class="frac"><span class="num">1</span><span class="den">LCs² + RCs + 1</span></span></div>
+</header>
+<div class="top-row">
+<section class="panel controls" aria-label="RLC circuit parameters">
+ <h2 class="section-name">Parameters and initial conditions</h2>
+ <div class="control-grid">
+  <div><div class="control-head"><label for="freq">Input frequency</label><span class="number-wrap"><input id="freqNum" type="number" min="0.2" max="12" step="0.05" value="1.50"><span>Hz</span></span></div><input id="freq" type="range" min="0.2" max="12" step="0.05" value="1.50"><div class="range-label"><span>0.2 Hz</span><span>12 Hz</span></div></div>
+  <div><div class="control-head"><label for="res">Resistance R</label><span class="number-wrap"><input id="resNum" type="number" min="0.1" max="120" step="any" value="3"><span>Ω</span></span></div><input id="res" type="range" min="0.1" max="120" step="any" value="3"><div class="range-label"><span>0.1 Ω</span><span>120 Ω</span></div></div>
+  <div><div class="control-head"><label for="ind">Inductance L</label><span class="number-wrap"><input id="indNum" type="number" min="0.1" max="1.5" step="0.01" value="0.4"><span>H</span></span></div><input id="ind" type="range" min="0.1" max="1.5" step="0.01" value="0.4"><div class="range-label"><span>0.10 H</span><span>1.50 H</span></div></div>
+  <div><div class="control-head"><label for="cap">Capacitance C</label><span class="number-wrap"><input id="capNum" type="number" min="2" max="80" step="0.5" value="15"><span>mF</span></span></div><input id="cap" type="range" min="2" max="80" step="0.5" value="15"><div class="range-label"><span>2 mF</span><span>80 mF</span></div></div>
+  <div><div class="control-head"><label for="vc">Initial capacitor voltage</label><span class="number-wrap"><input id="vcNum" type="number" min="-2" max="2" step="0.05" value="0.45"><span>V</span></span></div><input id="vc" type="range" min="-2" max="2" step="0.05" value="0.45"><div class="range-label"><span>−2 V</span><span>+2 V</span></div></div>
+  <div><div class="control-head"><label for="il">Initial inductor current</label><span class="number-wrap"><input id="ilNum" type="number" min="-0.3" max="0.3" step="0.01" value="0"><span>A</span></span></div><input id="il" type="range" min="-0.3" max="0.3" step="0.01" value="0"><div class="range-label"><span>−0.3 A</span><span>+0.3 A</span></div></div>
+ </div>
+ <div class="preset-row"><span class="preset-title">Damping examples:</span><button class="preset" type="button" data-zeta="0.3">Underdamped</button><button class="preset" type="button" data-zeta="1">Critical damping</button><button class="preset" type="button" data-zeta="2">Overdamped</button><span class="stat" style="margin-left:auto">Input amplitude: <b>1 V</b></span></div>
+ <div class="statbar"><span class="regime" id="regime">Underdamped</span><span class="stat">ζ = <b id="zetaStat">0.290</b></span><span class="stat">Natural frequency fₙ = <b id="fnStat">2.055 Hz</b></span><span class="stat">Critical resistance R<sub>crit</sub> = <b id="rcritStat">10.328 Ω</b></span><span class="stat">|H(jω)| = <b id="gainStat">0.000</b></span><span class="stat">Phase = <b id="phaseStat">0°</b></span></div>
+</section>
+<section class="panel schematic" aria-label="Series RLC schematic, capacitor-voltage output">
+ <div class="section-name" style="align-self:start;margin:0">Series RLC · capacitor output</div>
+ <svg viewBox="0 0 310 200" role="img" aria-label="Sinusoidal voltage source connected in series to a resistor and inductor, then a capacitor to ground. Output measured across capacitor.">
+ <g fill="none" stroke="#1e4b70" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M24 62 L24 82 M24 122 L24 165 L263 165 L263 130"/><circle cx="24" cy="102" r="20"/>
+ <path d="M24 62 H57 l7 -8 12 16 12 -16 12 16 12 -16 9 8 H139"/>
+ <path d="M139 62 C139 45,151 45,151 62 C151 45,163 45,163 62 C163 45,175 45,175 62 C175 45,187 45,187 62 H263 V93"/>
+ <path d="M245 96 H281 M245 109 H281 M263 109 V130"/>
+ <path d="M11 102 Q17 90 24 102 T37 102" stroke="#e87528"/>
+ <path d="M245 170 H281 M251 176 H275 M257 182 H269" stroke="#7291a8" stroke-width="2"/>
+ </g>
+ <g font-size="15" font-family="system-ui,Arial,sans-serif" fill="#1c496e" font-weight="650"><text x="83" y="40">R</text><text x="167" y="35">L</text><text x="289" y="106">C</text><text x="4" y="138" font-size="13">u(t)</text><text x="226" y="80" fill="#008e9a">+</text><text x="226" y="140" fill="#008e9a">−</text><text x="207" y="113" fill="#008e9a">v<tspan baseline-shift="sub" font-size="11">C</tspan></text></g>
+ <circle cx="263" cy="62" r="4" fill="#008e9a"/>
+ </svg>
+ <div class="schematic-caption">LC ÿ(t) + RC ẏ(t) + y(t) = u(t)</div>
+</section>
+</div>
+<section class="panel chart-card" aria-label="Capacitor response plots">
+ <div class="chart-head"><h2>Input and capacitor output</h2><span>Curves show the whole time interval · click on a plot to inspect a time</span></div>
+ <div class="legend">
+  <label style="--color:var(--slate)"><input data-series="input" type="checkbox" checked><span class="swatch dotted"></span>Input u(t)</label>
+  <label style="--color:var(--teal)"><input data-series="total" type="checkbox" checked><span class="swatch"></span>Total output v<sub>C</sub>(t)</label>
+  <label style="--color:var(--navy)"><input data-series="steady" type="checkbox" checked><span class="swatch dashed"></span>Steady state</label>
+ </div>
+ <svg id="mainPlot" class="chart-svg" viewBox="0 0 1120 325" role="img" aria-label="Input voltage, capacitor total voltage and steady-state voltage over time"></svg>
+ <div class="chart-sep"></div>
+ <div class="chart-head"><h2>Three additive contributions</h2><span>Transient can oscillate for an underdamped RLC circuit</span></div>
+ <div class="legend">
+  <label style="--color:var(--navy)"><input data-series="steady" type="checkbox" checked><span class="swatch dashed"></span>Steady state</label>
+  <label style="--color:var(--orange)"><input data-series="transient" type="checkbox" checked><span class="swatch"></span>Switching transient</label>
+  <label style="--color:var(--purple)"><input data-series="initial" type="checkbox" checked><span class="swatch"></span>Initial conditions</label>
+ </div>
+ <svg id="partsPlot" class="chart-svg" viewBox="0 0 1120 272" role="img" aria-label="Sinusoidal steady state, switching transient and initial-condition response over time"></svg>
+ <div class="bottom-row"><label for="scrub">Inspect at time</label><input type="range" min="0" max="1000" step="1" value="0" id="scrub"><output id="scrubTime" class="time-read">0.000 s</output><span class="bottom-hint">Static slider — no running-time animation</span><label for="window" style="margin-left:auto">Time window</label><select id="window" style="background:#fff;border:1px solid #d6e5ee;border-radius:7px;padding:5px;color:#284f6f"><option value="2">2 s</option><option value="4" selected>4 s</option><option value="6">6 s</option><option value="10">10 s</option><option value="15">15 s</option></select></div>
+ <div class="readouts" aria-label="Curve values at selected time">
+  <div class="readout" style="--color:var(--slate)"><div class="key">Input u(t)</div><div class="value" id="uRead">0.000 V</div></div>
+  <div class="readout" style="--color:var(--navy)"><div class="key">Steady-state voltage</div><div class="value" id="ssRead">0.000 V</div></div>
+  <div class="readout" style="--color:var(--orange)"><div class="key">Switching transient</div><div class="value" id="trRead">0.000 V</div></div>
+  <div class="readout" style="--color:var(--purple)"><div class="key">Initial-condition response</div><div class="value" id="icRead">0.000 V</div></div>
+  <div class="readout" style="--color:var(--teal)"><div class="key">Total capacitor voltage</div><div class="value" id="yRead">0.000 V</div></div>
+ </div>
+</section>
+<section class="equations" aria-label="Analytical expressions">
+ <div class="eqcard" style="--color:var(--navy)"><h3><span class="eqdot"></span>Sinusoidal steady state</h3><div class="eq">y<sub>ss</sub>(t) = M sin(ωt + φ)</div><div class="eqsub">M = 1/√[(1 − LCω²)² + (RCω)²], &nbsp;φ = −atan2(RCω, 1 − LCω²)</div></div>
+ <div class="eqcard" style="--color:var(--orange)"><h3><span class="eqdot"></span>Switching transient (zero-state)</h3><div class="eq">y<sub>tr</sub>(t) = −y<sub>ss</sub>(0) g<sub>0</sub>(t) − ẏ<sub>ss</sub>(0) g<sub>1</sub>(t)</div><div class="eqsub">Cancels the initial value and initial slope of the sinusoidal particular solution</div></div>
+ <div class="eqcard" style="--color:var(--purple)"><h3><span class="eqdot"></span>Initial-condition response (zero-input)</h3><div class="eq">y<sub>IC</sub>(t) = V<sub>C</sub>(0<sup>−</sup>) g<sub>0</sub>(t) + [i<sub>L</sub>(0<sup>−</sup>)/C] g<sub>1</sub>(t)</div><div class="eqsub">g₀(0) = 1, ġ₀(0) = 0; g₁(0) = 0, ġ₁(0) = 1</div></div>
+ <div class="eqcard" style="--color:var(--teal)"><h3><span class="eqdot"></span>Total capacitor voltage</h3><div class="eq">y(t) = y<sub>ss</sub>(t) + y<sub>tr</sub>(t) + y<sub>IC</sub>(t)</div><div class="eqsub">y(0⁺) = V<sub>C</sub>(0⁻), &nbsp;ẏ(0⁺) = i<sub>L</sub>(0⁻)/C</div></div>
+</section>
+<p class="explanation"><b>What to notice:</b> unlike the RC circuit, the RLC transient can oscillate, and the rate of decay depends on the damping ratio ζ. The <b>switching transient</b> belongs to the response to the input with zero initial conditions; the <b>initial-condition response</b> is the separate response caused by energy already stored in the capacitor and inductor. Both contributions use the same natural modes.</p>
+<footer>Ideal series RLC circuit · u(t) = sin(2πft) V for t ≥ 0 · v<sub>C</sub>(t) is the output · static inspection slider · standalone HTML / JavaScript without external libraries</footer>
+</main>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const NS='http://www.w3.org/2000/svg';
+const clr={input:'#9aabba',total:'#008e9a',steady:'#173b65',transient:'#e87528',initial:'#8155b6'};
+const enabled={input:true,total:true,steady:true,transient:true,initial:true};
+const state={f:1.5,R:3,L:0.4,C:0.015,V0:0.45,I0:0,T:4,t:0};
+const refs=[];
+const paramDefs={freq:{key:'f'},res:{key:'R'},ind:{key:'L'},cap:{key:'C',scale:.001},vc:{key:'V0'},il:{key:'I0'}};
+function svg(tag,props,parent){const el=document.createElementNS(NS,tag); for(const [k,v] of Object.entries(props||{}))el.setAttribute(k,String(v));if(parent)parent.appendChild(el);return el;}
+function text(parent,x,y,value,props={}){const el=svg('text',{x,y,fill:'#607b90','font-size':12,'font-family':'-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif',...props},parent);el.textContent=value;return el;}
+function niceMax(v){const p=Math.pow(10,Math.floor(Math.log10(Math.max(1e-6,v))));const a=[1,1.25,1.5,2,2.5,3,4,5,6,8,10];return (a.find(x=>x*p>=v)||10)*p;}
+function fixed(v,d=3){if(!Number.isFinite(v))return '—';if(Math.abs(v)<0.5*Math.pow(10,-d))v=0;return v.toFixed(d);}
+function model(){
+ const {f,R,L,C,V0,I0}=state, w=2*Math.PI*f,wn=1/Math.sqrt(L*C),alpha=R/(2*L),zeta=alpha/wn;
+ const a=1-L*C*w*w,b=R*C*w,den=Math.hypot(a,b),M=1/den,phase=-Math.atan2(b,a);
+ const yss0=M*Math.sin(phase), yssp0=M*w*Math.cos(phase);
+ let g0,g1;
+ if (zeta<1-1e-6){
+  const wd=Math.sqrt(wn*wn-alpha*alpha);
+  g1=t=>Math.exp(-alpha*t)*Math.sin(wd*t)/wd;
+  g0=t=>Math.exp(-alpha*t)*(Math.cos(wd*t)+alpha*Math.sin(wd*t)/wd);
+ }else if(zeta>1+1e-6){
+  const beta=Math.sqrt(alpha*alpha-wn*wn),r1=-alpha+beta,r2=-alpha-beta,d=r1-r2;
+  g1=t=>(Math.exp(r1*t)-Math.exp(r2*t))/d;
+  g0=t=>(-r2*Math.exp(r1*t)+r1*Math.exp(r2*t))/d;
+ }else{
+  g1=t=>t*Math.exp(-alpha*t);
+  g0=t=>(1+alpha*t)*Math.exp(-alpha*t);
+ }
+ return {w,wn,alpha,zeta,M,phase,yss0,yssp0,g0,g1,values(t){
+  const ss=M*Math.sin(w*t+phase),base0=g0(t),base1=g1(t);
+  const transient=-yss0*base0-yssp0*base1;
+  const initial=V0*base0+(I0/C)*base1;
+  return {input:Math.sin(w*t),steady:ss,transient,initial,total:ss+transient+initial};
+ }};
+}
+let currentModel=model();
+function drawPlot(plotId,series,height){
+ const el=$(plotId);el.replaceChildren(); const W=1120,left=75,right=25,top=16,bottom=42,pw=W-left-right,ph=height-top-bottom;
+ const N=1300,samples=Array.from({length:N+1},(_,i)=>currentModel.values(state.T*i/N));
+ let maximum=0;for(const x of samples)for(const s of series)maximum=Math.max(maximum,Math.abs(x[s]));
+ const ym=niceMax(Math.max(.25,maximum*1.1)),xx=t=>left+pw*t/state.T,yy=v=>top+ph*(ym-v)/(2*ym);
+ svg('rect',{x:left,y:top,width:pw,height:ph,fill:'#fff'},el);
+ for(let i=0;i<=4;i++){const v=ym-i*ym/2,y=yy(v);svg('line',{x1:left,y1:y,x2:left+pw,y2:y,stroke:Math.abs(v)<1e-10?'#aabfcf':'#e8eff4','stroke-width':Math.abs(v)<1e-10?1.5:1},el);text(el,left-10,y+4,fixed(v,ym>=3?1:2),{'text-anchor':'end'});}
+ for(let i=0;i<=8;i++){const t=state.T*i/8,x=xx(t);svg('line',{x1:x,y1:top,x2:x,y2:top+ph,stroke:'#edf2f6'},el);text(el,x,top+ph+21,fixed(t,state.T>=10?1:2),{'text-anchor':'middle'});}
+ svg('line',{x1:left,y1:top,x2:left,y2:top+ph,stroke:'#a6becf','stroke-width':1.2},el);svg('line',{x1:left,y1:top+ph,x2:left+pw,y2:top+ph,stroke:'#a6becf','stroke-width':1.2},el);
+ text(el,W/2,height-5,'Time (s)',{'text-anchor':'middle',fill:'#496d85'});const vl=text(el,19,top+ph/2,'Voltage (V)',{'text-anchor':'middle',fill:'#496d85'});vl.setAttribute('transform',`rotate(-90 19 ${top+ph/2})`);
+ const paths=[],points=[];
+ for(const s of series){
+  const d=samples.map((v,i)=>`${i?'L':'M'}${xx(state.T*i/N).toFixed(2)},${yy(v[s]).toFixed(2)}`).join(' ');
+  const attrs={d,fill:'none',stroke:clr[s],'stroke-width':s==='total'?3.3:2.6,'stroke-linejoin':'round','stroke-linecap':'round'};
+  if(s==='steady')attrs['stroke-dasharray']='10 6';if(s==='input')attrs['stroke-dasharray']='2 7';
+  const path=svg('path',attrs,el),circle=svg('circle',{cx:xx(0),cy:yy(0),r:s==='total'?5.7:4.5,fill:clr[s],stroke:'#fff','stroke-width':2},el);
+  paths.push({s,path});points.push({s,circle});
+ }
+ const cursor=svg('line',{x1:xx(state.t),x2:xx(state.t),y1:top,y2:top+ph,stroke:'#6689a3','stroke-dasharray':'4 5','stroke-width':1.7},el);
+ const track=svg('rect',{x:left,y:top,width:pw,height:ph,fill:'transparent','pointer-events':'all'},el);
+ track.addEventListener('click',e=>{const r=el.getBoundingClientRect();const px=(e.clientX-r.left)*W/r.width;state.t=Math.max(0,Math.min(state.T,(px-left)/pw*state.T));updateCursor();});
+ refs.push({paths,points,cursor,xx,yy});
+}
+function redraw(){currentModel=model();refs.length=0;drawPlot('mainPlot',['input','steady','total'],325);drawPlot('partsPlot',['steady','transient','initial'],272);updateCursor();}
+function updateCursor(){
+ const v=currentModel.values(state.t);
+ for(const ref of refs){const x=ref.xx(state.t);ref.cursor.setAttribute('x1',x);ref.cursor.setAttribute('x2',x);
+  for(const p of ref.paths)p.path.setAttribute('visibility',enabled[p.s]?'visible':'hidden');
+  for(const m of ref.points){m.circle.setAttribute('cx',x);m.circle.setAttribute('cy',ref.yy(v[m.s]));m.circle.setAttribute('visibility',enabled[m.s]?'visible':'hidden');}
+ }
+ $('scrub').value=String(Math.round(1000*state.t/state.T));$('scrubTime').textContent=fixed(state.t,3)+' s';
+ for(const [id,key] of [['uRead','input'],['ssRead','steady'],['trRead','transient'],['icRead','initial'],['yRead','total']])$(id).textContent=fixed(v[key])+' V';
+}
+function updateStats(){const m=currentModel;const Rcrit=2*Math.sqrt(state.L/state.C);const label=m.zeta<1-1e-6?'Underdamped':m.zeta>1+1e-6?'Overdamped':'Critically damped';$('regime').textContent=label;$('zetaStat').textContent=fixed(m.zeta);$('fnStat').textContent=fixed(m.wn/(2*Math.PI),2)+' Hz';$('rcritStat').textContent=fixed(Rcrit,2)+' Ω';$('gainStat').textContent=fixed(m.M);$('phaseStat').textContent=fixed(m.phase*180/Math.PI,1)+'°';document.querySelectorAll('[data-zeta]').forEach(btn=>{const z=+btn.dataset.zeta;btn.classList.toggle('active',Math.abs(z-m.zeta)<.005);});}
+function changeParameters(){for(const [id,def] of Object.entries(paramDefs))state[def.key]=Number($(id).value)*(def.scale||1);currentModel=model();updateStats();redraw();}
+for(const [id,def] of Object.entries(paramDefs)){
+ const slider=$(id),num=$(id+'Num');
+ slider.addEventListener('input',()=>{num.value=slider.value;changeParameters();});
+ const numChange=()=>{let n=Number(num.value);if(!Number.isFinite(n))return;n=Math.min(+num.max,Math.max(+num.min,n));if(n!==Number(num.value))num.value=String(n);slider.value=String(n);changeParameters();};
+ num.addEventListener('change',numChange);
+ num.addEventListener('input',()=>{if(num.value!==''&&Number.isFinite(Number(num.value)))numChange();});
+}
+document.querySelectorAll('[data-zeta]').forEach(btn=>btn.addEventListener('click',()=>{
+ const Rcrit=2*Math.sqrt(state.L/state.C), R=Rcrit*Number(btn.dataset.zeta),value=Math.min(120,Math.max(.1,R));
+ $('res').value=String(value);$('resNum').value=fixed(value,4);changeParameters();
+}));
+document.querySelectorAll('[data-series]').forEach(inp=>inp.addEventListener('change',()=>{enabled[inp.dataset.series]=inp.checked;updateCursor();document.querySelectorAll(`[data-series="${inp.dataset.series}"]`).forEach(x=>{x.checked=inp.checked;});}));
+$('window').addEventListener('change',()=>{const prev=state.T;state.T=Number($('window').value);state.t=Math.min(state.t,state.T);redraw();});
+$('scrub').addEventListener('input',()=>{state.t=state.T*Number($('scrub').value)/1000;updateCursor();});
+updateStats();redraw();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Second-order step response and poles</title>
+<style>
+  :root {
+    --ink: #17365d;
+    --accent: #0b7fab;
+    --grid: #d9e0e8;
+    --soft: #f5f8fb;
+    --panel: #ffffff;
+  }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    background: #f3f5f8;
+    color: var(--ink);
+  }
+  .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  h1 {
+    margin: 0 0 8px;
+    font-size: 28px;
+    font-weight: 700;
+  }
+  .subtitle {
+    margin-bottom: 18px;
+    font-size: 16px;
+  }
+  .controls, .info, .plots {
+    background: var(--panel);
+    border: 1px solid #d7dee7;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .controls, .info {
+    padding: 16px 18px;
+    margin-bottom: 16px;
+  }
+  .control-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: center;
+  }
+  .slider-block {
+    flex: 1 1 500px;
+  }
+  label {
+    font-weight: 700;
+    display: block;
+    margin-bottom: 8px;
+  }
+  input[type="range"] {
+    width: 100%;
+  }
+  .zeta-display {
+    font-size: 24px;
+    font-weight: 700;
+    min-width: 120px;
+  }
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px 24px;
+  }
+  .info-item .name {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #55708c;
+    margin-bottom: 4px;
+  }
+  .info-item .value {
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .formula {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8ef;
+    font-size: 17px;
+    line-height: 1.5;
+  }
+  .plots {
+    padding: 14px;
+  }
+  .plot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 18px;
+  }
+  .panel {
+    border: 1px solid #d7dee7;
+    border-radius: 10px;
+    padding: 10px;
+    background: #fff;
+  }
+  .panel h2 {
+    margin: 2px 0 10px;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: #fff;
+  }
+  .foot {
+    font-size: 13px;
+    color: #50657f;
+    margin-top: 10px;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 6px;
+    font-size: 13px;
+  }
+  .key { display: inline-flex; align-items: center; gap: 8px; }
+  .line {
+    width: 22px; height: 0; border-top: 3px solid var(--ink);
+  }
+  .line.grid { border-top-color: #9aa9ba; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Second-order step response</h1>
+  <div class="subtitle">Change the damping ratio and observe the pole locations and the normalised unit-step response.</div>
+
+  <div class="controls">
+    <div class="control-row">
+      <div class="slider-block">
+        <label for="zeta">Damping ratio ζ</label>
+        <input id="zeta" type="range" min="0.00" max="2.50" step="0.01" value="0.50">
+      </div>
+      <div class="zeta-display"><span id="zetaValue">0.50</span></div>
+    </div>
+  </div>
+
+  <div class="info">
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="name">Regime</div>
+        <div class="value" id="regime">Underdamped</div>
+      </div>
+      <div class="info-item">
+        <div class="name">Normalised poles</div>
+        <div class="value" id="polesText">-0.50 ± j0.87</div>
+      </div>
+      <div class="info-item">
+        <div class="name">Peak overshoot</div>
+        <div class="value" id="overshoot">16.3%</div>
+      </div>
+      <div class="info-item">
+        <div class="name">Normalised settling estimate</div>
+        <div class="value" id="settling">≈ 8.00</div>
+      </div>
+    </div>
+    <div class="formula" id="formula"></div>
+  </div>
+
+  <div class="plots">
+    <div class="plot-grid">
+      <div class="panel">
+        <h2>Poles in the normalised complex plane</h2>
+        <canvas id="poleCanvas" width="520" height="360"></canvas>
+        <div class="legend" style="margin-top:8px;">
+          <span class="key"><span class="line" style="border-top: 3px dotted #e87528;"></span>All possible pole locations</span>
+          <span class="key"><span style="color:#0b7fab;font-size:19px;font-weight:bold;line-height:10px;">×</span> Current poles</span>
+        </div>
+        <div class="foot">Horizontal axis: Re{p/ωₙ}, vertical axis: Im{p/ωₙ}.</div>
+      </div>
+      <div class="panel">
+        <h2>Normalised unit-step response</h2>
+        <canvas id="responseCanvas" width="520" height="360"></canvas>
+        <div class="legend">
+          <span class="key"><span class="line"></span>Response y/k</span>
+          <span class="key"><span class="line grid"></span>Final value 1</span>
+        </div>
+        <div class="foot">Horizontal axis: normalised time \(\omega_n t\). Vertical axis: normalised output \(y/k\).</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const zetaSlider = document.getElementById('zeta');
+  const zetaValue = document.getElementById('zetaValue');
+  const regimeEl = document.getElementById('regime');
+  const polesText = document.getElementById('polesText');
+  const overshootEl = document.getElementById('overshoot');
+  const settlingEl = document.getElementById('settling');
+  const formulaEl = document.getElementById('formula');
+  const poleCanvas = document.getElementById('poleCanvas');
+  const responseCanvas = document.getElementById('responseCanvas');
+  const pctx = poleCanvas.getContext('2d');
+  const rctx = responseCanvas.getContext('2d');
+
+  function format(x, digits=2) {
+    return Number(x).toFixed(digits);
+  }
+
+  function stepResponse(x, z) {
+    if (Math.abs(z - 1) < 1e-6) {
+      return 1 - (1 + x) * Math.exp(-x);
+    }
+    if (z < 1) {
+      const beta = Math.sqrt(1 - z*z);
+      return 1 - Math.exp(-z*x) * (Math.cos(beta*x) + (z/beta)*Math.sin(beta*x));
+    }
+    const alpha = Math.sqrt(z*z - 1);
+    return 1 - Math.exp(-z*x) * (Math.cosh(alpha*x) + (z/alpha)*Math.sinh(alpha*x));
+  }
+
+  function getPoles(z) {
+    if (Math.abs(z - 1) < 1e-8) {
+      return [{re:-1, im:0}, {re:-1, im:0}];
+    }
+    if (z < 1) {
+      const b = Math.sqrt(1 - z*z);
+      return [{re:-z, im:b}, {re:-z, im:-b}];
+    }
+    const a = Math.sqrt(z*z - 1);
+    return [{re:-z + a, im:0}, {re:-z - a, im:0}];
+  }
+
+  function getRegime(z) {
+    if (z < 1 - 1e-8) return 'Underdamped';
+    if (Math.abs(z - 1) <= 1e-8) return 'Critically damped';
+    return 'Overdamped';
+  }
+
+  function getOvershoot(z) {
+    if (z <= 0) return '100.0%';
+    if (z >= 1) return '0%';
+    const os = Math.exp(-Math.PI*z / Math.sqrt(1-z*z)) * 100;
+    return format(os,1) + '%';
+  }
+
+  function getSettling(z) {
+    if (z <= 0) return 'No settling';
+    const val = 4 / z;
+    return '≈ ' + format(val,2);
+  }
+
+  function updateFormula(z) {
+    if (Math.abs(z - 1) < 1e-6) {
+      formulaEl.innerHTML = 'Normalised response: <strong>y/k = 1 - (1 + ωₙt)e<sup>−ωₙt</sup></strong>.';
+      return;
+    }
+    if (z < 1) {
+      formulaEl.innerHTML = 'Normalised response: <strong>y/k = 1 − e<sup>−ζωₙt</sup>[cos(ω<sub>d</sub>t) + (ζ/√(1−ζ²)) sin(ω<sub>d</sub>t)]</strong>, with <strong>ω<sub>d</sub> = ωₙ√(1−ζ²)</strong>.';
+      return;
+    }
+    formulaEl.innerHTML = 'Normalised response: <strong>y/k = 1 − e<sup>−ζωₙt</sup>[cosh(ωₙ√(ζ²−1)t) + (ζ/√(ζ²−1)) sinh(ωₙ√(ζ²−1)t)]</strong>.';
+  }
+
+  function clearCanvas(ctx, canvas) {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+  }
+
+  function drawAxes(ctx, canvas, xMin, xMax, yMin, yMax, xLabel, yLabel, gridX, gridY) {
+    const left = 60, right = 18, top = 18, bottom = 42;
+    const w = canvas.width - left - right;
+    const h = canvas.height - top - bottom;
+
+    function X(x) { return left + (x - xMin) / (xMax - xMin) * w; }
+    function Y(y) { return top + h - (y - yMin) / (yMax - yMin) * h; }
+
+    ctx.strokeStyle = '#d9e0e8';
+    ctx.lineWidth = 1;
+    ctx.fillStyle = '#50657f';
+    ctx.font = '12px Arial';
+
+    for (const gx of gridX) {
+      const xx = X(gx);
+      ctx.beginPath(); ctx.moveTo(xx, top); ctx.lineTo(xx, top + h); ctx.stroke();
+      ctx.fillText(gx.toString(), xx - 8, top + h + 18);
+    }
+    for (const gy of gridY) {
+      const yy = Y(gy);
+      ctx.beginPath(); ctx.moveTo(left, yy); ctx.lineTo(left + w, yy); ctx.stroke();
+      ctx.fillText(gy.toString(), 8, yy + 4);
+    }
+
+    ctx.strokeStyle = '#17365d';
+    ctx.lineWidth = 1.2;
+    if (xMin <= 0 && xMax >= 0) {
+      const xx0 = X(0);
+      ctx.beginPath(); ctx.moveTo(xx0, top); ctx.lineTo(xx0, top + h); ctx.stroke();
+    }
+    if (yMin <= 0 && yMax >= 0) {
+      const yy0 = Y(0);
+      ctx.beginPath(); ctx.moveTo(left, yy0); ctx.lineTo(left + w, yy0); ctx.stroke();
+    }
+
+    ctx.fillStyle = '#17365d';
+    ctx.font = '13px Arial';
+    ctx.fillText(xLabel, left + w/2 - 32, canvas.height - 8);
+    ctx.save();
+    ctx.translate(16, top + h/2 + 25);
+    ctx.rotate(-Math.PI/2);
+    ctx.fillText(yLabel, 0, 0);
+    ctx.restore();
+
+    return {X, Y, left, top, w, h};
+  }
+
+  function drawPolePlot(z) {
+    clearCanvas(pctx, poleCanvas);
+    // The leftmost pole at ζ=2.5 is -2.5 - sqrt(2.5²-1) ≈ -4.7913.
+    // Keep the entire root locus visible, including the overdamped branch.
+    const view = drawAxes(
+      pctx, poleCanvas,
+      -5.1, 0.3, -1.65, 1.65,
+      'Real part', 'Imaginary part',
+      [-5,-4,-3,-2,-1,0], [-1.5,-1,-0.5,0,0.5,1,1.5]
+    );
+
+    // Dotted locus of the two poles for every damping ratio in [0,2.5].
+    // Under-damped: p/ωₙ = -ζ ± j sqrt(1-ζ²), on the unit semicircle.
+    // Over-damped:  p/ωₙ = -ζ ± sqrt(ζ²-1), on the negative real axis.
+    pctx.save();
+    pctx.strokeStyle = '#e87528';
+    pctx.lineWidth = 2.5;
+    pctx.setLineDash([2, 6]);
+    pctx.lineCap = 'round';
+
+    for (const sign of [+1, -1]) {
+      pctx.beginPath();
+      for (let i = 0; i <= 250; i++) {
+        const damping = i / 250;
+        const re = -damping;
+        const im = sign * Math.sqrt(Math.max(0, 1 - damping*damping));
+        if (i === 0) pctx.moveTo(view.X(re), view.Y(im));
+        else pctx.lineTo(view.X(re), view.Y(im));
+      }
+      pctx.stroke();
+    }
+
+    for (const sign of [+1, -1]) {
+      pctx.beginPath();
+      for (let i = 0; i <= 300; i++) {
+        const damping = 1 + (2.5 - 1) * i / 300;
+        const re = -damping + sign * Math.sqrt(Math.max(0, damping*damping - 1));
+        if (i === 0) pctx.moveTo(view.X(re), view.Y(0));
+        else pctx.lineTo(view.X(re), view.Y(0));
+      }
+      pctx.stroke();
+    }
+    pctx.restore();
+
+    // Highlight the two poles at the selected ζ.
+    const poles = getPoles(z);
+    pctx.strokeStyle = '#0b7fab';
+    pctx.fillStyle = '#0b7fab';
+    pctx.lineWidth = 2.8;
+    poles.forEach((p, idx) => {
+      const x = view.X(p.re);
+      const y = view.Y(p.im);
+      pctx.beginPath();
+      pctx.moveTo(x-8, y-8); pctx.lineTo(x+8, y+8);
+      pctx.moveTo(x-8, y+8); pctx.lineTo(x+8, y-8);
+      pctx.stroke();
+      pctx.font = 'bold 13px Arial';
+      if (Math.abs(z-1) < 1e-8) {
+        if (idx === 0) pctx.fillText('p₁ = p₂', x + 12, y - 10);
+      } else {
+        pctx.fillText(idx === 0 ? 'p₁' : 'p₂', x + 10, y - 8);
+      }
+    });
+  }
+
+  function drawResponsePlot(z) {
+    clearCanvas(rctx, responseCanvas);
+    const view = drawAxes(
+      rctx, responseCanvas,
+      0, 14, 0, 1.8,
+      'Normalised time  ωₙ t', 'Output  y/k',
+      [0,2,4,6,8,10,12,14], [0,0.5,1.0,1.5]
+    );
+
+    rctx.strokeStyle = '#9aa9ba';
+    rctx.lineWidth = 1.5;
+    rctx.beginPath();
+    rctx.moveTo(view.X(0), view.Y(1));
+    rctx.lineTo(view.X(14), view.Y(1));
+    rctx.stroke();
+
+    rctx.strokeStyle = '#17365d';
+    rctx.lineWidth = 2.5;
+    rctx.beginPath();
+    let first = true;
+    for (let i = 0; i <= 700; i++) {
+      const x = 14 * i / 700;
+      const y = stepResponse(x, z);
+      const px = view.X(x);
+      const py = view.Y(y);
+      if (first) { rctx.moveTo(px, py); first = false; }
+      else rctx.lineTo(px, py);
+    }
+    rctx.stroke();
+  }
+
+  function update() {
+    const z = parseFloat(zetaSlider.value);
+    zetaValue.textContent = format(z,2);
+    regimeEl.textContent = getRegime(z);
+    const poles = getPoles(z);
+
+    if (Math.abs(z - 1) < 1e-8) {
+      polesText.textContent = '-1 (double pole)';
+    } else if (z < 1) {
+      polesText.textContent = `${format(poles[0].re,2)} ± j${format(Math.abs(poles[0].im),2)}`;
+    } else {
+      polesText.textContent = `${format(poles[0].re,2)}, ${format(poles[1].re,2)}`;
+    }
+
+    overshootEl.textContent = getOvershoot(z);
+    settlingEl.textContent = getSettling(z);
+    updateFormula(z);
+    drawPolePlot(z);
+    drawResponsePlot(z);
+  }
+
+  zetaSlider.addEventListener('input', update);
+  update();
+})();
+</script>
+</body>
+</html>

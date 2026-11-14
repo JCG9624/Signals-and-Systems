@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="An interactive Signals and Systems demonstration: choose an initial condition that cancels an unstable natural mode, then test its sensitivity to a small error or disturbance.">
+<title>Unstable system · cancelling the natural response</title>
+<style>
+:root{color-scheme:light;--ink:#142a42;--muted:#53667a;--teal:#087e82;--orange:#c0561d;--blue:#4468a2;--line:#d9e2ea;--pale:#eff7f7;--paper:#fff;--bg:#f3f5f7;--radius:14px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}button,select,input[type=number]{border:1px solid #b5c3d0;border-radius:8px;background:#fff;color:var(--ink)}button{cursor:pointer;padding:9px 13px;font-weight:650;line-height:1.25;min-height:40px}button:hover{background:#eef2f6}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #527acc;outline-offset:3px}button.primary{background:var(--ink);color:white;border-color:var(--ink)}button.primary:hover{background:#254665}button:disabled{opacity:.5;cursor:default}input[type=range]{width:100%;accent-color:var(--teal);cursor:pointer}input[type=number]{width:100%;padding:8px 10px}label{display:block}h1,h2,h3,p{margin:0}h1{font-size:clamp(25px,3vw,38px);line-height:1.17;letter-spacing:-.035em;max-width:940px;font-weight:720}h2{font-size:18px;letter-spacing:-.015em}h3{font-size:15px}small,.small{font-size:13px}main{max-width:1420px;margin:auto;padding:28px 30px 22px}.eyebrow{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);font-weight:750;margin-bottom:9px}.intro{color:var(--muted);margin:10px 0 17px;max-width:920px}.model{display:flex;gap:18px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:14px;margin-bottom:21px}.math{font-family:Cambria,"Times New Roman",serif;font-size:20px;letter-spacing:.005em}.math i{font-style:italic}.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.22;margin:0 3px}.frac>span:first-child{padding:0 5px 3px;border-bottom:1px solid currentColor}.frac>span:last-child{padding:3px 5px 0}.model .tag{font:12px system-ui,sans-serif;border-radius:20px;background:#fff0e9;color:#97491e;padding:5px 11px}.model .separator{height:28px;border-left:1px solid var(--line)}.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}.panel{background:white;border:1px solid var(--line);border-radius:var(--radius)}.display{overflow:hidden}.display-head{padding:18px 20px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.status{font-size:12px;padding:5px 10px;border-radius:20px;background:#fff1e9;color:#98431c;white-space:nowrap;font-weight:650}.status.exact{color:#087377;background:#e6f4f2}.legend{display:flex;gap:17px;flex-wrap:wrap;padding:8px 20px 4px;color:var(--muted);font-size:12px}.legend span{display:inline-flex;align-items:center;gap:6px}.swatch{width:23px;display:inline-block;height:0;border-top:3px solid}.swatch.input{border-color:var(--blue)}.swatch.output{border-color:var(--orange)}.swatch.reference{border-color:var(--teal);border-top-style:dashed}.chart-wrap{position:relative;margin:0 10px}canvas{display:block;width:100%;height:371px}.chart-info{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;padding:0 20px 11px;font-size:12px;color:var(--muted)}.chart-info label{display:flex;gap:7px;align-items:center}.chart-info select{font-size:12px;padding:4px 7px}.note-line{min-height:47px;background:#f6f8fa;border-top:1px solid var(--line);padding:11px 20px;font-size:13px;color:var(--muted)}.note-line strong{color:var(--ink)}.transport{border-top:1px solid var(--line);padding:13px 20px}.transport-row{display:flex;gap:8px;align-items:center}.transport-row .time{margin-left:auto;font-variant-numeric:tabular-nums;font-size:14px;white-space:nowrap}.transport-row select{font-size:13px;padding:6px}.scrub{margin:12px 0 0}.scrub-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}.controls{padding:18px;align-self:start}.control{margin-top:15px;padding-top:14px;border-top:1px solid var(--line)}.control-title{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;gap:10px;font-size:13px;font-weight:650}.control-title output{font-variant-numeric:tabular-nums;color:var(--teal);white-space:nowrap}.range-ends{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}.presets{display:grid;gap:7px;margin:10px 0 4px}.preset{display:flex;align-items:center;justify-content:space-between;text-align:left;font-size:13px;padding:10px}.preset .formula{font:16px Cambria,serif;font-weight:400}.preset.active{border-color:var(--teal);box-shadow:inset 3px 0 var(--teal);background:#eef7f6}.initial-entry{display:flex;align-items:center;gap:9px;font-size:13px;margin-top:11px}.initial-entry input{font-size:14px;min-width:0}.ic-note{margin-top:6px;font-size:11px;color:var(--muted)}.disturb{width:100%;font-size:12px;margin-top:10px;min-height:36px;padding:8px}.reading{margin-top:13px;padding:11px;background:#f1f7f7;border-radius:8px}.reading-top{font-size:10px;font-weight:750;letter-spacing:.09em;text-transform:uppercase;color:var(--teal)}.reading-row{display:flex;justify-content:space-between;margin-top:5px;font-size:13px;gap:12px;font-variant-numeric:tabular-nums}.reading-row span:last-child{font-weight:650}.equation-panel{margin-top:18px;padding:19px 21px}.equation-panel .topline{display:flex;justify-content:space-between;align-items:baseline;gap:15px;flex-wrap:wrap}.equation-large{text-align:center;margin:15px 0 12px;font-size:23px;line-height:1.9}.periodic-label{color:var(--teal)}.natural-label{color:var(--orange)}.equation-sub{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;font-size:18px;margin-bottom:12px}.explanation{max-width:960px;margin:auto;text-align:center;color:var(--muted);font-size:13px}.explanation .math{font-size:16px}details{margin-top:15px;border-top:1px solid var(--line);padding-top:12px}summary{cursor:pointer;font-weight:650;font-size:13px;color:var(--ink);width:fit-content}.decomp{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}.decomp>div{background:#f6f8fa;border-radius:8px;padding:13px}.decomp p{margin-top:6px;font-size:13px;color:var(--muted)}.decomp .math{font-size:18px}.decomp canvas{height:180px}.two-notes{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:18px 1px 0}.two-notes p{font-size:12px;line-height:1.6;color:var(--muted);margin-top:5px}.two-notes h3{font-size:13px}.footer{display:flex;justify-content:space-between;gap:15px;border-top:1px solid var(--line);margin-top:18px;padding-top:12px;font-size:11px;color:var(--muted)}.footer button{font-size:11px;min-height:28px;padding:4px 8px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}[hidden]{display:none!important}
+.display{display:flex;flex-direction:column}.chart-wrap{flex:1;min-height:371px}#wave{position:absolute;inset:0;height:100%}
+@media(min-width:1300px){.chart-wrap{min-height:397px}.layout{grid-template-columns:minmax(0,1fr) 320px}.controls{padding:19px 20px}}
+@media(max-width:900px){main{padding:20px 16px}.layout{grid-template-columns:minmax(0,1fr)}.controls{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:17px}.controls>h2{grid-column:1/-1}.control{margin:0}.controls .initial-control{grid-row:2/5}.reading{margin-top:0}.decomp{grid-template-columns:1fr 1fr}.chart-wrap{min-height:350px}}
+@media(max-width:570px){main{padding:18px 10px}h1{font-size:27px}.intro{font-size:14px}.model{gap:12px}.model .math{font-size:18px}.model .separator{display:none}.display-head{padding:16px 13px 0}.display-head h2{font-size:16px}.status{font-size:10px}.legend{padding:8px 13px 3px;gap:10px;font-size:10px}canvas{height:340px}.chart-wrap{margin:0 3px}.chart-info{padding:0 13px 10px;font-size:11px;gap:7px}.note-line{padding:10px 13px;font-size:12px}.transport{padding:12px 13px}.transport-row{gap:6px}.transport-row button{font-size:12px;padding:8px 9px}.transport-row .time{font-size:12px}.controls{grid-template-columns:1fr;padding:16px}.controls>h2{grid-column:auto}.controls .initial-control{grid-row:auto}.control{padding-top:12px}.equation-panel{padding:17px 13px}.equation-large{font-size:19px}.equation-sub{font-size:16px;gap:12px}.decomp,.two-notes{grid-template-columns:1fr}.decomp .math{font-size:16px}.two-notes{gap:15px}.footer{font-size:10px;align-items:flex-start}.reading{margin:0}.range-ends{font-size:11px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+@media print{body{background:white}main{padding:0;max-width:none}.transport,.controls,.footer button{display:none}.layout{display:block}.two-notes,.equation-panel{break-inside:avoid}.panel{border-color:#aaa}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">Signals &amp; Systems · Initial conditions</div>
+    <h1>Cancel the transient.<br>The system is still unstable.</h1>
+    <p class="intro">A carefully chosen initial condition leaves a pure sinusoid. Change it slightly and the unstable natural response grows exponentially.</p>
+    <div class="model" aria-label="System: derivative of y equals a y plus x; input x is sine of omega t; transfer function H of s equals one over s minus a; a is positive; omega equals two pi f.">
+      <span class="math"><span class="frac"><span>d<i>y</i></span><span>d<i>t</i></span></span> = <i>a y</i> + <i>x</i></span><span class="separator"></span>
+      <span class="math"><i>x</i>(<i>t</i>) = sin(<i>ωt</i>)</span><span class="separator"></span>
+      <span class="math"><i>H</i>(<i>s</i>) = <span class="frac"><span>1</span><span><i>s</i> − <i>a</i></span></span></span>
+      <span class="tag">Unstable pole: s = +a</span><span class="small" style="color:var(--muted)">a &gt; 0 &nbsp; · &nbsp; ω = 2πf &nbsp; · &nbsp; t ≥ 0</span>
+    </div>
+  </header>
+  <div class="layout">
+    <section class="panel display" aria-labelledby="response-title">
+      <div class="display-head"><h2 id="response-title">Input and output</h2><span id="status" class="status">Growing natural response</span></div>
+      <div class="legend"><span><i class="swatch input"></i>Input x(t)</span><span><i class="swatch output"></i>Total output y(t)</span><span><i class="swatch reference"></i>Sinusoidal particular response</span></div>
+      <div class="chart-wrap"><canvas id="wave" role="img" aria-label="Two aligned time plots: the sinusoidal input and the total output compared with the bounded sinusoidal particular response. The unstable exponential appears whenever cancellation is imperfect.">Animated input and output plots. Exact cancellation gives a bounded periodic output; any initial error grows as exp(a t).</canvas></div>
+      <div class="chart-info"><span id="axis-note">Output axis fixed to ±2; values outside it are marked.</span><label for="scale">Output scale <select id="scale"><option value="fixed">Fixed ±2</option><option value="fit">Fit visible output</option></select></label></div>
+      <div class="note-line" id="scenario-note" role="status">With <strong>y(0) = 0</strong>, the zero-state response contains a growing exponential.</div>
+      <div class="transport">
+        <div class="transport-row"><button class="primary" id="play" aria-label="Play animation">Play</button><button id="restart">Restart</button><select id="speed" aria-label="Playback speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select><span class="time" id="time">t = 0.00 s</span></div>
+        <label class="sr-only" for="scrub">Time</label><input class="scrub" id="scrub" type="range" min="0" max="12" step="0.01" value="0"><div class="scrub-labels"><span>0 s</span><span id="duration-end">12 s</span></div>
+      </div>
+    </section>
+    <aside class="panel controls" aria-label="System and initial-condition controls">
+      <h2>Set the experiment</h2>
+      <div class="control initial-control">
+        <div class="control-title">Initial condition</div>
+        <div class="presets" aria-label="Initial condition presets"><button class="preset active" id="zero" aria-pressed="true"><span>1. Start from rest</span><span class="formula">y(0) = 0</span></button><button class="preset" id="exact" aria-pressed="false"><span>2. Exact cancellation</span><span class="formula">y(0) = y₀*</span></button><button class="preset" id="error" aria-pressed="false"><span>3. Add a 1% initial error</span><span class="formula">y₀* + ε</span></button></div>
+        <label class="initial-entry" for="y0"><span style="white-space:nowrap">y(0) =</span><input id="y0" type="number" step="any" value="0" aria-describedby="ic-note"></label>
+        <p class="ic-note" id="ic-note">The 1% error is measured relative to the sinusoidal output amplitude.</p>
+        <button class="disturb" id="disturb">Add a 1% disturbance now</button>
+      </div>
+      <div class="control"><label class="control-title" for="a"><span>Unstable pole a</span><output id="a-value">0.40 s⁻¹</output></label><input type="range" id="a" min="0.1" max="1" step="0.01" value="0.4"><div class="range-ends"><span>0.10 s⁻¹</span><span>1.00 s⁻¹</span></div></div>
+      <div class="control"><label class="control-title" for="f"><span>Input frequency f</span><output id="f-value">0.50 Hz</output></label><input type="range" id="f" min="0.1" max="2" step="0.01" value="0.5"><div class="range-ends"><span>0.10 Hz</span><span>2.00 Hz</span></div></div>
+      <div class="control"><label class="control-title" for="duration"><span>Time window</span><output id="duration-value">12 s</output></label><input type="range" id="duration" min="8" max="30" step="1" value="12"><div class="range-ends"><span>8 s</span><span>30 s</span></div></div>
+      <div class="reading" aria-label="Sinusoidal response measurements"><div class="reading-top">Algebraic value H(j2πf)</div><div class="reading-row"><span>Amplitude ratio</span><span id="gain">0.3158</span></div><div class="reading-row"><span>Phase shift</span><span id="phase">−97.26°</span></div><div class="reading-row"><span>Exact y₀*</span><span id="ic">−0.3132</span></div><div class="reading-row"><span>Natural response now</span><span id="natural">0.3132</span></div></div>
+    </aside>
+  </div>
+  <section class="panel equation-panel" aria-labelledby="cancel-title">
+    <div class="topline"><h2 id="cancel-title">Where the cancellation happens</h2><span class="small" id="coefficient" style="color:var(--muted)">Coefficient of eᵃᵗ: C = +0.3132</span></div>
+    <div class="equation-large math" aria-label="The output equals the sinusoidal particular response plus the initial-condition error times the unstable exponential."><i>y</i>(<i>t</i>) = <span class="periodic-label"><i>y</i><sub>sin</sub>(<i>t</i>)</span> + <span class="natural-label">(<i>y</i>₀ − <i>y</i>₀*)e<sup><i>at</i></sup></span><span id="kick-formula" hidden class="natural-label"> + <span id="kick-symbol">δe<sup>a(t−t<sub>d</sub>)</sup>u(t−t<sub>d</sub>)</span></span></div>
+    <div class="equation-sub math"><span class="periodic-label"><i>y</i><sub>sin</sub>(<i>t</i>) = <span class="frac"><span>−<i>a</i> sin(<i>ωt</i>) − <i>ω</i> cos(<i>ωt</i>)</span><span><i>a</i>² + <i>ω</i>²</span></span></span><span><i>y</i>₀* = <i>y</i><sub>sin</sub>(0) = <span class="frac"><span>−<i>ω</i></span><span><i>a</i>² + <i>ω</i>²</span></span></span></div>
+    <p class="explanation">Set <span class="math"><i>y</i>₀ = <i>y</i>₀*</span> and the coefficient of the unstable mode is exactly zero. The output is then <span class="math"><i>y</i><sub>sin</sub>(<i>t</i>) = |<i>H</i>(j<i>ω</i>)| sin(<i>ωt</i> + ∠<i>H</i>(j<i>ω</i>))</span> from the start.</p>
+    <details id="decomposition"><summary>See how the zero-input and zero-state exponentials cancel</summary><div class="decomp"><div><h3>The two exponential terms</h3><p class="math"><span style="color:var(--blue)">From the input: −<i>y</i>₀* e<sup><i>at</i></sup></span><br><span style="color:var(--orange)">From the initial state: <i>y</i>₀ e<sup><i>at</i></sup></span></p><p>The zero-state response is y<sub>zs</sub>(t) = y<sub>sin</sub>(t) − y₀*e<sup>at</sup>; the zero-input response is y<sub>zi</sub>(t) = y₀e<sup>at</sup>. Only their exponential terms cancel. Each can grow while their sum remains bounded.</p><p id="event-note">No disturbance has been added.</p></div><div><canvas id="modal" role="img" aria-label="Plot of the two exponential terms and their sum, before any disturbance. Opposite terms cancel exactly for the special initial condition.">The exponential driven by the input and the exponential due to the initial state sum to the natural response.</canvas><p class="small">Blue: input term · Orange dashed: initial-state term · Black: sum. Independent vertical scale; disturbance term excluded here.</p></div></div></details>
+  </section>
+  <div class="two-notes"><section><h3>What “frequency response” means here</h3><p>H(jω) gives the gain and phase of this special sinusoidal particular solution. For the causal unstable system, h(t) = e<sup>at</sup>u(t) has no ordinary Fourier transform; its Laplace ROC is Re(s) &gt; a. The value H(jω) is the algebraic evaluation of the rational transfer function, outside that ROC. It is not an attracting steady-state response.</p></section><section><h3>Why feedback is needed in practice</h3><p>Exact cancellation needs exact dynamics and an exact initial state. Initial errors, model errors and disturbances excite the unstable mode. Feedback is used to stabilise the dynamics and maintain the desired behaviour despite these imperfections. The matched initial condition alone does not stabilise the system.</p></section></div>
+  <footer class="footer"><span>Analytical trajectories · No time-stepping error · Self-contained and usable offline</span><button id="fullscreen">Full screen</button></footer>
+</main>
+<script>
+(() => {
+ 'use strict';
+ const $ = id => document.getElementById(id);
+ const state = {a:.4,f:.5,T:12,t:0,y0:0,mode:'zero',playing:false,speed:1,kicks:[]};
+ const colours={ink:'#142a42',muted:'#53667a',grid:'#e4eaf0',teal:'#087e82',orange:'#c0561d',blue:'#4468a2'};
+ const wave=$('wave'), modal=$('modal');
+ let lastFrame=0, lastReadout=0, motionHandle=null;
+ function parameters(){const w=2*Math.PI*state.f,d=state.a**2+w*w,M=1/Math.sqrt(d),ystar=-w/d;return {w,d,M,ystar,phase:Math.atan2(-w,-state.a)*180/Math.PI};}
+ function coefficient(){return state.mode==='exact'?0:state.y0-parameters().ystar;}
+ function sinusoid(t){const p=parameters();return(-state.a*Math.sin(p.w*t)-p.w*Math.cos(p.w*t))/p.d;}
+ function natural(t){let n=coefficient()*Math.exp(state.a*t);for(const k of state.kicks){if(t>=k.t)n+=k.delta*Math.exp(state.a*(t-k.t));}return n;}
+ function output(t){return sinusoid(t)+natural(t);}
+ function fmt(x,n=4){if(Math.abs(x)<1e-13)return '0';if(Math.abs(x)>=1e4||Math.abs(x)<1e-4)return x.toExponential(2).replace('-','−');return x.toFixed(n).replace('-','−');}
+ function signed(x){return x>0?'+'+fmt(x):fmt(x);}
+ function updateReadouts(){
+  const p=parameters();
+  $('a-value').textContent=state.a.toFixed(2)+' s⁻¹';$('f-value').textContent=state.f.toFixed(2)+' Hz';$('duration-value').textContent=state.T+' s';$('duration-end').textContent=state.T+' s';
+  $('gain').textContent=fmt(p.M);$('phase').textContent=fmt(p.phase,2)+'°';$('ic').textContent=fmt(p.ystar);$('natural').textContent=fmt(natural(state.t));
+  $('time').textContent='t = '+state.t.toFixed(2)+' s';$('scrub').value=state.t;
+  $('coefficient').textContent='Coefficient of eᵃᵗ: C = '+signed(coefficient());
+  for(const name of ['zero','exact','error']){$(name).classList.toggle('active',state.mode===name);$(name).setAttribute('aria-pressed',String(state.mode===name));}
+  const clean=coefficient()===0&&state.kicks.length===0;
+  $('status').textContent=clean?'Exact sinusoidal trajectory':'Growing natural response';$('status').classList.toggle('exact',clean);
+  const activeKick=state.kicks.length>0;
+  if(activeKick){const k=state.kicks[state.kicks.length-1];$('scenario-note').innerHTML='<strong>Disturbance added at t = '+k.t.toFixed(2)+' s.</strong> The resulting state error grows as e<sup>a(t−t<sub>d</sub>)</sup>.';}
+  else if(state.mode==='exact'){$('scenario-note').innerHTML='<strong>The unstable mode is cancelled exactly.</strong> The output follows the dashed sinusoid from t = 0; the system remains unstable.';}
+  else if(state.mode==='error'){$('scenario-note').innerHTML='<strong>Initial error: ε = 1% of the sinusoidal amplitude.</strong> Its relative envelope grows to 100% after '+(Math.log(100)/state.a).toFixed(2)+' s.';}
+  else if(state.mode==='zero'){$('scenario-note').innerHTML='With <strong>y(0) = 0</strong>, the zero-state response contains a growing exponential.';}
+  else{$('scenario-note').innerHTML='<strong>Custom initial condition.</strong> The natural response has coefficient C = '+signed(coefficient())+'.';}
+  $('kick-formula').hidden=!activeKick;
+  $('kick-symbol').innerHTML=state.kicks.length>1?'Σ δ<sub>k</sub>e<sup>a(t−t<sub>k</sub>)</sup>u(t−t<sub>k</sub>)':'δe<sup>a(t−t<sub>d</sub>)</sup>u(t−t<sub>d</sub>)';
+  $('event-note').textContent=state.kicks.length?state.kicks.map(k=>'State jump +'+fmt(k.delta)+' at t = '+k.t.toFixed(2)+' s.').join(' '):'No disturbance has been added.';
+  $('disturb').disabled=state.t>=state.T;
+ }
+ function context(canvas){const box=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);const w=Math.max(1,box.width),h=Math.max(1,box.height);if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);}const c=canvas.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);return {c,w,h};}
+ function niceRange(x){if(x<=2)return 2;const power=10**Math.floor(Math.log10(x)),s=x/power;return (s<=2?2:s<=5?5:10)*power;}
+ function labelNumber(n){if(n===0)return '0';return Math.abs(n)>=10000?n.toExponential(0).replace('+',''):Number(n.toPrecision(3)).toString().replace('-','−');}
+ function axes(c,box,range,label,ticks=true){
+  const {x,y,w,h}=box;c.font='11px system-ui';c.lineWidth=1;c.textBaseline='middle';
+  for(let j=0;j<5;j++){const v=range*(1-j/2),yy=y+h*j/4;c.strokeStyle=j===2?'#b7c6d3':colours.grid;c.setLineDash([]);c.beginPath();c.moveTo(x,yy);c.lineTo(x+w,yy);c.stroke();c.fillStyle=colours.muted;c.textAlign='right';c.fillText(labelNumber(v),x-9,yy);}
+  const count=state.T<=16?6:5;c.textAlign='center';
+  for(let j=0;j<=count;j++){const xx=x+w*j/count,t=state.T*j/count;c.strokeStyle=colours.grid;c.beginPath();c.moveTo(xx,y);c.lineTo(xx,y+h);c.stroke();if(ticks){c.fillStyle=colours.muted;c.fillText(Number(t.toFixed(1)).toString(),xx,y+h+16);}}
+  c.fillStyle=colours.ink;c.textAlign='left';c.font='600 12px system-ui';c.fillText(label,x,y-14);
+ }
+ function path(c,box,range,fn,end,color,width=2,dash=[],start=0){
+  c.save();c.beginPath();c.rect(box.x,box.y,box.w,box.h);c.clip();c.strokeStyle=color;c.lineWidth=width;c.setLineDash(dash);c.lineJoin='round';c.lineCap='round';c.beginPath();
+  const samples=Math.max(2,Math.ceil(box.w*(end-start)/state.T*2));
+  for(let i=0;i<=samples;i++){const t=start+(end-start)*i/samples;const xx=box.x+t/state.T*box.w,yy=box.y+box.h/2-fn(t)/range*box.h/2;if(i===0)c.moveTo(xx,yy);else c.lineTo(xx,yy);}c.stroke();c.restore();
+ }
+ function dot(c,box,range,t,v,color,r=3.6){if(Math.abs(v)>range)return;c.fillStyle=color;c.strokeStyle='#fff';c.lineWidth=1.5;c.beginPath();c.arc(box.x+t/state.T*box.w,box.y+box.h/2-v/range*box.h/2,r,0,2*Math.PI);c.fill();c.stroke();}
+ function drawWave(){
+  const {c,w,h}=context(wave);if(w<10)return;const left=w<500?47:59,right=18,top=31,gap=44,bottom=39;const total=h-top-bottom-gap,hi=Math.round(total*.27),ho=total-hi;
+  const inputBox={x:left,y:top,w:w-left-right,h:hi},outBox={x:left,y:top+hi+gap,w:w-left-right,h:ho};
+  let range=2;if($('scale').value==='fit'){let max=1.6;for(let i=0;i<=400;i++)max=Math.max(max,Math.abs(output(state.t*i/400))*1.14);range=niceRange(max);}
+  axes(c,inputBox,1.2,'Input x(t)',false);axes(c,outBox,range,'Output y(t)');
+  c.font='11px system-ui';c.fillStyle=colours.muted;c.textAlign='right';c.fillText('Time t (s)',outBox.x+outBox.w,h-5);
+  path(c,inputBox,1.2,t=>Math.sin(parameters().w*t),state.T,'#e2e9f3',1.3);
+  path(c,inputBox,1.2,t=>Math.sin(parameters().w*t),state.t,colours.blue,2.1);
+  path(c,outBox,range,sinusoid,state.T,'#badbd9',1.7,[5,5]);
+  path(c,outBox,range,sinusoid,state.t,colours.teal,2,[6,5]);
+  // Include one-sided limits at disturbance instants so state jumps are visible.
+  const cuts=[0,...state.kicks.filter(k=>k.t>0&&k.t<state.t).map(k=>k.t),state.t].sort((a,b)=>a-b);
+  for(let i=0;i<cuts.length-1;i++){const start=cuts[i],end=cuts[i+1],before=state.kicks.some(k=>k.t===end)&&end<state.t?Math.max(start,end-1e-9):end;path(c,outBox,range,output,before,colours.orange,2.7,[],start);}
+  for(const k of state.kicks){if(k.t<=state.t){c.save();c.beginPath();c.rect(outBox.x,outBox.y,outBox.w,outBox.h);c.clip();const xx=outBox.x+k.t/state.T*outBox.w;c.setLineDash([2,4]);c.strokeStyle='#a57559';c.lineWidth=1;c.beginPath();c.moveTo(xx,outBox.y);c.lineTo(xx,outBox.y+outBox.h);c.stroke();c.setLineDash([]);c.strokeStyle=colours.orange;c.lineWidth=2.7;c.beginPath();const after=output(k.t),before=after-state.kicks.filter(x=>x.t===k.t).reduce((s,x)=>s+x.delta,0);c.moveTo(xx,outBox.y+outBox.h/2-before/range*outBox.h/2);c.lineTo(xx,outBox.y+outBox.h/2-after/range*outBox.h/2);c.stroke();c.restore();}}
+  const cursor=inputBox.x+state.t/state.T*inputBox.w;c.setLineDash([3,4]);c.strokeStyle='#8295a8';c.lineWidth=1;for(const b of [inputBox,outBox]){c.beginPath();c.moveTo(cursor,b.y);c.lineTo(cursor,b.y+b.h);c.stroke();}c.setLineDash([]);
+  dot(c,inputBox,1.2,state.t,Math.sin(parameters().w*state.t),colours.blue);dot(c,outBox,range,state.t,output(state.t),colours.orange);
+  let clipped=false,firstT=0;for(let j=0;j<=700;j++){const t=state.t*j/700;if(Math.abs(output(t))>range){clipped=true;firstT=t;break;}}
+  if(clipped){const sign=Math.sign(output(firstT)),xx=Math.max(outBox.x+8,Math.min(outBox.x+outBox.w-8,outBox.x+firstT/state.T*outBox.w)),yy=sign>0?outBox.y+3:outBox.y+outBox.h-3;c.fillStyle=colours.orange;c.beginPath();c.moveTo(xx,yy);c.lineTo(xx-5,yy+sign*8);c.lineTo(xx+5,yy+sign*8);c.closePath();c.fill();}
+  $('axis-note').textContent='Output axis: ±'+labelNumber(range)+(clipped?' · Curve leaves the plotted range; y(t) = '+fmt(output(state.t))+'.':'.');
+ }
+ function drawModal(){if(!$('decomposition').open)return;const {c,w,h}=context(modal);if(w<10)return;const p=parameters(),box={x:52,y:23,w:w-67,h:h-56};let max=Math.max(Math.abs(p.ystar),Math.abs(state.y0),Math.abs(coefficient()))*Math.exp(state.a*state.t)*1.12;const range=niceRange(Math.max(2,max));axes(c,box,range,'Exponential terms');path(c,box,range,t=>-p.ystar*Math.exp(state.a*t),state.t,colours.blue,2);path(c,box,range,t=>state.y0*Math.exp(state.a*t),state.t,colours.orange,2,[6,4]);path(c,box,range,t=>coefficient()*Math.exp(state.a*t),state.t,colours.ink,2);}
+ function draw(){drawWave();drawModal();}
+ function setPlaying(value){state.playing=value;$('play').textContent=value?'Pause':'Play';$('play').setAttribute('aria-label',value?'Pause animation':'Play animation');lastFrame=0;if(motionHandle!==null){cancelAnimationFrame(motionHandle);motionHandle=null;}if(value)motionHandle=requestAnimationFrame(frame);}
+ function frame(now){motionHandle=null;if(!state.playing)return;if(lastFrame)state.t=Math.min(state.T,state.t+Math.min((now-lastFrame)/1000,.1)*state.speed);lastFrame=now;draw();if(now-lastReadout>70){updateReadouts();lastReadout=now;}if(state.t>=state.T){setPlaying(false);updateReadouts();return;}motionHandle=requestAnimationFrame(frame);}
+ function restart(){setPlaying(false);state.t=0;state.kicks=[];updateReadouts();draw();}
+ function choose(mode){state.mode=mode;const p=parameters();state.y0=mode==='zero'?0:mode==='exact'?p.ystar:p.ystar+.01*p.M;$('y0').value=String(state.y0);restart();}
+ for(const m of ['zero','exact','error'])$(m).addEventListener('click',()=>choose(m));
+ for(const id of ['a','f'])$(id).addEventListener('input',()=>{state[id]=Number($(id).value);if(state.mode==='custom')restart();else choose(state.mode);});
+ $('duration').addEventListener('input',()=>{state.T=Number($('duration').value);$('scrub').max=state.T;state.t=Math.min(state.t,state.T);if(state.t>=state.T)setPlaying(false);updateReadouts();draw();});
+ $('y0').addEventListener('change',()=>{const v=$('y0').valueAsNumber;if(!Number.isFinite(v)){$('y0').value=String(state.y0);return;}state.y0=v;state.mode='custom';restart();});
+ $('play').addEventListener('click',()=>{if(!state.playing&&state.t>=state.T){state.t=0;state.kicks=[];updateReadouts();}setPlaying(!state.playing);draw();});
+ $('restart').addEventListener('click',restart);
+ $('speed').addEventListener('change',()=>{state.speed=Number($('speed').value);});
+ $('scrub').addEventListener('input',()=>{setPlaying(false);state.t=Number($('scrub').value);updateReadouts();draw();});
+ $('disturb').addEventListener('click',()=>{if(state.t>=state.T)return;state.kicks.push({t:state.t,delta:.01*parameters().M});updateReadouts();draw();});
+ $('scale').addEventListener('change',draw);
+ $('decomposition').addEventListener('toggle',drawModal);
+ $('fullscreen').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch(e){$('fullscreen').textContent='Full screen unavailable';}});
+ document.addEventListener('fullscreenchange',()=>{$('fullscreen').textContent=document.fullscreenElement?'Exit full screen':'Full screen';draw();});
+ document.addEventListener('keydown',e=>{if(e.code==='Space'&&!['INPUT','BUTTON','SELECT','SUMMARY','TEXTAREA'].includes(document.activeElement.tagName)){e.preventDefault();$('play').click();}});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.playing)setPlaying(false);});
+ new ResizeObserver(draw).observe(document.querySelector('.display'));
+ updateReadouts();draw();
+})();
+</script>
+</body>
+</html>

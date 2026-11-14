@@ -92,7 +92,7 @@
   }
   .plot-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
     gap: 18px;
   }
   .panel {
@@ -129,6 +129,15 @@
     width: 22px; height: 0; border-top: 3px solid var(--ink);
   }
   .line.grid { border-top-color: #9aa9ba; }
+  .line.settling { border-top: 2px dashed #e87528; }
+  .band-key {
+    display: inline-block;
+    width: 22px;
+    height: 10px;
+    background: rgba(11,127,171,0.12);
+    border-top: 1px dashed #74aabd;
+    border-bottom: 1px dashed #74aabd;
+  }
 </style>
 </head>
 <body>
@@ -161,11 +170,12 @@
         <div class="value" id="overshoot">16.3%</div>
       </div>
       <div class="info-item">
-        <div class="name">Normalised settling estimate</div>
-        <div class="value" id="settling">≈ 8.00</div>
+        <div class="name">Normalised 2% settling time ωₙTₛ</div>
+        <div class="value" id="settling">≈ 8.08</div>
       </div>
     </div>
     <div class="formula" id="formula"></div>
+    <div class="foot">The 2% settling time is the last entry into the band 0.98–1.02, after which the response stays inside. It is calculated from the response for every damping regime.</div>
   </div>
 
   <div class="plots">
@@ -184,9 +194,11 @@
         <canvas id="responseCanvas" width="520" height="360"></canvas>
         <div class="legend">
           <span class="key"><span class="line"></span>Response y/k</span>
-          <span class="key"><span class="line grid"></span>Final value 1</span>
+          <span class="key"><span class="line grid"></span>Reference level 1</span>
+          <span class="key"><span class="band-key"></span>±2% band</span>
+          <span class="key"><span class="line settling"></span>2% settling time</span>
         </div>
-        <div class="foot">Horizontal axis: normalised time \(\omega_n t\). Vertical axis: normalised output \(y/k\).</div>
+        <div class="foot">Horizontal axis: normalised time ω<sub>n</sub>t. Vertical axis: normalised output y/k. The time axis extends when needed to show settling.</div>
       </div>
     </div>
   </div>
@@ -210,17 +222,85 @@
     return Number(x).toFixed(digits);
   }
 
-  function stepResponse(x, z) {
-    if (Math.abs(z - 1) < 1e-6) {
-      return 1 - (1 + x) * Math.exp(-x);
-    }
+  // BEGIN NUMERICAL MODEL
+  // x = omega_n*t; stepError = 1 - y/k. There is no finite settling at z=0.
+  // Definition: |y/k - 1| <= 0.02 for all subsequent times.
+  // This is the response-based 2% definition, not the approximation 4/z.
+  // Reference: https://www.mathworks.com/help/control/ref/dynamicsystem.stepinfo.html
+  const SETTLING_TOLERANCE = 0.02;
+
+  function stepError(x, z) {
+    if (z === 1) return (1 + x) * Math.exp(-x);
     if (z < 1) {
-      const beta = Math.sqrt(1 - z*z);
-      return 1 - Math.exp(-z*x) * (Math.cos(beta*x) + (z/beta)*Math.sin(beta*x));
+      const beta = Math.sqrt((1 - z) * (1 + z));
+      const angle = beta * x;
+      const sinc = Math.abs(angle) < 1e-4
+        ? 1 - angle*angle/6 + Math.pow(angle,4)/120
+        : Math.sin(angle)/angle;
+      return Math.exp(-z*x) * (Math.cos(angle) + z*x*sinc);
     }
-    const alpha = Math.sqrt(z*z - 1);
-    return 1 - Math.exp(-z*x) * (Math.cosh(alpha*x) + (z/alpha)*Math.sinh(alpha*x));
+    const alpha = Math.sqrt((z - 1) * (z + 1));
+    const slowPole = -1 / (z + alpha);
+    // This exponential form avoids exp(-z*x)*cosh(alpha*x) overflow
+    // and remains well conditioned as the two real poles approach each other.
+    return Math.exp(slowPole*x) *
+      (1 + slowPole/(2*alpha) * Math.expm1(-2*alpha*x));
   }
+
+  function stepResponse(x, z) {
+    return 1 - stepError(x, z);
+  }
+
+  function bisectSettlingCrossing(z, left, right) {
+    // left is outside the band; right is inside. On this bracket the
+    // absolute error decreases monotonically to or through the band.
+    for (let i = 0; i < 80; i++) {
+      const middle = left + (right - left)/2;
+      if (middle === left || middle === right) break;
+      if (Math.abs(stepError(middle,z)) > SETTLING_TOLERANCE) left = middle;
+      else right = middle;
+    }
+    return right;
+  }
+
+  function getSettling(z) {
+    if (z <= 0) return Infinity;
+    if (z >= 1) {
+      // Critical and overdamped step responses rise monotonically to 1.
+      let right = 1;
+      while (stepError(right,z) > SETTLING_TOLERANCE) right *= 2;
+      return bisectSettlingCrossing(z,0,right);
+    }
+    const beta = Math.sqrt((1 - z) * (1 + z));
+    // Error extrema occur at x=n*pi/beta and have magnitude exp(-z*x).
+    // Find the last extremum strictly outside the CLOSED 2% band, then
+    // locate the crossing before the next zero. All later extrema are
+    // inside the band, so a temporary first entry cannot be mistaken for settling.
+    let n = Math.max(0,Math.floor(beta*Math.log(1/SETTLING_TOLERANCE)/(Math.PI*z)));
+    let left = n*Math.PI/beta;
+    if (n > 0 && Math.exp(-z*left) <= SETTLING_TOLERANCE) {
+      n -= 1;
+      left = n*Math.PI/beta;
+    }
+    const right = (n*Math.PI + Math.acos(-z))/beta;
+    return bisectSettlingCrossing(z,left,right);
+  }
+
+  function responseWindow(settlingTime) {
+    const required = Number.isFinite(settlingTime) ? Math.max(14,1.15*settlingTime) : 14;
+    const rough = required/7;
+    const scale = Math.pow(10,Math.floor(Math.log10(rough)));
+    const fraction = rough/scale;
+    const tickStep = scale * (fraction <= 1 ? 1 : fraction <= 2 ? 2 :
+      fraction <= 2.5 ? 2.5 : fraction <= 5 ? 5 : 10);
+    const xMax = Math.ceil(required/tickStep)*tickStep;
+    const ticks = [];
+    for (let i = 0; i <= Math.round(xMax/tickStep); i++) {
+      ticks.push(Number((i*tickStep).toPrecision(10)));
+    }
+    return {xMax,ticks};
+  }
+  // END NUMERICAL MODEL
 
   function getPoles(z) {
     if (Math.abs(z - 1) < 1e-8) {
@@ -235,6 +315,7 @@
   }
 
   function getRegime(z) {
+    if (z === 0) return 'Undamped';
     if (z < 1 - 1e-8) return 'Underdamped';
     if (Math.abs(z - 1) <= 1e-8) return 'Critically damped';
     return 'Overdamped';
@@ -247,13 +328,11 @@
     return format(os,1) + '%';
   }
 
-  function getSettling(z) {
-    if (z <= 0) return 'No settling';
-    const val = 4 / z;
-    return '≈ ' + format(val,2);
-  }
-
   function updateFormula(z) {
+    if (z === 0) {
+      formulaEl.innerHTML = 'Normalised response: <strong>y/k = 1 − cos(ωₙt)</strong>. The oscillation does not decay, so there is no finite settling time.';
+      return;
+    }
     if (Math.abs(z - 1) < 1e-6) {
       formulaEl.innerHTML = 'Normalised response: <strong>y/k = 1 - (1 + ωₙt)e<sup>−ωₙt</sup></strong>.';
       return;
@@ -287,7 +366,8 @@
     for (const gx of gridX) {
       const xx = X(gx);
       ctx.beginPath(); ctx.moveTo(xx, top); ctx.lineTo(xx, top + h); ctx.stroke();
-      ctx.fillText(gx.toString(), xx - 8, top + h + 18);
+      const label = gx.toString();
+      ctx.fillText(label, xx - ctx.measureText(label).width/2, top + h + 18);
     }
     for (const gy of gridY) {
       const yy = Y(gy);
@@ -308,7 +388,7 @@
 
     ctx.fillStyle = '#17365d';
     ctx.font = '13px Arial';
-    ctx.fillText(xLabel, left + w/2 - 32, canvas.height - 8);
+    ctx.fillText(xLabel, left + (w - ctx.measureText(xLabel).width)/2, canvas.height - 8);
     ctx.save();
     ctx.translate(16, top + h/2 + 25);
     ctx.rotate(-Math.PI/2);
@@ -383,28 +463,54 @@
     });
   }
 
-  function drawResponsePlot(z) {
+  function drawResponsePlot(z, settlingTime) {
     clearCanvas(rctx, responseCanvas);
+    const {xMax,ticks} = responseWindow(settlingTime);
+    const peak = z < 1 ? 1 + Math.exp(-Math.PI*z/Math.sqrt(1-z*z)) : 1;
+    const yMax = Math.max(1.8,Math.ceil((peak+0.08)*10)/10);
     const view = drawAxes(
       rctx, responseCanvas,
-      0, 14, 0, 1.8,
+      0, xMax, 0, yMax,
       'Normalised time  ωₙ t', 'Output  y/k',
-      [0,2,4,6,8,10,12,14], [0,0.5,1.0,1.5]
+      ticks, [0,0.5,1.0,1.5,2.0].filter(value => value <= yMax)
     );
+
+    rctx.fillStyle = 'rgba(11,127,171,0.12)';
+    rctx.fillRect(view.X(0),view.Y(1.02),view.w,view.Y(0.98)-view.Y(1.02));
+    rctx.save();
+    rctx.strokeStyle = '#74aabd';
+    rctx.lineWidth = 1;
+    rctx.setLineDash([4,4]);
+    for (const level of [0.98,1.02]) {
+      rctx.beginPath();
+      rctx.moveTo(view.X(0),view.Y(level));
+      rctx.lineTo(view.X(xMax),view.Y(level));
+      rctx.stroke();
+    }
+    if (Number.isFinite(settlingTime)) {
+      rctx.strokeStyle = '#e87528';
+      rctx.lineWidth = 1.5;
+      rctx.beginPath();
+      rctx.moveTo(view.X(settlingTime),view.Y(0));
+      rctx.lineTo(view.X(settlingTime),view.Y(yMax));
+      rctx.stroke();
+    }
+    rctx.restore();
 
     rctx.strokeStyle = '#9aa9ba';
     rctx.lineWidth = 1.5;
     rctx.beginPath();
     rctx.moveTo(view.X(0), view.Y(1));
-    rctx.lineTo(view.X(14), view.Y(1));
+    rctx.lineTo(view.X(xMax), view.Y(1));
     rctx.stroke();
 
     rctx.strokeStyle = '#17365d';
     rctx.lineWidth = 2.5;
     rctx.beginPath();
     let first = true;
-    for (let i = 0; i <= 700; i++) {
-      const x = 14 * i / 700;
+    const samples = Math.max(700,Math.min(20000,Math.ceil(30*xMax/(2*Math.PI))));
+    for (let i = 0; i <= samples; i++) {
+      const x = xMax * i / samples;
       const y = stepResponse(x, z);
       const px = view.X(x);
       const py = view.Y(y);
@@ -429,10 +535,11 @@
     }
 
     overshootEl.textContent = getOvershoot(z);
-    settlingEl.textContent = getSettling(z);
+    const settlingTime = getSettling(z);
+    settlingEl.textContent = Number.isFinite(settlingTime) ? '≈ ' + format(settlingTime,2) : 'No settling';
     updateFormula(z);
     drawPolePlot(z);
-    drawResponsePlot(z);
+    drawResponsePlot(z,settlingTime);
   }
 
   zetaSlider.addEventListener('input', update);
@@ -441,3 +548,4 @@
 </script>
 </body>
 </html>
+

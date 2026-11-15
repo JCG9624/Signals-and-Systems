@@ -6,8 +6,11 @@
 <title>Bode Studio · Poles and zeros</title>
 <style>
 :root{color-scheme:light;--navy:#192e45;--muted:#617187;--teal:#0b7775;--teal-bg:#eaf5f2;--line:#dde4ec;--bg:#f3f5f7;--red:#cb464d;--blue:#3265c8;--white:#fff;--shadow:0 2px 8px #10243d04}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--navy);font:14px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer;border:1px solid #ccd5df;background:#fff;color:var(--navy);border-radius:7px;padding:7px 11px;font-weight:600;min-height:34px;line-height:1.25}button:hover{background:#f0f4f7}button:disabled{opacity:.4;cursor:default}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,canvas:focus-visible{outline:3px solid #699bcf;outline-offset:3px}button.primary{background:var(--teal);border-color:var(--teal);color:white}button.primary:hover{background:#095e5d}button.active{background:var(--teal-bg);border-color:#88bcb1;color:#075f5e}input[type=number],select{border:1px solid #ccd5df;border-radius:6px;background:#fff;color:var(--navy);padding:6px 8px;min-height:33px;min-width:0}input[type=number]{font-variant-numeric:tabular-nums}input[type=checkbox]{accent-color:var(--teal)}h1,h2,h3,p{margin:0}h1{font-size:27px;line-height:1.12;letter-spacing:-.04em;font-weight:750}h2{font-size:15px;font-weight:700;letter-spacing:-.01em}h3{font-size:13px}main{max-width:1536px;margin:auto;padding:21px 25px}.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:16px}.brand{display:flex;align-items:center;gap:13px}.brandmark{background:var(--navy);border-radius:10px;width:43px;height:43px;color:#fff;display:grid;place-items:center;font-size:27px;letter-spacing:-.11em;padding-right:3px}.eyebrow{font-size:9px;letter-spacing:.17em;color:var(--teal);font-weight:750;margin-bottom:5px;text-transform:uppercase}.top-actions{display:flex;align-items:center;gap:7px}.top-actions select{max-width:190px;font-size:12px}.top-actions button{font-size:12px}.top-actions .download{margin-left:4px}.intro{color:var(--muted);font-size:12px;margin-top:6px}.card{border:1px solid var(--line);background:white;border-radius:12px;box-shadow:var(--shadow)}.formula-card{display:flex;align-items:center;gap:19px;padding:13px 18px;margin-bottom:15px}.formula-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;white-space:nowrap}.formula{font:21px/1.2 Cambria,"Times New Roman",serif;display:flex;align-items:center;gap:8px;overflow:auto;min-height:49px;flex:1;padding:1px 0 3px}.formula .frac{display:inline-flex;flex-direction:column;text-align:center;white-space:nowrap}.formula .frac>span:first-child{border-bottom:1px solid var(--navy);padding:0 8px 5px}.formula .frac>span:last-child{padding:5px 8px 0}.formula .factor{display:inline-block;margin:0 2px}.gain-control{border-left:1px solid var(--line);padding-left:18px;display:flex;align-items:center;gap:8px;font-size:12px;white-space:nowrap}.gain-control input{width:88px}.workspace{display:grid;grid-template-columns:minmax(340px,.88fr) minmax(0,1.35fr);gap:15px;align-items:start}.plane-card{overflow:hidden}.card-title{padding:14px 17px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px}.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:650;white-space:nowrap;border-radius:20px;background:#eef2f7;padding:3px 8px;color:#617187}.badge.warn{background:#fff0e7;color:#9c4b22}.badge.axis{background:#fff7d9;color:#81641a}.plane-tools{padding:0 15px 10px}.modes{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.modes button{font-size:12px;min-height:34px;padding:7px 5px}.pole-icon{font-size:20px;line-height:10px;vertical-align:-1px;margin-right:2px;color:#8450bc}.zero-icon{font-size:18px;line-height:10px;vertical-align:-1px;margin-right:2px;color:#09837b}.mode-sub{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;color:var(--muted);font-size:11px}.mode-sub label{display:flex;align-items:center;gap:5px}.mode-sub select{min-height:29px;font-size:11px;padding:3px 6px}.mode-sub .snap{margin-left:auto}.plane-wrap{margin:0 11px;position:relative}.plane-wrap canvas{display:block;width:100%;height:330px;touch-action:none;cursor:grab;border-radius:8px}.plane-wrap canvas.add{cursor:crosshair}.plane-wrap canvas.erase{cursor:crosshair}.plane-footer{display:flex;align-items:center;justify-content:space-between;padding:6px 16px 11px;gap:9px;color:var(--muted);font-size:10px}.zoom{display:flex;gap:4px;align-items:center}.zoom button{font-size:12px;min-height:26px;padding:3px 8px}.zoom span{font-variant-numeric:tabular-nums;min-width:43px;text-align:center}.hint{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#f8fafb;padding:9px 16px;color:var(--muted);font-size:11px;min-height:36px}.factors-title{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 5px}.factors-title span{color:var(--muted);font-size:10px}.factor-list{max-height:169px;overflow:auto;padding:0 9px 7px}.factor-row{display:flex;align-items:center;gap:6px;border:1px solid transparent;border-radius:7px;margin:2px 0;min-height:33px}.factor-row.selected{background:#f0f7f5;border-color:#c6e0d9}.factor-pick{border:0;background:transparent!important;flex:1;display:flex;align-items:center;gap:8px;min-width:0;min-height:31px;padding:5px 7px;text-align:left;font-size:12px}.factor-pick .name{font-weight:700;min-width:20px}.factor-pick .coord{color:var(--muted);font-weight:400;font-family:Cambria,serif;font-size:15px}.factor-pick .cancelled{font-size:9px;color:#936a2c;font-weight:500;margin-left:auto}.factor-row .remove{border:0;background:transparent;color:#758395;padding:4px 8px;min-height:28px;font-size:16px;font-weight:400}.color-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}.inspector{background:#f8fafb;padding:12px 15px;border-top:1px solid var(--line)}.inspector-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}.inspector-head span{font-size:10px;color:var(--muted)}.coordinates{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}.coordinates label{font-size:10px;color:var(--muted);display:flex;flex-direction:column;gap:4px}.coordinates input{width:100%;font-size:12px;background:white}.coordinates button{font-size:11px;min-height:33px;padding:6px 8px}.factor-details{color:var(--muted);font-size:11px;line-height:1.6;margin-top:8px;font-variant-numeric:tabular-nums}.plot-card{overflow:hidden}.plots-head{padding:14px 18px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px}.view-switch{display:flex;border:1px solid var(--line);border-radius:7px;padding:2px;gap:2px}.view-switch button{border:0;font-size:11px;min-height:27px;padding:5px 9px;font-weight:600}.view-switch button.active{background:var(--navy);color:#fff}.plot-legend{display:flex;flex-wrap:wrap;gap:13px;padding:0 18px 7px;align-items:center;font-size:11px;color:var(--muted);min-height:24px}.plot-legend span{display:flex;align-items:center;gap:6px}.line{width:23px;display:inline-block;height:0;border-top:2px solid}.line.exact{border-color:var(--red)}.line.asym{border-color:var(--blue);border-top-style:dashed}.plot-legend #view-caption{margin-left:auto;font-size:10px}.chart{position:relative;margin:0 9px}.chart canvas{display:block;width:100%;height:224px;touch-action:pan-y}.chart-label{padding:5px 18px 0;font-size:11px;font-weight:700;color:#384c63;display:flex;align-items:center;justify-content:space-between}.chart-label span{font-size:10px;font-weight:400;color:var(--muted)}.chart-rule{border-top:1px solid #edf0f4;margin:0 17px}.factor-legend{display:flex;gap:8px;flex-wrap:wrap;padding:3px 18px 7px;max-height:59px;overflow:auto}.factor-legend:empty{display:none}.factor-chip{font-size:10px;border:0;min-height:22px;padding:2px 6px;background:#f2f5f8;font-weight:500;display:flex;gap:4px;align-items:center}.hover-readout{padding:6px 18px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;min-height:29px;background:#fafbfc;border-top:1px solid #edf0f4}.frequency-bar{display:flex;align-items:end;gap:10px;padding:11px 17px;border-top:1px solid var(--line);background:#f8fafb}.frequency-bar label{display:flex;flex-direction:column;gap:3px;font-size:10px;color:var(--muted)}.frequency-bar input{width:91px;font-size:12px}.frequency-bar button{font-size:11px;min-height:32px;padding:6px 10px}.frequency-bar .units{font-size:10px;color:var(--muted);padding-bottom:8px;margin-right:auto}.notes{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:15px 2px 0;color:var(--muted);font-size:11px}.notes strong{color:#3c5268;font-weight:650}.notes p{margin-top:4px;line-height:1.65}.note-title{font-size:11px;font-weight:650;color:#425b70}.bottom{display:flex;justify-content:space-between;gap:12px;color:#7c8897;font-size:10px;padding:14px 1px 2px}.bottom button{font-size:10px;min-height:23px;padding:3px 6px}.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);padding:10px 16px;border-radius:9px;background:var(--navy);color:#fff;font-size:12px;z-index:5;box-shadow:0 4px 20px #18304b22;max-width:90vw}.toast[hidden]{display:none}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}[hidden]{display:none!important}
+.gain-settings{border-left:1px solid var(--line);padding-left:18px;flex:0 0 195px;min-width:0}.gain-settings .gain-control{border:0;padding:0;justify-content:space-between}.gain-control input:disabled{background:#f1f5f7;color:#53687b;opacity:1}.dc-lock-control{display:flex;align-items:center;gap:6px;margin:7px 0 3px;font-size:11px;cursor:pointer}.dc-lock-control input{margin:0}.dc-readout{font-size:11px;color:var(--teal);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.dc-status{font-size:10px;color:#925623;margin-top:4px;line-height:1.45}.dc-readout.warn{color:#925623}
+@media(max-width:480px){.gain-settings{flex-basis:145px;padding-left:10px}.dc-lock-control,.dc-readout{font-size:10px}.gain-settings .gain-control input{width:75px}}
 .analysis-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 17px;border-bottom:1px solid var(--line);background:#f8fafb}.analysis-nav h2{font-size:14px}.analysis-nav .view-switch button{font-size:11px}.time-head{padding:15px 18px 10px}.time-head p{color:var(--muted);font-size:11px;margin-top:3px}.time-controls{display:flex;align-items:end;flex-wrap:wrap;gap:9px;padding:0 17px 13px}.time-controls label{display:flex;flex-direction:column;gap:4px;font-size:10px;color:var(--muted)}.time-controls input{width:90px;font-size:12px}.time-controls select{font-size:12px;min-width:127px}.time-controls button{font-size:11px;min-height:33px}.time-controls .auto-duration{display:flex;flex-direction:row;align-items:center;gap:5px;margin-left:auto;min-height:32px}.time-chart canvas{height:365px}.time-status{padding:10px 18px;border-top:1px solid var(--line);color:var(--muted);background:#f8fafb;font-size:11px;min-height:53px}.time-status.warn{background:#fff7ed;color:#925623}.both-views #time-panel{border-top:2px solid var(--line)}.both-views .time-chart canvas{height:275px}.time-input-formula{padding:0 18px 9px;color:#435d75;font:16px Cambria,"Times New Roman",serif}.time-legend{padding-bottom:8px}.time-chart.empty canvas{opacity:.45}.time-empty{position:absolute;inset:25px 35px 45px 70px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;color:#617187;line-height:1.7;pointer-events:none}.time-chart:not(.empty) .time-empty{display:none}
 .time-controls input[type=checkbox]{width:auto;min-height:0}.both-views .chart canvas{height:170px}.both-views .time-chart canvas{height:250px}
+.time-scale-controls{padding-top:10px;border-top:1px solid #edf0f4;background:#fafbfc}.time-controls .auto-amplitude{flex-direction:row;align-items:center;gap:5px;min-height:33px}.scale-help{flex:1 1 155px;align-self:center;color:var(--muted);font-size:10px;line-height:1.5}
 @media(max-width:1050px){.analysis-nav{padding:11px 12px;flex-wrap:wrap}.time-controls{padding-left:13px;padding-right:13px;gap:7px}.time-controls input{width:80px}.time-controls .auto-duration{margin-left:0}.time-controls input[type=checkbox]{width:auto}}
 @media(max-width:480px){.analysis-nav{gap:7px}.analysis-nav h2{font-size:13px}.analysis-nav .view-switch button{font-size:10px;padding:5px 7px}.time-chart canvas{height:310px}.time-controls select{min-width:118px}.time-controls input{width:77px}}
 @media(min-width:1450px){.plane-wrap canvas{height:365px}.chart canvas{height:241px}}
@@ -28,7 +31,12 @@
   </header>
   <section class="card formula-card" aria-label="Current transfer function">
     <div class="formula-label">Transfer function</div><div class="formula" id="formula" aria-live="polite" aria-label="H of s equals 9 times the product of 1 zero factors divided by 1 pole factors."><i>H</i>(s) = 9 × <span class="frac"><span><span class="factor">(s + 1)</span></span><span><span class="factor">(s² + 1.2s + 9)</span></span></span></div>
-    <label class="gain-control" for="gain">Gain K <input id="gain" type="number" step="any" value="9" aria-describedby="gain-description"></label>
+    <div class="gain-settings">
+      <label class="gain-control" for="gain">Gain K <input id="gain" type="number" step="any" value="9" aria-describedby="gain-description" title="Constant factor K"></label>
+      <label class="dc-lock-control" for="dc-lock" title="Keep the current signed H(0) as roots change."><input id="dc-lock" type="checkbox" aria-describedby="dc-readout dc-status">Keep DC gain</label>
+      <div class="dc-readout" id="dc-readout" aria-live="polite">H(0) = 1</div>
+      <div class="dc-status" id="dc-status" role="status" hidden=""></div>
+    </div>
     <span id="gain-description" class="sr-only">The factor gain K is not generally the DC gain. Negative and zero gains are supported.</span>
   </section>
   <div class="workspace">
@@ -69,9 +77,15 @@
           <label for="time-duration">Duration (s)<input id="time-duration" type="number" min="0.00001" step="any" value="12"></label>
           <label class="auto-duration" for="time-auto"><input id="time-auto" type="checkbox" checked=""> Auto duration</label>
         </div>
+        <div class="time-controls time-scale-controls" role="group" aria-label="Time plot amplitude limits">
+          <label for="amplitude-min">Amplitude min<input id="amplitude-min" type="number" step="any" value="-1" aria-describedby="amplitude-scale-help"></label>
+          <label for="amplitude-max">Amplitude max<input id="amplitude-max" type="number" step="any" value="1" aria-describedby="amplitude-scale-help"></label>
+          <label class="auto-amplitude" for="amplitude-auto"><input id="amplitude-auto" type="checkbox" checked="" aria-describedby="amplitude-scale-help"> Auto amplitude scale</label>
+          <span class="scale-help" id="amplitude-scale-help">Edit a limit to fix the vertical axis.</span>
+        </div>
         <div class="time-input-formula" id="input-formula">x(t) = 1 u(t)</div>
         <div class="plot-legend time-legend"><span><i class="line exact"></i>Output y(t)</span><span><i class="line asym"></i>Input x(t)</span></div>
-        <div class="chart-label">Amplitude <span>linear time axis</span></div>
+        <div class="chart-label">Amplitude <span id="time-scale-caption">auto amplitude · linear time axis</span></div>
         <div class="chart time-chart" id="time-chart"><canvas id="time-response" role="img" aria-label="Time-domain input and total output with zero initial conditions. Output is red and input is dashed blue." width="1741" height="482">Input and output versus time in seconds.</canvas><div class="time-empty" id="time-empty"></div></div>
         <div class="hover-readout" id="time-readout">Move over the time plot to inspect the input and output.</div>
         <div class="time-status" id="time-status" role="status">Input applied at t = 0; all initial conditions are zero.</div>
@@ -85,12 +99,16 @@
   <footer class="bottom"><span>Real roots stay on the axis · pairs are mirrored automatically · Delete removes a selection · Esc selects Move</span><button id="fullscreen">Full screen</button></footer>
 </main>
 <div class="toast" id="toast" role="status" hidden=""></div>
-<script type="application/json" id="initial-model">{"gain":9,"domain":5,"min":0.01,"max":100,"roots":[{"id":1,"kind":"pole","form":"pair","re":-0.6,"im":2.939387691339814},{"id":2,"kind":"zero","form":"real","re":-1,"im":0}],"analysis":"time","time":{"input":"step","amplitude":1,"omega":1,"duration":12,"auto":true}}</script>
+<script type="application/json" id="initial-model">{"gain":9,"domain":5,"min":0.01,"max":100,"roots":[{"id":1,"kind":"pole","form":"pair","re":-0.6,"im":2.939387691339814},{"id":2,"kind":"zero","form":"real","re":-1,"im":0}],"analysis":"time","time":{"input":"step","amplitude":1,"omega":1,"duration":12,"auto":true},"timeScale":{"auto":true,"min":-1,"max":1},"dcLock":false,"dcTarget":null}</script>
 <script id="bode-math">
 (function(root){
   'use strict';
   var log10=Math.log10, PI=Math.PI, EPS=1e-10;
   function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+  function stepCoordinate(value,delta){
+    var next=value+delta,tolerance=64*Number.EPSILON*Math.max(Math.abs(value),Math.abs(delta));
+    return Math.abs(next)<=tolerance?0:Number(next.toPrecision(15));
+  }
   function factor(g,w){
     var sign=g.kind==='zero'?1:-1, mag,phase,ma,pa;
     if(g.form==='real'){
@@ -121,6 +139,35 @@
     roots.forEach(function(p){if(p.kind!=='pole'||removed.has(p.id))return;var z=roots.find(function(z){return z.kind==='zero'&&!removed.has(z.id)&&same(p,z);});if(z){removed.add(p.id);removed.add(z.id);}});
     return {roots:roots.filter(function(g){return !removed.has(g.id);}),cancelled:removed};
   }
+  function dcFactor(roots){
+    var groups=reduce(roots).roots,sign=1,logAbs=0,originZero=false,originPole=false;
+    groups.forEach(function(g){
+      var exponent=g.kind==='zero'?1:-1;
+      if(g.form==='real'){
+        if(g.re===0){if(exponent===1)originZero=true;else originPole=true;return;}
+        sign*=Math.sign(-g.re);logAbs+=exponent*Math.log(Math.abs(g.re));
+      }else logAbs+=exponent*2*Math.log(Math.hypot(g.re,g.im));
+    });
+    return {kind:originPole?'pole':originZero?'zero':'finite',sign:sign,logAbs:logAbs};
+  }
+  function dcGain(roots,k){
+    if(k===0)return {kind:'finite',value:0};
+    var f=dcFactor(roots);
+    if(f.kind==='pole')return {kind:'undefined',reason:'An uncancelled pole at the origin makes H(0) undefined.'};
+    if(f.kind==='zero')return {kind:'finite',value:0};
+    var value=Math.sign(k)*f.sign*Math.exp(Math.log(Math.abs(k))+f.logAbs);
+    if(!Number.isFinite(value)||value===0)return {kind:'range',reason:'H(0) is outside the supported numerical range.'};
+    return {kind:'finite',value:value};
+  }
+  function gainForDC(roots,target,currentK){
+    var f=dcFactor(roots);
+    if(target===0)return {ok:true,value:f.kind==='zero'?currentK:0};
+    if(f.kind==='pole')return {ok:false,reason:'A pole at the origin makes H(0) undefined. Move it away to resume the lock.'};
+    if(f.kind==='zero')return {ok:false,reason:'A zero at the origin forces H(0) = 0 for finite K. Move it away to resume the lock.'};
+    var value=Math.sign(target)*f.sign*Math.exp(Math.log(Math.abs(target))-f.logAbs);
+    if(!Number.isFinite(value)||value===0||Math.abs(value)>1e100)return {ok:false,reason:'The required K is outside the supported numerical range. Adjust the roots to resume the lock.'};
+    return {ok:true,value:value};
+  }
   function total(roots,k,w){if(k===0)return gain(0);var v=gain(k);roots.forEach(function(g){var f=factor(g,w);v.mag+=f.mag;v.ma+=f.ma;v.phase+=f.phase;v.pa+=f.pa;});return v;}
   function frequencies(roots,min,max,n){
     var lo=log10(min),hi=log10(max),a=[];
@@ -133,7 +180,7 @@
     });
     return Array.from(new Set(a)).sort(function(a,b){return a-b;});
   }
-  root.BodeMath={factor:factor,gain:gain,reduce:reduce,total:total,frequencies:frequencies,clamp:clamp};
+  root.BodeMath={factor:factor,gain:gain,reduce:reduce,total:total,frequencies:frequencies,clamp:clamp,stepCoordinate:stepCoordinate,dcGain:dcGain,gainForDC:gainForDC};
 })(typeof globalThis!=='undefined'?globalThis:this);
 </script>
 <script id="time-math">
@@ -243,15 +290,15 @@
   var $=function(id){return document.getElementById(id);}, M=BodeMath;
   var palette=['#7756b6','#168c82','#b07627','#477ab6','#bd5e8d','#6b8e35','#b86e52','#6c71ad'];
   var initial=JSON.parse($('initial-model').textContent);
-  var state={roots:initial.roots,gain:initial.gain,domain:initial.domain,min:initial.min,max:initial.max,selected:initial.roots.length?initial.roots[0].id:'gain',mode:'move',form:'pair',snap:false,view:'total',analysis:initial.analysis||'time',time:Object.assign({input:'step',amplitude:1,omega:1,duration:12,auto:true},initial.time||{})};
-  var nextId=state.roots.reduce(function(n,g){return Math.max(n,g.id+1);},1),past=[],future=[],drag=null,planeBox=null,plotBoxes={},cache=null,hover=null,toastTimer=0,renderPending=false,timeCache=null,timeKey='',timeBox=null,timeHover=null;
+  var state={roots:initial.roots,gain:initial.gain,domain:initial.domain,min:initial.min,max:initial.max,selected:initial.roots.length?initial.roots[0].id:'gain',mode:'move',form:'pair',snap:false,view:'total',analysis:initial.analysis||'time',time:Object.assign({input:'step',amplitude:1,omega:1,duration:12,auto:true},initial.time||{}),timeScale:Object.assign({auto:true,min:-1,max:1},initial.timeScale||{}),dcLock:initial.dcLock===true&&Number.isFinite(initial.dcTarget),dcTarget:Number.isFinite(initial.dcTarget)?initial.dcTarget:null};
+  var nextId=state.roots.reduce(function(n,g){return Math.max(n,g.id+1);},1),past=[],future=[],drag=null,rootEdit=null,planeBox=null,plotBoxes={},cache=null,hover=null,toastTimer=0,renderPending=false,timeCache=null,timeKey='',timeBox=null,timeHover=null,dcNotice='';
   function num(n,d){if(!Number.isFinite(n))return Number.isNaN(n)?'undefined':n>0?'+∞':'−∞';if(n===0)return '0';if(Math.abs(n)>=1e4||Math.abs(n)<.001)return n.toExponential(2).replace('-','−');return Number(n.toFixed(d===undefined?3:d)).toString().replace('-','−');}
   function plain(n){return Number(n.toPrecision(8)).toString();}
   function name(g){return (g.kind==='pole'?'P':'Z')+g.id;}
   function color(g){return palette[(g.id-1)%palette.length];}
   function selected(){return state.roots.find(function(g){return g.id===state.selected;})||null;}
   function coord(g){return num(g.re)+(g.form==='pair'?' ± j'+num(g.im):'');}
-  function snapshot(){return JSON.stringify({roots:state.roots,gain:state.gain,domain:state.domain,min:state.min,max:state.max,selected:state.selected,nextId:nextId,time:state.time,analysis:state.analysis});}
+  function snapshot(){return JSON.stringify({roots:state.roots,gain:state.gain,domain:state.domain,min:state.min,max:state.max,selected:state.selected,nextId:nextId,time:state.time,timeScale:state.timeScale,analysis:state.analysis,dcLock:state.dcLock,dcTarget:state.dcTarget});}
   function remember(before){past.push(before||snapshot());if(past.length>80)past.shift();future=[];}
   function restore(s){var v=JSON.parse(s);Object.assign(state,v);nextId=v.nextId;render();}
   function message(t){$('toast').textContent=t;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(function(){$('toast').hidden=true;},2800);}
@@ -288,8 +335,8 @@
     }
     $('selected-title').textContent=name(g)+' · '+(g.kind==='pole'?'Pole':'Zero')+(g.form==='pair'?' pair':'');
     $('selected-form').textContent=g.form==='pair'?'Conjugate roots':'Real root';
-    if(document.activeElement!==$('root-real'))$('root-real').value=plain(g.re);
-    if(document.activeElement!==$('root-imag'))$('root-imag').value=g.form==='pair'?plain(g.im):'0';
+    if(document.activeElement!==$('root-real'))$('root-real').value=String(g.re);
+    if(document.activeElement!==$('root-imag'))$('root-imag').value=g.form==='pair'?String(g.im):'0';
     $('root-imag').disabled=g.form!=='pair';
     var text='';
     if(g.form==='pair'){
@@ -330,6 +377,7 @@
     if(document.activeElement!==$('input-amplitude'))$('input-amplitude').value=plain(settings.amplitude);
     if(document.activeElement!==$('input-omega'))$('input-omega').value=plain(settings.omega);
     if(document.activeElement!==$('time-duration'))$('time-duration').value=plain(timeCache.duration||settings.duration);
+    renderTimeScale();
     var labels={step:'Step response',impulse:'Impulse response',ramp:'Ramp response',sine:'Sinusoidal response'},a=num(settings.amplitude),expression=settings.input==='step'?'u(t)':settings.input==='impulse'?'δ(t)':settings.input==='ramp'?'t u(t)':'sin('+num(settings.omega)+'t) u(t)';
     $('time-title').textContent=labels[settings.input];
     $('input-formula').textContent='x(t) = '+a+' '+expression;
@@ -343,13 +391,27 @@
       else if(timeCache.axis)notes.push('Imaginary-axis poles can produce persistent oscillations or growing responses.');
       if(timeCache.limited)notes.push('Auto duration is limited to resolve the fastest oscillations.');
       if(timeCache.truncated)notes.push('Curve stopped at t = '+num(timeCache.stopTime)+' s because it exceeds the numerical range. Shorten the duration.');
+      if(!state.timeScale.auto&&timeCache.input.concat(timeCache.output).some(function(y){return y<state.timeScale.min||y>state.timeScale.max;}))notes.push('Some values are outside the fixed amplitude limits.');
     }
-    $('time-status').textContent=notes.join(' ');$('time-status').className='time-status'+(timeCache.error||timeCache.unstable||timeCache.truncated?' warn':'');
+    if(dcNotice)notes.push(dcNotice);
+    $('time-status').textContent=notes.join(' ');$('time-status').className='time-status'+(timeCache.error||timeCache.unstable||timeCache.truncated||dcNotice?' warn':'');
     updateTimeReadout();
   }
   function render(){
     if(state.selected!=='gain'&&!selected())state.selected=state.roots.length?state.roots[0].id:'gain';
+    var lock=state.dcLock?M.gainForDC(state.roots,state.dcTarget,state.gain):null;
+    if(lock&&lock.ok)state.gain=lock.value;
     calculate();renderFormula();renderList();renderInspector();
+    var dc=M.dcGain(state.roots,state.gain),rootScale=state.roots.reduce(function(n,g){return Math.max(n,Math.hypot(g.re,g.im));},1);
+    var nearOrigin=state.dcLock&&lock.ok&&Math.abs(state.gain)>1e10&&state.roots.some(function(g){return g.kind==='zero'&&g.form==='real'&&g.re!==0&&Math.abs(g.re)<64*Number.EPSILON*rootScale;});
+    dcNotice=state.dcLock&&!lock.ok?'DC-gain lock paused. Target H(0) = '+num(state.dcTarget,5)+'. '+lock.reason:nearOrigin?'A zero is extremely close to the origin. Preserving H(0) requires a very large K, so the transient can dominate the plot.':'';
+    var warning=state.dcLock?!lock.ok||nearOrigin:dc.kind!=='finite';
+    $('gain').disabled=state.dcLock;$('gain').title=state.dcLock?'K adjusts automatically to preserve the locked H(0).':'Constant factor K';
+    $('dc-lock').checked=state.dcLock;$('dc-lock').disabled=!state.dcLock&&dc.kind!=='finite';
+    $('dc-lock').parentElement.title=state.dcLock?'Clear to edit K manually.':dc.kind==='finite'?'Keep the current signed H(0) as roots change.':dc.reason;
+    $('dc-readout').textContent='H(0) = '+(dc.kind==='finite'?num(dc.value,5):dc.kind==='undefined'?'undefined':'out of range')+(state.dcLock?(lock.ok?' · locked':' · lock paused'):'');
+    $('dc-readout').className='dc-readout'+(warning?' warn':'');
+    $('dc-status').hidden=!warning;$('dc-status').textContent=dcNotice|| (warning?dc.reason:'');
     $('undo').disabled=!past.length;$('redo').disabled=!future.length;$('clear').disabled=!state.roots.length;
     document.querySelectorAll('[data-mode]').forEach(function(b){var active=b.dataset.mode===state.mode;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
     document.querySelectorAll('[data-view]').forEach(function(b){var active=b.dataset.view===state.view;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
@@ -446,15 +508,28 @@
     if(!cache.primary.values.some(function(v){return Number.isFinite(v[field]);})){c.fillStyle='#6f8193';c.textAlign='center';c.font='12px system-ui';c.fillText(field==='phase'?'Phase undefined (K = 0)':'Zero transfer function: magnitude −∞ dB',box.x+box.w/2,box.y+box.h/2);}
     if(hover!==null&&hover>=state.min&&hover<=state.max){var xx=box.x+(Math.log10(hover)-lo)/(hi-lo)*box.w;c.strokeStyle='#90a1b3';c.lineWidth=1;c.setLineDash([3,4]);c.beginPath();c.moveTo(xx,box.y);c.lineTo(xx,box.y+box.h);c.stroke();c.setLineDash([]);var val=getPrimary(hover)[field];if(Number.isFinite(val)&&val>=range.min&&val<=range.max){c.fillStyle='#cb464d';c.beginPath();c.arc(xx,box.y+(range.max-val)/(range.max-range.min)*box.h,3.2,0,2*Math.PI);c.fill();}}
   }
-  function drawTime(){
-    var v=setup($('time-response')),c=v.c,w=v.w,h=v.h,box={x:w<460?59:66,y:16,w:w-(w<460?77:84),h:h-54},data=timeCache;
+  function timeAmplitudeBounds(){
+    if(!state.timeScale.auto)return {low:state.timeScale.min,high:state.timeScale.max};
+    var data=timeCache;
     var values=data&&!data.error?data.input.concat(data.output):[0,1],min=Math.min(0,Math.min.apply(null,values)),max=Math.max(0,Math.max.apply(null,values)),span=max-min;
     if(span<1e-12){min-=1;max+=1;span=2;}
     var step=nice(span*1.12/5),low=Math.floor((min-span*.04)/step)*step,high=Math.ceil((max+span*.04)/step)*step;
+    return {low:low,high:high};
+  }
+  function renderTimeScale(){
+    var bounds=timeAmplitudeBounds();
+    $('amplitude-auto').checked=state.timeScale.auto;
+    $('amplitude-min').value=plain(bounds.low);$('amplitude-max').value=plain(bounds.high);
+    $('amplitude-scale-help').textContent=state.timeScale.auto?'Edit a limit to fix the vertical axis.':'Fixed while poles, zeros and inputs change.';
+    $('time-scale-caption').textContent=(state.timeScale.auto?'auto':'fixed')+' amplitude · linear time axis';
+  }
+  function drawTime(){
+    var v=setup($('time-response')),c=v.c,w=v.w,h=v.h,box={x:w<460?59:66,y:16,w:w-(w<460?77:84),h:h-54},data=timeCache,bounds=timeAmplitudeBounds(),low=bounds.low,high=bounds.high,step=nice((high-low)/5)||(high-low);
     var duration=data&&data.duration||state.time.duration,px=function(t){return box.x+t/duration*box.w;},py=function(y){return box.y+(high-y)/(high-low)*box.h;};
     timeBox={x:box.x,y:box.y,w:box.w,h:box.h,duration:duration,low:low,high:high};
     c.font='10px system-ui';c.textBaseline='middle';c.lineWidth=1;
-    for(var y=low;y<=high+step*1e-6;y+=step){c.strokeStyle=Math.abs(y)<step*1e-6?'#b7c6d3':'#e5ebf0';c.beginPath();c.moveTo(box.x,py(y));c.lineTo(box.x+box.w,py(y));c.stroke();c.fillStyle='#6d7e91';c.textAlign='right';c.fillText(num(y,2),box.x-9,py(y));}
+    var firstTick=Math.ceil(low/step)*step;
+    for(var tick=0;tick<8;tick++){var y=firstTick+tick*step;if(y>high+step*1e-6)break;c.strokeStyle=Math.abs(y)<step*1e-6?'#b7c6d3':'#e5ebf0';c.beginPath();c.moveTo(box.x,py(y));c.lineTo(box.x+box.w,py(y));c.stroke();c.fillStyle='#6d7e91';c.textAlign='right';c.fillText(num(y,4),box.x-9,py(y));}
     var tstep=nice(duration/6);
     for(var t=0;t<=duration+tstep*1e-6;t+=tstep){c.strokeStyle='#e5ebf0';c.beginPath();c.moveTo(px(t),box.y);c.lineTo(px(t),box.y+box.h);c.stroke();c.fillStyle='#6d7e91';c.textAlign='center';c.fillText(num(t,3),px(t),box.y+box.h+16);}
     c.fillStyle='#7a8998';c.textAlign='right';c.fillText('t (s)',box.x+box.w,h-5);
@@ -466,7 +541,7 @@
     c.restore();c.setLineDash([]);
     if(data.impulse){
       function arrow(area,col,x){
-        if(area===0)return;var base=py(0),tip=base+(area>0?-1:1)*Math.min(65,box.h*.3);tip=Math.max(box.y+15,Math.min(box.y+box.h-15,tip));
+        if(area===0)return;var base=M.clamp(py(0),box.y,box.y+box.h),tip=base+(area>0?-1:1)*Math.min(65,box.h*.3);tip=Math.max(box.y+15,Math.min(box.y+box.h-15,tip));
         c.strokeStyle=col;c.fillStyle=col;c.lineWidth=2;c.beginPath();c.moveTo(x,base);c.lineTo(x,tip);c.stroke();var direction=tip<base?1:-1;c.beginPath();c.moveTo(x-4,tip+direction*7);c.lineTo(x,tip);c.lineTo(x+4,tip+direction*7);c.stroke();
       }
       arrow(state.time.amplitude,'#3265c8',box.x+2);
@@ -516,14 +591,53 @@
   $('input-amplitude').addEventListener('change',editTime);$('input-omega').addEventListener('change',editTime);
   $('time-duration').addEventListener('change',function(){var value=$('time-duration').valueAsNumber;if(!Number.isFinite(value)||value<1e-5||value>1e5){message('Use a duration between 1e−5 and 1e5 seconds.');$('time-duration').value=plain(timeCache&&timeCache.duration||state.time.duration);return;}remember();state.time.auto=false;state.time.duration=value;render();});
   $('time-auto').addEventListener('change',function(){remember();state.time.auto=$('time-auto').checked;if(!state.time.auto&&timeCache&&timeCache.duration)state.time.duration=timeCache.duration;render();});
+  function editTimeScale(){
+    var low=$('amplitude-min').valueAsNumber,high=$('amplitude-max').valueAsNumber;
+    if(!Number.isFinite(low)||!Number.isFinite(high)||Math.abs(low)>1e100||Math.abs(high)>1e100||high<=low){message('Use finite amplitude limits with min < max and magnitudes at most 1e100.');renderTimeScale();return;}
+    remember();state.timeScale={auto:false,min:low,max:high};render();
+  }
+  $('amplitude-min').addEventListener('change',editTimeScale);$('amplitude-max').addEventListener('change',editTimeScale);
+  $('amplitude-auto').addEventListener('change',function(){var bounds=timeAmplitudeBounds();remember();state.timeScale={auto:$('amplitude-auto').checked,min:bounds.low,max:bounds.high};render();});
   $('time-response').addEventListener('pointermove',function(e){if(!timeBox||!timeCache||timeCache.error)return;var r=$('time-response').getBoundingClientRect(),x=e.clientX-r.left;if(x<timeBox.x||x>timeBox.x+timeBox.w)return;timeHover=(x-timeBox.x)/timeBox.w*timeBox.duration;drawTime();updateTimeReadout();});
   $('time-response').addEventListener('pointerleave',function(){timeHover=null;if(state.analysis!=='frequency')drawTime();updateTimeReadout();});
   $('form').addEventListener('change',function(){state.form=$('form').value;render();});$('snap').addEventListener('change',function(){state.snap=$('snap').checked;});
   $('factor-list').addEventListener('click',function(e){var rem=e.target.closest('[data-remove]');if(rem){remove(Number(rem.dataset.remove));return;}var p=e.target.closest('[data-select]');if(p){state.selected=p.dataset.select==='gain'?'gain':Number(p.dataset.select);state.mode='move';render();}});
   $('factor-legend').addEventListener('click',function(e){var b=e.target.closest('[data-inspect]');if(!b)return;state.selected=b.dataset.inspect==='gain'?'gain':Number(b.dataset.inspect);state.view='selected';render();});
-  function editRoot(){var g=selected();if(!g)return;var re=$('root-real').valueAsNumber,im=$('root-imag').valueAsNumber;if(!Number.isFinite(re)||g.form==='pair'&&!Number.isFinite(im)){message('Enter finite root coordinates.');render();return;}re=M.clamp(re,-1e4,1e4);im=g.form==='pair'?M.clamp(Math.abs(im),.0001,1e4):0;if(re===g.re&&im===g.im)return;remember();g.re=re;g.im=im;render();}
-  $('root-real').addEventListener('change',editRoot);$('root-imag').addEventListener('change',editRoot);$('remove-selected').addEventListener('click',function(){if(selected())remove(state.selected);});
-  $('gain').addEventListener('change',function(){var v=$('gain').valueAsNumber;if(!Number.isFinite(v)||Math.abs(v)>1e100){message('Enter a finite gain with magnitude at most 1e100.');$('gain').value=plain(state.gain);return;}remember();state.gain=v;render();});
+  function beginRootEdit(field){
+    var g=selected();if(!g)return null;
+    if(!rootEdit||rootEdit.id!==g.id||rootEdit.field!==field.id)rootEdit={id:g.id,field:field.id,before:snapshot(),remembered:false};
+    return rootEdit;
+  }
+  function editRoot(field){
+    var edit=beginRootEdit(field);if(!edit)return;
+    var g=state.roots.find(function(g){return g.id===edit.id;}),key=field.id==='root-real'?'re':'im',value=field.valueAsNumber;
+    if(!Number.isFinite(value)){field.setAttribute('aria-invalid','true');return;}
+    field.removeAttribute('aria-invalid');
+    value=key==='re'?M.clamp(value,-1e4,1e4):g.form==='pair'?M.clamp(Math.abs(value),.0001,1e4):0;
+    if(value===g[key])return;
+    if(!edit.remembered){remember(edit.before);edit.remembered=true;}
+    g[key]=value;render();
+  }
+  function finishRootEdit(field){
+    var valid=Number.isFinite(field.valueAsNumber);editRoot(field);
+    var g=selected();if(g)field.value=String(field.id==='root-real'?g.re:g.im);
+    field.removeAttribute('aria-invalid');rootEdit=null;
+    if(!valid)message('Enter a finite root coordinate. The last valid value has been restored.');
+    render();
+  }
+  ['root-real','root-imag'].forEach(function(id){var field=$(id);
+    field.addEventListener('focus',function(){beginRootEdit(field);});
+    field.addEventListener('input',function(){editRoot(field);});
+    field.addEventListener('change',function(){finishRootEdit(field);});
+    field.addEventListener('blur',function(){finishRootEdit(field);});
+    field.addEventListener('keydown',function(e){
+      if(e.key==='Enter'){e.preventDefault();finishRootEdit(field);}
+      else if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();var g=selected();if(!g)return;var value=Number.isFinite(field.valueAsNumber)?field.valueAsNumber:field.id==='root-real'?g.re:g.im,next=M.stepCoordinate(value,(e.key==='ArrowUp'?1:-1)*(e.shiftKey?1:.1));field.value=String(field.id==='root-real'?M.clamp(next,-1e4,1e4):M.clamp(next,.0001,1e4));editRoot(field);}
+    });
+  });
+  $('remove-selected').addEventListener('click',function(){if(selected())remove(state.selected);});
+  $('gain').addEventListener('change',function(){if(state.dcLock)return;var v=$('gain').valueAsNumber;if(!Number.isFinite(v)||Math.abs(v)>1e100){message('Enter a finite gain with magnitude at most 1e100.');$('gain').value=plain(state.gain);return;}remember();state.gain=v;render();});
+  $('dc-lock').addEventListener('change',function(){var enabled=$('dc-lock').checked,dc=M.dcGain(state.roots,state.gain);if(enabled&&dc.kind!=='finite'){message(dc.reason);render();return;}remember();state.dcLock=enabled;if(enabled)state.dcTarget=dc.value;render();});
   $('undo').addEventListener('click',function(){if(!past.length)return;future.push(snapshot());restore(past.pop());});
   $('redo').addEventListener('click',function(){if(!future.length)return;past.push(snapshot());restore(future.pop());});
   $('clear').addEventListener('click',function(){if(!state.roots.length)return;remember();state.roots=[];state.selected='gain';render();});
@@ -543,14 +657,14 @@
     empty:{gain:1,roots:[]}
   };
   $('preset').addEventListener('change',function(){var key=$('preset').value,p=presets[key];if(!p)return;remember();state.gain=p.gain;state.roots=p.roots.map(function(g){return {id:nextId++,kind:g[0],form:g[1],re:g[2],im:g[3]};});state.domain=5;state.min=.01;state.max=100;state.selected=state.roots.length?state.roots[0].id:'gain';state.mode='move';hover=null;$('preset').value='';render();});
-  $('download').addEventListener('click',function(){var clone=document.documentElement.cloneNode(true),data={gain:state.gain,domain:state.domain,min:state.min,max:state.max,roots:state.roots,analysis:state.analysis,time:state.time};clone.querySelector('#initial-model').textContent=JSON.stringify(data);clone.querySelector('#toast').hidden=true;var blob=new Blob(['<!doctype html>\n'+clone.outerHTML],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Bode_Pole_Zero_Explorer.html';a.click();setTimeout(function(){URL.revokeObjectURL(url);},2000);message('Downloaded a self-contained HTML tool with this model and input.');});
+  $('download').addEventListener('click',function(){var clone=document.documentElement.cloneNode(true),data={gain:state.gain,domain:state.domain,min:state.min,max:state.max,roots:state.roots,analysis:state.analysis,time:state.time,timeScale:state.timeScale,dcLock:state.dcLock,dcTarget:state.dcTarget};clone.querySelector('#initial-model').textContent=JSON.stringify(data);clone.querySelector('#toast').hidden=true;var blob=new Blob(['<!doctype html>\n'+clone.outerHTML],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Bode_Pole_Zero_Explorer.html';a.click();setTimeout(function(){URL.revokeObjectURL(url);},2000);message('Downloaded a self-contained HTML tool with this model and input.');});
   $('fullscreen').addEventListener('click',async function(){try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch(e){message('Full screen is unavailable in this view.');}});
   document.addEventListener('fullscreenchange',function(){$('fullscreen').textContent=document.fullscreenElement?'Exit full screen':'Full screen';render();});
-  document.addEventListener('keydown',function(e){if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName))return;if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();$(e.shiftKey?'redo':'undo').click();}else if(e.key==='Escape'){state.mode='move';render();}else if((e.key==='Delete'||e.key==='Backspace')&&selected()){e.preventDefault();remove(state.selected);}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)&&document.activeElement===$('plane')&&selected()){e.preventDefault();var g=selected(),delta=e.shiftKey?1:.1;remember();if(e.key==='ArrowLeft')g.re-=delta;if(e.key==='ArrowRight')g.re+=delta;if(g.form==='pair'&&e.key==='ArrowUp')g.im+=delta;if(g.form==='pair'&&e.key==='ArrowDown')g.im=Math.max(.0001,g.im-delta);render();}});
+  document.addEventListener('keydown',function(e){if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName))return;if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();$(e.shiftKey?'redo':'undo').click();}else if(e.key==='Escape'){state.mode='move';render();}else if((e.key==='Delete'||e.key==='Backspace')&&selected()){e.preventDefault();remove(state.selected);}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)&&document.activeElement===$('plane')&&selected()){e.preventDefault();var g=selected(),delta=e.shiftKey?1:.1;remember();if(e.key==='ArrowLeft')g.re=M.stepCoordinate(g.re,-delta);if(e.key==='ArrowRight')g.re=M.stepCoordinate(g.re,delta);if(g.form==='pair'&&e.key==='ArrowUp')g.im=M.stepCoordinate(g.im,delta);if(g.form==='pair'&&e.key==='ArrowDown')g.im=Math.max(.0001,M.stepCoordinate(g.im,-delta));render();}});
   new ResizeObserver(function(){if(cache)paint();}).observe(document.querySelector('.workspace'));
   render();
 })();
 </script>
-<script type="module">import { mountAutoSiteWidget } from "/_sites/dispatch-assets/sites-widget.js";mountAutoSiteWidget({"kind":"auto","toolbarOrigin":null,"viewerRemixEnabled":false,"invitationBanner":true,"mobileEnabled":false,"environment":"production","chatgptOrigin":"https://chatgpt.com","locale":"en-US","accountId":"personal","projectId":"appgprj_6af86f46aea881918928498dffcfa0f1","projectTitle":"Bode Studio — Poles and Zeros"});</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5a705d9cad4218d',t:'MTc5NDY2OTg2Mw=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5a705d9cad4218d',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; visibility: hidden;"></iframe>
+<script type="module">import { mountAutoSiteWidget } from "/_sites/dispatch-assets/sites-widget.js";mountAutoSiteWidget({"kind":"auto","toolbarOrigin":null,"viewerRemixEnabled":false,"invitationBanner":true,"mobileEnabled":false,"environment":"production","chatgptOrigin":"https://chatgpt.com","locale":"en-US","accountId":"personal","projectId":"appgprj_6af86f46aea881918928498dffcfa0f1","projectTitle":"Bode Studio — Poles and Zeros"});</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5ad690f09e729c7',t:'MTc5NDczNjg0Mg=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5ad690f09e729c7',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; visibility: hidden;"></iframe>
 
 <div data-sites-widget="editor-composer" popover="manual"></div></body><div id="aiFabShadowRoot" data-fab-type="react" style="opacity: 1;"></div><grammarly-desktop-integration data-grammarly-shadow-root="true" style="visibility: visible !important;"></grammarly-desktop-integration></html>

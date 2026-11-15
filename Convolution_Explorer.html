@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#163a4a">
+<meta name="description" content="Explore continuous-time convolution with step, pulse, sinusoidal and exponential inputs, and integrator, RC and RLC systems.">
+<title>Convolution Studio · Signals &amp; Systems</title>
+<style>:root{--ink:#19384a;--muted:#60788b;--line:#dce6eb;--bg:#f3f7f8;--teal:#07837b;--teal-dark:#006a64;--magenta:#a84681;--coral:#d16a50;--output:#245b9a;--negative:#c85a71;--radius:16px;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg);font-synthesis:none}
+*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button,select,input[type=checkbox],input[type=range],summary{cursor:pointer}button,input,select{min-height:40px}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #8acdc5;outline-offset:3px}button{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:9px;font-weight:650;padding:9px 14px;transition:background .15s,border-color .15s}button:hover{background:#f1f7f7;border-color:#a8c9ca}input,select{border:1px solid #cbdbe3;border-radius:8px;background:#fff;color:var(--ink);padding:8px 10px;width:100%;font-size:14px}input[type=number]{font-variant-numeric:tabular-nums}input[type=checkbox]{width:17px;height:17px;min-height:0;accent-color:var(--teal);margin:0}input:disabled{background:#eef3f5;color:#7a8e9b}label{display:block;font-size:12px;font-weight:550;color:var(--muted)}label input,label select{margin-top:6px}select{padding-right:25px}h1,h2,h3,p{margin:0}h1{font-size:28px;letter-spacing:-1px;line-height:1.15}h2{font-size:17px;letter-spacing:-.35px}h3{font-size:15px}p{line-height:1.6}.masthead{max-width:1480px;margin:auto;padding:30px 38px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{display:flex;gap:14px;align-items:center}.brand-mark{width:48px;height:48px;display:grid;place-items:center;background:var(--ink);color:#bce9de;border-radius:14px;font-size:48px;line-height:1;padding-bottom:8px;box-shadow:0 4px 12px #163a4a12}.eyebrow{font-size:10px;letter-spacing:1.8px;font-weight:750;color:var(--muted);margin-bottom:6px}.header-actions{display:flex;align-items:flex-end;gap:12px}.header-actions label{min-width:245px}.header-actions select{font-size:13px;min-height:40px}.secondary{font-size:12px;height:40px;white-space:nowrap}.secondary span{font-size:18px;margin-right:4px}main{max-width:1480px;margin:0 auto;padding:0 38px}.intro{border-top:1px solid var(--line);display:flex;gap:14px;align-items:baseline;padding:19px 0 23px}.intro p{font-size:16px;font-weight:650;letter-spacing:-.2px}.intro span{font-size:13px;color:var(--muted)}.workspace{display:grid;grid-template-columns:285px minmax(0,1fr);gap:22px;align-items:start}.settings,.experiment{display:flex;flex-direction:column;gap:18px}.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 3px 8px #19384a03;overflow:hidden}.setting-card{padding:19px}.section-heading{display:flex;gap:9px;align-items:center;margin-bottom:19px}.section-heading h2{font-size:15px}.step-number{width:23px;height:23px;display:grid;place-items:center;border-radius:7px;font-size:12px;font-weight:750}.input-number{background:#f6eaf2;color:var(--magenta)}.system-number{background:#fbede7;color:var(--coral)}.signal-symbol{margin-left:auto;font:italic 18px Georgia,serif}.input-color{color:var(--magenta)}.system-color{color:var(--coral)}.output-color{color:var(--output);font-style:italic;font-family:Georgia,serif;font-weight:500}.setting-card>label,.setting-card>div:not(.section-heading):not(.formula),#rlc-fields>label{margin-bottom:15px}.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field-row>*{min-width:0}#rlc-fields .field-row{margin-bottom:10px}.formula{font-family:Georgia,"Times New Roman",serif;text-align:center;font-size:17px;line-height:1.9;overflow-wrap:anywhere;padding:10px 4px;border-radius:9px;margin-top:5px}.formula .small-formula{display:block;font-size:14px;line-height:1.5}.input-formula{background:#faf4f8;color:#873768}.system-formula{background:#fcf5f0;color:#a4523b}.field-note{font-size:11px;color:var(--muted);line-height:1.55;margin-top:10px}.damping-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:12px 0 8px}.damping-buttons button{font-size:10px;padding:6px 2px;min-height:31px;border-radius:6px}.damping-buttons button.active{background:#fbede7;border-color:#db9f8d;color:#a4523b}summary{padding:16px 19px;font-size:12px;font-weight:650;list-style-position:inside}summary::marker{color:var(--muted)}.details-body{padding:0 19px 16px}.details-body .field-row{margin:12px 0 17px}.check{display:flex;gap:8px;align-items:center;font-size:11px}.plot-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:22px 23px 16px}.plot-heading .eyebrow{font-size:9px;letter-spacing:1.6px;margin-bottom:7px}.swap-switch{display:flex;align-items:center;gap:7px;white-space:nowrap;font-size:11px;color:var(--ink);position:relative;cursor:pointer}.swap-switch input{position:absolute;opacity:0;width:100%;height:100%;z-index:1}.switch-track{width:30px;height:18px;background:#dce6eb;border-radius:20px;position:relative}.switch-track:after{content:"";position:absolute;top:3px;left:3px;width:12px;height:12px;background:#fff;border-radius:50%;box-shadow:0 1px 3px #163a4a25;transition:transform .15s}.swap-switch input:checked+.switch-track{background:var(--teal)}.swap-switch input:checked+.switch-track:after{transform:translateX(12px)}.swap-switch input:focus-visible+.switch-track{outline:3px solid #8acdc5;outline-offset:3px}.equation-strip{margin:0 23px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #e6edf0;background:#f8fafb;border-radius:10px}.integral-equation{font:italic 20px Georgia,"Times New Roman",serif;display:flex;align-items:center;gap:6px}.integral-symbol{position:relative;font-size:33px;font-weight:400;line-height:1.3;margin:0 9px 0 2px}.integral-symbol sup,.integral-symbol sub{position:absolute;font-size:11px;font-style:normal;left:14px}.integral-symbol sup{top:-2px}.integral-symbol sub{bottom:-3px;left:4px}.time-chip{font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--muted)}.time-chip strong{color:var(--ink);font-size:14px;font-weight:650}.legend{display:flex;gap:19px;align-items:center;flex-wrap:wrap;margin:17px 24px 0;font-size:11px;color:var(--muted)}.legend span{display:flex;align-items:center;gap:7px}.legend i{display:inline-block;width:22px;height:0;border-top:2.5px solid}.legend i.dashed{border-top-style:dashed}.canvas-wrap{padding:0 12px 0 8px;width:100%;position:relative}canvas{display:block;width:100%;height:285px;touch-action:pan-y}#response{height:210px;cursor:crosshair}.areas{margin:0 23px 16px;padding:13px 16px;background:#f7faf9;border:1px solid #e5eeeb;border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:9px}.areas>div{display:grid;grid-template-columns:auto auto;column-gap:6px;align-items:center;font-size:10px;color:var(--muted)}.areas strong{grid-column:1/-1;font-size:20px;font-weight:650;line-height:1.2;letter-spacing:-.5px;margin-top:5px;color:var(--ink);font-variant-numeric:tabular-nums}.areas .net-area strong{color:var(--teal-dark);font-weight:750}.area-dot{width:6px;height:6px;border-radius:50%}.positive-dot{background:var(--teal)}.negative-dot{background:var(--negative)}.area-operator{color:#98abae;font-size:18px}.tail-note{font-size:10px;color:var(--muted);margin:-6px 24px 14px;line-height:1.5}.playback{background:#f8fafb;border-top:1px solid var(--line);padding:13px 23px 15px}.playback-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.transport{display:flex;gap:6px;align-items:center}.icon-button{width:33px;min-height:33px;padding:3px;font-size:21px}.play-button{background:var(--teal-dark);border-color:var(--teal-dark);color:white;font-size:12px;padding:6px 15px;min-height:33px;min-width:84px}.play-button:hover{background:#005852;color:#fff;border-color:#005852}.play-button span{font-size:10px;margin-right:3px}.slider-hint{font-size:11px;color:var(--muted)}.speed-label{display:flex;gap:7px;align-items:center;font-size:10px}.speed-label select{font-size:11px;min-height:31px;width:65px;margin-top:0;padding:4px 5px}.timeline{display:flex;gap:9px;align-items:center;margin-top:14px;font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}.timeline>span{min-width:20px;text-align:center}input[type=range]{min-height:20px;padding:0;accent-color:var(--teal);margin:0;flex:1;min-width:30px}.time-number{display:flex;align-items:center;gap:5px;font-size:11px;white-space:nowrap;margin-left:6px}.time-number input{width:78px;font-size:12px;min-height:31px;padding:5px;margin:0}.output-heading{padding-bottom:4px}.plot-subtitle{font-size:10px;color:var(--muted)}.output-footnote{padding:11px 23px;background:#fbfcfd;border-top:1px solid #edf1f4;color:var(--muted);font-size:10px;line-height:1.5}.teaching-notes{margin-top:24px}.teaching-notes summary{font-size:13px;padding:18px 22px}.teaching-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;padding:5px 24px 22px}.teaching-grid h3{margin:6px 0}.teaching-grid p,.model-notes p{font-size:12px;color:var(--muted)}.note-number{font-size:11px;font-weight:750;letter-spacing:1px;color:var(--teal)}.model-notes{padding:17px 24px;background:#f8fafb;border-top:1px solid var(--line)}.model-notes p+p{margin-top:10px}footer{max-width:1480px;margin:0 auto;padding:25px 38px 30px;display:flex;justify-content:space-between;font-size:10px;color:#78909c;gap:15px}footer>span:first-child{font-weight:650}.status{font-size:12px;color:var(--muted);margin-top:8px;min-height:18px}.visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}.frac{display:inline-flex;vertical-align:middle;flex-direction:column;text-align:center;line-height:1.4;font-size:.92em;margin:0 2px}.frac>span:first-child{border-bottom:1px solid currentColor;padding:0 5px 2px}.frac>span:last-child{padding:2px 4px 0}[hidden]{display:none!important}
+@media(min-width:1450px){.workspace{grid-template-columns:300px minmax(0,1fr)}canvas{height:310px}#response{height:230px}.plot-heading h2{font-size:19px}.integral-equation{font-size:22px}}
+@media(max-width:1020px){.masthead,main{padding-left:22px;padding-right:22px}.masthead{align-items:flex-start}.header-actions{flex-direction:column;align-items:stretch;gap:8px}.header-actions label{min-width:220px}.secondary{align-self:flex-end}.workspace{grid-template-columns:255px minmax(0,1fr);gap:15px}.setting-card{padding:16px}.plot-heading{padding:19px 17px 14px}.plot-heading h2{font-size:16px}.equation-strip{margin:0 17px;padding:10px}.integral-equation{font-size:17px}.time-chip{font-size:10px}.time-chip strong{font-size:12px}.legend{margin-left:18px;gap:12px;font-size:10px}.areas{margin-left:17px;margin-right:17px;padding:12px}.areas strong{font-size:18px}.playback{padding-left:17px;padding-right:17px}.slider-hint{display:none}.plot-subtitle{max-width:110px;text-align:right}.intro{display:block}.intro span{display:block;margin-top:3px}}
+@media(max-width:760px){.masthead{flex-direction:column;padding:22px 18px 20px;gap:22px}.brand-mark{width:43px;height:43px;font-size:43px}h1{font-size:25px}.header-actions{flex-direction:row;align-items:flex-end;width:100%;gap:9px}.header-actions label{min-width:0;flex:1}.header-actions select{font-size:11px}.secondary{font-size:10px;padding:8px;align-self:auto}.secondary span{font-size:14px;margin:0}.intro{padding:15px 0 18px}.intro p{font-size:15px}.intro span{font-size:12px;line-height:1.5}main{padding:0 14px}.workspace{display:flex;flex-direction:column;gap:17px}.settings{display:grid;grid-template-columns:1fr 1fr;width:100%;gap:10px}.setting-card{padding:13px;border-radius:12px}.section-heading{gap:6px;margin-bottom:14px}.section-heading h2{font-size:12px}.step-number{width:20px;height:20px;font-size:10px}.signal-symbol{display:none}.settings label{font-size:10px}.settings input,.settings select{font-size:12px;padding:7px 6px}.field-row{gap:7px}.formula{font-size:14px}.formula .small-formula{font-size:12px}.field-note{font-size:10px}.damping-buttons{grid-template-columns:1fr 1fr}.damping-buttons button{font-size:9px}.view-settings{grid-column:1/-1;border-radius:12px}.view-settings .details-body{display:grid;grid-template-columns:1fr 1fr;column-gap:14px;align-items:center}.view-settings .field-note{grid-column:1/-1}.view-settings .field-row{margin:6px 0}.experiment{width:100%;gap:16px}.plot-heading{padding:18px 15px 14px}.plot-heading h2{font-size:16px}.swap-switch{font-size:9px;gap:5px}.switch-track{width:28px;flex-shrink:0}.swap-switch input:checked+.switch-track:after{transform:translateX(10px)}.equation-strip{margin:0 14px;gap:8px}.integral-equation{font-size:16px;gap:3px}.integral-symbol{font-size:28px}.time-chip{font-size:9px}.time-chip strong{font-size:10px}.legend{font-size:9px;margin:15px 15px 0;gap:13px}.legend i{width:17px}.canvas-wrap{padding:0 5px 0 0}canvas{height:255px}#response{height:205px}.areas{margin:0 14px 14px;padding:12px 10px;gap:7px}.areas>div{font-size:9px}.areas strong{font-size:18px}.area-operator{font-size:15px}.playback{padding:13px 14px}.speed-label{font-size:9px}.timeline{gap:5px}.time-number{margin-left:2px;gap:4px}.time-number input{width:67px}.time-chip{white-space:nowrap}.tail-note{margin-left:15px;margin-right:15px}.plot-subtitle{font-size:9px}.output-footnote{padding:10px 15px}.teaching-grid{grid-template-columns:1fr;gap:18px;padding:0 20px 20px}.model-notes{padding:16px 20px}.teaching-notes{margin-top:18px}footer{padding:18px;font-size:9px;align-items:flex-start}footer>span:last-child{max-width:175px;text-align:right}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.play-symbol{display:inline-block;width:0;height:0;border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:6px solid currentColor}.pause-symbol{display:inline-block;width:6px;height:8px;border-left:2px solid currentColor;border-right:2px solid currentColor}
+.parameter-symbol{display:flex;align-items:baseline;gap:5px;margin-top:3px;min-height:26px;font-size:12px;color:var(--ink);font-weight:400;line-height:1.4}.parameter-symbol math{font-family:"Cambria Math","STIX Two Math","Latin Modern Math",math;font-size:20px;font-weight:400;line-height:1.4}.damping-buttons.resistor-output{grid-template-columns:repeat(3,1fr)}input[aria-invalid="true"]{border-color:var(--negative);background:#fff7f9}
+.impulse-note{font-size:10px;line-height:1.5;color:var(--muted);margin:9px 23px 0}.impulse-summary{font-size:11px;line-height:1.5;color:var(--teal-dark);margin:0 23px 12px;font-variant-numeric:tabular-nums}.impulse-summary strong{font-weight:650}#train-fields .field-row{margin-bottom:8px}
+.legend-impulse{font-size:17px;line-height:12px;font-weight:500;width:18px;text-align:center}
+@media(min-width:1021px) and (max-height:1000px){.has-impulses #overlap{height:180px}.impulse-note{margin-top:6px;font-size:9px}.impulse-summary{font-size:10px;margin-bottom:9px}}
+@media(max-width:760px){.parameter-symbol math{font-size:19px}.parameter-symbol{font-size:10px;gap:3px}.impulse-note,.impulse-summary{margin-left:15px;margin-right:15px;font-size:9px}}
+@media(min-width:1021px) and (max-height:1000px){.masthead{padding-top:20px;padding-bottom:18px}.intro{padding-top:12px;padding-bottom:16px}.plot-heading{padding:15px 22px 10px}.plot-heading h2{font-size:17px}.equation-strip{padding:7px 12px}.integral-equation{font-size:19px}.integral-symbol{font-size:27px;line-height:1.1}.integral-symbol sup{top:-6px}.integral-symbol sub{bottom:-6px}.legend{margin-top:11px}canvas{height:200px}#response{height:150px}.areas{padding-top:8px;padding-bottom:8px;margin-bottom:10px}.areas strong{font-size:18px;margin-top:3px}.playback{padding-top:10px;padding-bottom:11px}.timeline{margin-top:10px}.output-heading{padding-top:15px;padding-bottom:2px}.output-footnote{padding-top:9px;padding-bottom:9px}}
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="brand"><span class="brand-mark" aria-hidden="true">∗</span><div><div class="eyebrow">SIGNALS &amp; SYSTEMS</div><h1>Convolution Studio</h1></div></div>
+  <div class="header-actions"><label for="example">Explore an example<select id="example"><option value="custom">Custom experiment</option><option value="pulseRC" selected>Pulse through an RC circuit</option><option value="stepRLC">Step through an RLC circuit</option><option value="highpass">Step across the RLC inductor</option><option value="impulseTrain">Pulse through an impulse train</option><option value="resonance">Sinusoid at resonance</option><option value="signed">Positive and negative areas</option><option value="original">Original MATLAB example</option></select></label><button id="download" class="secondary" title="Download this app and its current settings as a standalone HTML file"><span aria-hidden="true">↓</span> Download HTML</button></div>
+</header>
+<main>
+  <div class="intro"><p>Slide, overlap, integrate.</p><span>Watch how the input and impulse response build the output, one instant at a time.</span></div>
+  <div class="workspace">
+    <aside class="settings" aria-label="Experiment settings">
+      <section class="card setting-card"><div class="section-heading"><span class="step-number input-number">1</span><h2>Choose an input</h2><span class="signal-symbol input-color">x(t)</span></div>
+        <label for="input">Input signal<select id="input"><option value="step">Step</option><option value="pulse" selected>Rectangular pulse</option><option value="sine">Sinusoid</option><option value="exponential">Decaying exponential</option><option value="original">Two-sided exponential (MATLAB)</option></select></label>
+        <div class="field-row"><label for="amplitude">Amplitude<input id="amplitude" type="number" min="-10" max="10" step="0.1" value="1"></label><label for="delay"><span id="delay-label">Start time (s)</span><input id="delay" type="number" min="-20" max="20" step="0.1" value="0"></label></div>
+        <div id="pulse-fields"><label for="width">Pulse width (s)<input id="width" type="number" min="0.05" max="20" step="0.1" value="2"></label></div>
+        <div id="sine-fields" hidden class="field-row"><label for="omega">ω (rad/s)<input id="omega" type="number" min="0.1" max="20" step="0.1" value="2"></label><label for="phase">Phase (°)<input id="phase" type="number" min="-360" max="360" step="15" value="0"></label></div>
+        <div id="exp-fields" hidden><label for="rate">Exponential rate (s⁻¹)<input id="rate" type="number" min="0.05" max="10" step="0.1" value="0.5"></label></div>
+        <div class="formula input-formula" id="input-formula"></div><p class="field-note" id="input-note"></p>
+      </section>
+      <section class="card setting-card"><div class="section-heading"><span class="step-number system-number">2</span><h2>Choose a system</h2><span class="signal-symbol system-color">h(t)</span></div>
+        <label for="system">Linear time-invariant system<select id="system"><option value="integrator">Integrator</option><option value="rc" selected>RC circuit · capacitor voltage</option><option value="rlc">Series RLC circuit</option><option value="train">Train of Dirac impulses</option></select></label>
+        <div id="rc-fields"><label for="tau">Time constant τ = RC (s)<input id="tau" type="number" min="0.05" max="10" step="0.1" value="1"></label></div>
+        <div id="rlc-fields" hidden>
+          <label for="output">Measured output<select id="output"><option value="capacitor">Capacitor voltage · low-pass</option><option value="resistor">Resistor voltage · band-pass</option><option value="inductor">Inductor voltage · high-pass</option></select></label>
+          <div class="field-row"><label for="wn">Natural frequency<span class="parameter-symbol"><math aria-hidden="true"><msub><mi>ω</mi><mi>n</mi></msub></math><span>(rad/s)</span></span><input id="wn" aria-label="Natural frequency omega n in radians per second" type="number" min="0.1" max="20" step="0.1" value="2" title="Undamped natural angular frequency: omega n = 1/sqrt(LC)."></label><label for="zeta">Damping ratio<span class="parameter-symbol"><math aria-hidden="true"><mi>ζ</mi></math></span><input id="zeta" aria-label="Damping ratio zeta" type="number" min="0" max="4" step="0.05" value="0.25" aria-describedby="damping-constraint"></label></div>
+          <div class="damping-buttons" role="group" aria-label="Damping presets"><button data-zeta="0">Undamped</button><button data-zeta="0.25">Under</button><button data-zeta="1">Critical</button><button data-zeta="2">Over</button></div>
+          <p id="damping-note" class="field-note"></p>
+          <p id="damping-constraint" class="field-note" hidden>Resistor voltage requires R &gt; 0, so ζ must be positive. The undamped case is excluded.</p>
+        </div>
+        <div id="train-fields" hidden><div class="field-row"><label for="spacing">Spacing T (s)<input id="spacing" type="number" min="0.1" max="10" step="0.1" value="1.5"></label><label for="count">Number N<input id="count" type="number" min="1" max="12" step="1" value="4"></label></div><p class="field-note">A finite causal train: impulses at 0, T, …, (N − 1)T. Each impulse has weight K.</p></div>
+        <label for="gain">Gain multiplier K<input id="gain" type="number" min="-5" max="5" step="0.1" value="1"></label>
+        <div class="formula system-formula" id="system-formula"></div><p class="field-note" id="system-note"></p>
+      </section>
+      <details class="card view-settings"><summary>Plot settings</summary><div class="details-body">
+        <label class="check"><input id="autoTime" type="checkbox" checked> Fit time window automatically</label>
+        <div class="field-row"><label for="tMin">Start (s)<input id="tMin" type="number" min="-100" max="140" step="0.5" value="-2"></label><label for="tMax">End (s)<input id="tMax" type="number" min="-99" max="150" step="0.5" value="10"></label></div>
+        <label class="check"><input id="autoScale" type="checkbox" checked> Auto output amplitude</label>
+        <div class="field-row"><label for="yMin">Amplitude min<input id="yMin" type="number" step="0.5" value="-1"></label><label for="yMax">Amplitude max<input id="yMax" type="number" step="0.5" value="2"></label></div>
+        <p class="field-note">Editing a limit fixes that axis. All time axes use seconds.</p>
+      </div></details>
+    </aside>
+    <div class="experiment">
+      <section class="card overlap-card" aria-labelledby="overlap-title">
+        <div class="plot-heading"><div><div class="eyebrow">THE CONVOLUTION INTEGRAL</div><h2 id="overlap-title">Where the signals overlap</h2></div><label class="swap-switch"><input id="swapped" type="checkbox" role="switch"><span class="switch-track" aria-hidden="true"></span>Swap x and h</label></div>
+        <div class="equation-strip"><div class="integral-equation" id="convolution-equation"></div><span class="time-chip">t₀ = <strong id="time-readout">1.50</strong> s</span></div>
+        <div class="legend" id="overlap-legend"></div>
+        <p id="impulse-note" class="impulse-note" hidden>Arrows show impulse weights (areas), not finite amplitudes. Green arrows show the weighted input samples.</p>
+        <div class="canvas-wrap"><canvas id="overlap" height="285" role="img" aria-label="Input, reversed and shifted impulse response, and their product versus integration time tau."></canvas></div>
+        <div class="areas"><div><span class="area-dot positive-dot"></span><span id="positive-label">Positive area</span><strong id="positive-area">0</strong></div><span class="area-operator">+</span><div><span class="area-dot negative-dot"></span><span id="negative-label">Negative area</span><strong id="negative-area">0</strong></div><span class="area-operator">=</span><div class="net-area"><span>Output y(t₀)</span><strong id="net-area">0</strong></div></div>
+        <p id="impulse-summary" class="impulse-summary" hidden></p>
+        <div id="tail-note" class="tail-note" hidden></div>
+        <div class="playback"><div class="playback-top"><div class="transport"><button id="restart" class="icon-button" aria-label="Return to start" title="Return to start">↶</button><button id="play" class="play-button"><span aria-hidden="true" class="play-symbol"></span> Play</button></div><span class="slider-hint">Move t₀ to explore the overlap</span><label class="speed-label" for="speed">Speed<select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label></div>
+          <div class="timeline"><label for="time" class="visually-hidden">Observation time t zero in seconds</label><span id="time-start">−2</span><input id="time" type="range" min="-2" max="10" step="0.01" value="1.5"><span id="time-end">10</span><label class="time-number" for="time-value">t₀<input id="time-value" type="number" step="0.05" value="1.5"><span>s</span></label></div>
+        </div>
+      </section>
+      <section class="card output-card" aria-labelledby="output-title"><div class="plot-heading output-heading"><div><div class="eyebrow">THE ACCUMULATED RESULT</div><h2 id="output-title">Output response <span class="output-color">y(t)</span></h2></div><span class="plot-subtitle">Select any point to move t₀</span></div><div class="canvas-wrap"><canvas id="response" height="210" role="img" aria-label="Output response y of t versus time, with the current observation time highlighted."></canvas></div><div class="output-footnote" id="response-note">The output at each instant is the signed area under the product above.</div></section>
+    </div>
+  </div>
+  <details class="card teaching-notes"><summary>What am I looking at?</summary><div class="teaching-grid"><div><span class="note-number">01</span><h3>Reverse and shift</h3><p>Keep x(τ) fixed. Reverse h(τ) and shift it by t₀ to obtain h(t₀ − τ). The horizontal axis here is the integration variable τ.</p></div><div><span class="note-number">02</span><h3>Multiply and integrate</h3><p>Green marks show the product. Add the positive and negative areas, plus any impulse weights, to find y(t₀). Impulse arrows have a specified area, not a finite amplitude. The output graph collects these values for all t.</p></div><div><span class="note-number">03</span><h3>Try the other order</h3><p>Turn on “Swap x and h” to keep h(τ) fixed and shift x(t₀ − τ). The overlap looks different, but the convolution output is the same.</p></div></div><div class="model-notes"><p><strong>Circuit models.</strong> RC measures capacitor voltage. The series RLC circuit measures capacitor voltage (low-pass), resistor voltage (band-pass) or inductor voltage (high-pass), with ωₙ = 1/√(LC) and ζ = (R/2)√(C/L). K = 1 gives the circuit voltage ratio; other K values scale it.</p><p><strong>Initial conditions.</strong> These are causal impulse-response models, at rest before the input is applied. The original MATLAB example is two-sided: its past input is included, so y(0) = 2 for the default integrator example. For inputs with jumps and systems containing impulses, the plotted output uses the input value just after each jump.</p><p><strong>Impulsive systems.</strong> The inductor impulse response contains Kδ(t), producing the instantaneous term Kx(t). A finite train of N impulses at 0, T, …, (N − 1)T produces N delayed copies of the input. Each impulse contribution is its weight multiplied by the input sampled at the corresponding time.</p><p><strong>Numerical display.</strong> The output uses exact linear-state propagation to floating-point precision. Regular signed areas use numerical quadrature; Dirac impulse contributions use exact weighted samples. Any area beyond the visible τ window is reported below the plot.</p></div></details>
+  <div class="status" id="status" role="status" aria-live="polite"></div>
+</main>
+<footer><span>Convolution Studio</span><span>Continuous time · zero-state response · built for exploration</span></footer>
+<script id="saved-state" type="application/json">{}</script>
+<script type="module">// Continuous-time convolution. Small exact linear models, no time-stepping solver.
+const defaults = {
+  input: 'pulse', amplitude: 1, delay: 0, width: 2, omega: 2, phase: 0, rate: 0.5,
+  system: 'rc', gain: 1, tau: 1, wn: 2, zeta: 0.25, output: 'capacitor', spacing: 1.5, count: 4,
+  tMin: -2, tMax: 10, t0: 1.5, autoTime: true, swapped: false, speed: 1,
+  autoScale: true, yMin: -1, yMax: 2
+};
+
+const identity = n => Array.from({length:n}, (_,i) => Array.from({length:n}, (_,j) => +(i===j)));
+const multiply = (a,b) => a.map(row => b[0].map((_,j) => row.reduce((s,v,k) => s+v*b[k][j],0)));
+const matvec = (a,v) => a.map(row => row.reduce((s,x,j) => s+x*v[j],0));
+const dot = (a,b) => a.reduce((s,v,i)=>s+v*b[i],0);
+
+function expm(a,t) {
+  const n=a.length, norm=Math.max(...a.map(row=>row.reduce((s,x)=>s+Math.abs(x*t),0)));
+  const squarings=Math.max(0,Math.ceil(Math.log2(norm/0.5)));
+  const b=a.map(row=>row.map(x=>x*t/2**squarings));
+  let sum=identity(n), term=identity(n);
+  for(let k=1;k<=36;k++) {
+    term=multiply(term,b).map(row=>row.map(x=>x/k));
+    sum=sum.map((row,i)=>row.map((x,j)=>x+term[i][j]));
+    if(Math.max(...term.flat().map(Math.abs))<2e-16) break;
+  }
+  for(let k=0;k<squarings;k++) sum=multiply(sum,sum);
+  return sum;
+}
+
+function inputAt(s,t) {
+  let q=t-s.delay;
+  const a=s.amplitude,epsilon=1e-12*Math.max(1,Math.abs(t),Math.abs(s.delay));
+  if(Math.abs(q)<epsilon)q=0;
+  if(s.input==='pulse'&&Math.abs(q-s.width)<epsilon)q=s.width;
+  if(s.input==='original') return a*(q<0?Math.exp(s.rate*q):2*Math.exp(-s.rate*q));
+  if(q<0) return 0;
+  if(s.input==='step') return a;
+  if(s.input==='pulse') return q<s.width?a:0;
+  if(s.input==='sine') return a*Math.sin(s.omega*q+s.phase*Math.PI/180);
+  return a*Math.exp(-s.rate*q);
+}
+
+const sinc=x=>Math.abs(x)<1e-4?1-x*x/6+x**4/120:Math.sin(x)/x;
+// Singular impulse weights are kept separate from the ordinary part of h(t).
+// A Dirac delta is never approximated by a tall, narrow finite pulse.
+function impulseMasses(s) {
+  if(s.system==='train')return Array.from({length:s.count},(_,i)=>({time:i*s.spacing,weight:s.gain}));
+  if(s.system==='rlc'&&s.output==='inductor')return [{time:0,weight:s.gain}];
+  return [];
+}
+function impulseAt(s,t) {
+  if(t<0) return 0;
+  if(s.system==='train')return 0;
+  if(s.system==='integrator') return s.gain;
+  if(s.system==='rc') return s.gain/s.tau*Math.exp(-t/s.tau);
+  const w=s.wn, z=s.zeta, k=s.gain;
+  let h,dh;
+  if(z<1) {
+    const wd=w*Math.sqrt(1-z*z), e=Math.exp(-z*w*t);
+    h=k*w*w*t*e*sinc(wd*t);
+    dh=k*w*w*e*(Math.cos(wd*t)-z*w*t*sinc(wd*t));
+  } else if(z===1) {
+    h=k*w*w*t*Math.exp(-w*t);
+    dh=k*w*w*Math.exp(-w*t)*(1-w*t);
+  } else {
+    const r=Math.sqrt(z*z-1), p1=-w/(z+r), p2=-w*(z+r);
+    h=k*w*w*Math.exp(p1*t)*(-Math.expm1((p2-p1)*t))/(p1-p2);
+    dh=k*w*w*(p1*Math.exp(p1*t)-p2*Math.exp(p2*t))/(p1-p2);
+  }
+  const resistor=2*z/w*dh;
+  return s.output==='resistor'?resistor:s.output==='inductor'?-h-resistor:h;
+}
+
+function createEngine(s) {
+  const impulses=impulseMasses(s);
+  if(s.system==='train')return {
+    response:t=>impulses.reduce((sum,p)=>sum+p.weight*inputAt(s,t-p.time),0),
+    input:t=>inputAt(s,t),impulse:()=>0,impulses
+  };
+  let A,B,C;
+  if(s.system==='integrator') { A=[[0]]; B=[s.gain]; C=[1]; }
+  else if(s.system==='rc') { A=[[-1/s.tau]]; B=[s.gain/s.tau]; C=[1]; }
+  else { A=[[0,s.wn],[-s.wn,-2*s.zeta*s.wn]]; B=[0,s.gain*s.wn]; C=s.output==='resistor'?[0,2*s.zeta]:s.output==='inductor'?[-1,-2*s.zeta]:[1,0]; }
+  const n=A.length, zeros=Array(n).fill(0);
+  function driven(generator, initialInput, initialState=zeros) {
+    const m=generator.length;
+    const aug=Array.from({length:n+m},(_,i)=>Array.from({length:n+m},(_,j)=>
+      i<n?(j<n?A[i][j]:j===n?B[i]:0):(j<n?0:generator[i-n][j-n])));
+    const v=[...initialState,...initialInput];
+    return t=>dot(C,matvec(expm(aug,t),v).slice(0,n));
+  }
+  const step=driven([[0]],[s.amplitude]);
+  let active;
+  if(s.input==='sine') active=driven([[0,s.omega],[-s.omega,0]],[s.amplitude*Math.sin(s.phase*Math.PI/180),s.amplitude*Math.cos(s.phase*Math.PI/180)]);
+  else if(s.input==='exponential') active=driven([[-s.rate]],[s.amplitude]);
+  let pastState;
+  if(s.input==='original') {
+    const a=s.rate;
+    if(s.system==='integrator') pastState=[s.gain*s.amplitude/a];
+    else if(s.system==='rc') pastState=[s.gain*s.amplitude/(1+a*s.tau)];
+    else {
+      const d=s.gain*s.wn**2*s.amplitude/(a*a+2*s.zeta*s.wn*a+s.wn**2);
+      pastState=[d,a/s.wn*d];
+    }
+    active=driven([[-a]],[2*s.amplitude],pastState);
+  }
+  function regularResponse(t) {
+    const q=t-s.delay;
+    if(s.input==='original') return q<0?dot(C,pastState)*Math.exp(s.rate*q):active(q);
+    if(q<0) return 0;
+    if(s.input==='step') return step(q);
+    if(s.input==='pulse') return step(q)-(q>=s.width?step(q-s.width):0);
+    return active(q);
+  }
+  const direct=s.system==='rlc'&&s.output==='inductor'?s.gain:0;
+  return {response:t=>regularResponse(t)+direct*inputAt(s,t),input:t=>inputAt(s,t),impulse:t=>impulseAt(s,t),impulses};
+}
+
+const nodes=[-.9602898564975363,-.7966664774136267,-.5255324099163290,-.1834346424956498,.1834346424956498,.5255324099163290,.7966664774136267,.9602898564975363];
+const weights=[.1012285362903763,.2223810344533745,.3137066458778873,.3626837833783620,.3626837833783620,.3137066458778873,.2223810344533745,.1012285362903763];
+
+function convolutionAreas(s,t,swapped=false,window=null) {
+  let positive=0,negative=0,impulsePositive=0,impulseNegative=0;
+  for(const p of impulseMasses(s)) {
+    const position=swapped?p.time:t-p.time;
+    if(window&&(position<window[0]-1e-10||position>window[1]+1e-10))continue;
+    const v=p.weight*inputAt(s,t-p.time);
+    if(v>=0)impulsePositive+=v;else impulseNegative+=v;
+  }
+  positive=impulsePositive;negative=impulseNegative;
+  const finish=()=>({positive,negative,net:positive+negative,impulseNet:impulsePositive+impulseNegative,regularNet:positive+negative-impulsePositive-impulseNegative});
+  if(s.system==='train')return finish();
+  // Integrate causal support, splitting at all input discontinuities.
+  // The two-sided exponential's remaining past tail is bounded by exp(-30).
+  let lo,hi,breaks=[];
+  if(s.input==='original') {
+    lo=swapped?0:Math.min(t,s.delay)-30/s.rate;
+    hi=swapped?Math.max(0,t-s.delay)+30/s.rate:t;
+    breaks=[swapped?t-s.delay:s.delay];
+  } else if(swapped) {
+    lo=s.input==='pulse'?Math.max(0,t-s.delay-s.width):0;
+    hi=t-s.delay;
+  } else {
+    lo=s.delay; hi=s.input==='pulse'?Math.min(t,s.delay+s.width):t;
+  }
+  if(window) { lo=Math.max(lo,window[0]); hi=Math.min(hi,window[1]); }
+  if(hi<=lo) return finish();
+  const cut=[lo,...breaks.filter(v=>v>lo&&v<hi),hi].sort((a,b)=>a-b);
+  const frequency=Math.max(s.input==='sine'?s.omega:0,s.system==='rlc'&&s.zeta<1?s.wn:0,0.5);
+  const rate=Math.max(s.input==='original'||s.input==='exponential'?s.rate:0,s.system==='rc'?1/s.tau:0,s.system==='rlc'?s.wn*(s.zeta+Math.sqrt(Math.max(0,s.zeta*s.zeta-1))):0,0.5);
+  const maxStep=Math.min(0.5,Math.PI/(2*frequency),4/rate);
+  const f=q=>swapped?impulseAt(s,q)*inputAt(s,t-q):inputAt(s,q)*impulseAt(s,t-q);
+  for(let j=0;j<cut.length-1;j++) {
+    const count=Math.min(12000,Math.max(1,Math.ceil((cut[j+1]-cut[j])/maxStep)));
+    const delta=(cut[j+1]-cut[j])/count;
+    for(let k=0;k<count;k++) {
+      const mid=cut[j]+(k+.5)*delta, half=delta/2;
+      for(let i=0;i<8;i++) {
+        const v=half*weights[i]*f(mid+half*nodes[i]);
+        if(v>=0) positive+=v; else negative+=v;
+      }
+    }
+  }
+  return finish();
+}
+
+function autoWindow(s) {
+  let before=2,after=8;
+  if(s.system==='rc') after=Math.max(after,7*s.tau);
+  if(s.system==='rlc') after=Math.max(after,s.zeta===0?6*2*Math.PI/s.wn:8/(s.wn*(s.zeta<=1?s.zeta:1/(s.zeta+Math.sqrt(s.zeta*s.zeta-1)))));
+  if(s.input==='pulse') after+=s.width;
+  if(s.input==='sine') after=Math.max(after,5*2*Math.PI/s.omega);
+  if(s.input==='exponential') after=Math.max(after,6/s.rate);
+  if(s.input==='original') {before=5/s.rate;after=Math.max(after,5/s.rate);}
+  if(s.system==='train')after+=(s.count-1)*s.spacing;
+  return [Math.max(-100,s.delay-before),Math.min(150,s.delay+Math.min(s.system==='train'?150:120,after))];
+}
+
+
+const $=id=>document.getElementById(id);
+const colours={input:'#a84681',system:'#d16a50',product:'#07837b',output:'#245b9a',negative:'#c85a71',ink:'#19384a',muted:'#60788b',grid:'#e7eef2'};
+const numericBounds={amplitude:[-10,10],delay:[-20,20],width:[.05,20],omega:[.1,20],phase:[-360,360],rate:[.05,10],gain:[-5,5],tau:[.05,10],wn:[.1,20],zeta:[0,4],spacing:[.1,10],count:[1,12],tMin:[-100,140],tMax:[-99,150],t0:[-100,150],speed:[.5,2],yMin:[-1e9,1e9],yMax:[-1e9,1e9]};
+let saved={};try{saved=JSON.parse($('saved-state').textContent);}catch{}
+let state={...defaults};
+for(const key of Object.keys(defaults)) {
+  const v=saved[key];
+  if(key in numericBounds&&Number.isFinite(v)&&v>=numericBounds[key][0]&&v<=numericBounds[key][1]) state[key]=v;
+  else if(typeof defaults[key]==='boolean'&&typeof v==='boolean') state[key]=v;
+}
+for(const [key,values] of Object.entries({input:['step','pulse','sine','exponential','original'],system:['integrator','rc','rlc','train'],output:['capacitor','resistor','inductor']})) if(values.includes(saved[key]))state[key]=saved[key];
+state.count=Math.round(state.count);
+if(state.tMax<=state.tMin) {state.tMin=defaults.tMin;state.tMax=defaults.tMax;}
+if(state.yMax<=state.yMin) {state.yMin=-1;state.yMax=2;}
+let engine,outputData=[],outputBounds=[-1,1],upperBounds=[-1,1],playing=false,lastFrame=0,raf=0,lastPaint=0;
+const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
+const fmt=(v,d=3)=>{
+  if(Math.abs(v)<1e-10) return '0';
+  return (Math.abs(v)>=1e4||Math.abs(v)<.001?v.toExponential(2):Number(v.toPrecision(d)).toString()).replace('-','−');
+};
+const n=v=>Number(v.toPrecision(5)).toString();
+const u=q=>`u(${q})`;
+const isResistorOutput=()=>state.system==='rlc'&&state.output==='resistor';
+const isInductorOutput=()=>state.system==='rlc'&&state.output==='inductor';
+const frac=(top,bottom)=>`<span class="frac"><span>${top}</span><span>${bottom}</span></span>`;
+function boundsOf(values) {
+  let lo=Math.min(0,...values),hi=Math.max(0,...values);
+  if(hi-lo<1e-8) return [-1,1];
+  const pad=(hi-lo)*.13;
+  return [lo-pad,hi+pad];
+}
+function inputFormula() {
+  const a=n(state.amplitude),d=state.delay,q=d===0?'t':`t − (${n(d)})`;
+  if(state.input==='step')return `x(t) = ${a} ${u(q)}`;
+  if(state.input==='pulse')return `x(t) = ${a}[${u(q)}<br>− ${u(q+` − ${n(state.width)}`)}]`;
+  if(state.input==='sine')return `x(t) = ${a} sin(${n(state.omega)}(${q})${state.phase?` + ${n(state.phase)}°`:''})<span class="small-formula">× ${u(q)}</span>`;
+  if(state.input==='exponential')return `x(t) = ${a} e<sup>−${n(state.rate)}(${q})</sup> ${u(q)}`;
+  return `<span class="small-formula">q = ${q}</span>x(t) = ${a} e<sup>${n(state.rate)}q</sup>, q &lt; 0<span class="small-formula">x(t) = ${n(2*state.amplitude)} e<sup>−${n(state.rate)}q</sup>, q ≥ 0</span>`;
+}
+function systemFormula() {
+  const k=n(state.gain);
+  if(state.system==='integrator')return `H(s) = ${frac(k,'s')}<span class="small-formula">h(t) = ${k} u(t)</span>`;
+  if(state.system==='rc')return `H(s) = ${frac(k,`${n(state.tau)}s + 1`)}<span class="small-formula">h(t) = ${n(state.gain/state.tau)} e<sup>−t/${n(state.tau)}</sup> u(t)</span>`;
+  if(state.system==='train')return `h(t) = ${k} ∑ δ(t − mT)<span class="small-formula">m = 0, …, ${state.count-1}; T = ${n(state.spacing)} s</span><span class="small-formula">H(s) = ${k} ∑ e<sup>−mTs</sup></span>`;
+  const numerator=state.output==='resistor'?`${n(2*state.gain*state.zeta*state.wn)}s`:state.output==='inductor'?`${k}s²`:n(state.gain*state.wn**2);
+  return `H(s) = ${frac(numerator,`s² + ${n(2*state.zeta*state.wn)}s + ${n(state.wn**2)}`)}${isInductorOutput()?`<span class="small-formula">h(t) = ${k} δ(t) + h<sub>reg</sub>(t)</span>`:''}`;
+}
+function syncUI(force=false) {
+  for(const key of Object.keys(defaults)) {
+    const el=$(key); if(!el)continue;
+    if(el.type==='checkbox') el.checked=state[key];
+    else if(force||document.activeElement!==el) el.value=state[key];
+  }
+  $('pulse-fields').hidden=state.input!=='pulse';
+  $('sine-fields').hidden=state.input!=='sine';
+  $('exp-fields').hidden=!['exponential','original'].includes(state.input);
+  $('rc-fields').hidden=state.system!=='rc';$('rlc-fields').hidden=state.system!=='rlc';
+  $('train-fields').hidden=state.system!=='train';
+  $('delay-label').textContent=state.input==='original'?'Switch time (s)':'Start time (s)';
+  $('input-formula').innerHTML=inputFormula();$('system-formula').innerHTML=systemFormula();
+  $('input-note').textContent=state.input==='original'?'The original MATLAB signal extends to −∞. Its past contribution is included.':state.input==='sine'?'The sinusoid is switched on at the start time.':'The input is zero before the start time.';
+  $('system-note').textContent=state.system==='integrator'?'The impulse response is a step: convolution accumulates the input.':state.system==='rc'?'Capacitor voltage / input voltage. Increasing τ gives a slower response.':state.system==='train'?'Convolution adds N delayed copies of the input, each multiplied by K.':isInductorOutput()?'Inductor voltage / input voltage. High frequencies pass through. The impulse at t = 0 supplies the instantaneous Kx(t) term.':!isResistorOutput()&&state.zeta===0?'At ζ = 0 this is an ideal LC circuit. The capacitor output still oscillates; its transfer function is not zero.':'ωₙ is the undamped natural frequency; ζ controls damping. Initial energy is zero.';
+  const z=state.zeta;
+  $('damping-note').textContent=z===0?`Undamped · oscillation frequency = ωₙ = ${fmt(state.wn)} rad/s.`:z<1?`Underdamped · damped frequency ωd = ${fmt(state.wn*Math.sqrt(1-z*z))} rad/s.`:z===1?'Critically damped · repeated real pole.':'Overdamped · two distinct real poles.';
+  const resistor=isResistorOutput();
+  $('zeta').min=resistor?'0.01':'0';
+  $('zeta').step=resistor?'0.01':'0.05';
+  document.querySelector('[data-zeta="0"]').hidden=resistor;
+  document.querySelector('.damping-buttons').classList.toggle('resistor-output',resistor);
+  $('damping-constraint').hidden=!resistor;
+  document.querySelectorAll('[data-zeta]').forEach(b=>{b.classList.toggle('active',Number(b.dataset.zeta)===z);b.setAttribute('aria-pressed',Number(b.dataset.zeta)===z);});
+  // Axis limits remain editable; changing a limit turns off automatic scaling.
+  $('yMin').disabled=false;$('yMax').disabled=false;
+  // Time fields stay editable: an edit switches off automatic fitting.
+  $('time').min=state.tMin;$('time').max=state.tMax;$('time').step=.001;
+  $('time-value').min=state.tMin;$('time-value').max=state.tMax;
+  $('time-start').textContent=fmt(state.tMin);$('time-end').textContent=fmt(state.tMax);
+  const first=state.swapped?'h(τ)':'x(τ)',second=state.swapped?'x(t₀ − τ)':'h(t₀ − τ)';
+  $('convolution-equation').innerHTML=`<span>y(t₀) =</span><span class="integral-symbol">∫<sup>∞</sup><sub>−∞</sub></span><span>${first} ${second} dτ</span>`;
+  const singular=engine.impulses.length>0;
+  const hSuffix=state.system==='train'?' · impulses':isInductorOutput()?' · incl. δ':'';
+  const key=(colour,impulse=false,dashed=false)=>impulse?`<b class="legend-impulse" style="color:${colour}">↑</b>`:`<i class="${dashed?'dashed':''}" style="border-color:${colour}"></i>`;
+  $('overlap-legend').innerHTML=`<span>${key(state.swapped?colours.system:colours.input,state.swapped&&state.system==='train')}${first}${state.swapped?hSuffix:''}</span><span>${key(state.swapped?colours.input:colours.system,!state.swapped&&state.system==='train',true)}${second}${state.swapped?'':hSuffix}</span><span>${key(colours.product,state.system==='train')}Product</span>`;
+  $('overlap').setAttribute('aria-label',`${state.swapped?'Impulse response and reversed, shifted input':'Input and reversed, shifted impulse response'}, and their product versus tau in seconds.${singular?' Arrows show Dirac impulse weights and weighted input samples.':''}`);
+  $('impulse-note').hidden=!singular;$('impulse-summary').hidden=!singular;
+  document.querySelector('.overlap-card').classList.toggle('has-impulses',singular);
+  $('positive-label').textContent=singular?'Positive contribution':'Positive area';
+  $('negative-label').textContent=singular?'Negative contribution':'Negative area';
+}
+function rebuild(force=false) {
+  // An undamped circuit has no resistor voltage. Keep that degenerate case out
+  // of the resistor-output controls, including restored/exported experiments.
+  if(isResistorOutput()&&state.zeta<.01) {
+    state.zeta=.25;
+    announce('Resistor voltage requires positive damping. ζ has been set to 0.25.');
+  }
+  $('zeta').removeAttribute('aria-invalid');
+  if(state.autoTime) [state.tMin,state.tMax]=autoWindow(state);
+  state.t0=clamp(state.t0,state.tMin,state.tMax);
+  engine=createEngine(state);
+  const span=state.tMax-state.tMin,epsilon=span*1e-8;
+  const times=Array.from({length:701},(_,i)=>state.tMin+i/700*span);
+  const shifts=state.system==='train'?engine.impulses.map(p=>p.time):[0];
+  for(const shift of shifts)for(const point of [state.delay+shift,state.delay+state.width+shift]) {
+    if(point>=state.tMin&&point<=state.tMax)for(const t of [point-epsilon,point,point+epsilon])if(t>=state.tMin&&t<=state.tMax)times.push(t);
+  }
+  outputData=times.sort((a,b)=>a-b).map(t=>[t,engine.response(t)]);
+  // Keep the upper amplitude scale steady while the student moves time.
+  const maxX=Math.abs(state.amplitude)*(state.input==='original'?2:1);
+  const h=Array.from({length:701},(_,i)=>engine.impulse(i/700*(state.tMax-state.tMin)));
+  const xExt=state.input==='sine'?[-maxX,maxX]:[Math.min(0,state.amplitude),Math.max(0,state.amplitude)*(state.input==='original'?2:1)];
+  if(state.input==='original'&&state.amplitude<0)xExt[0]=2*state.amplitude;
+  const weights=engine.impulses.map(p=>p.weight);
+  const hExt=[Math.min(0,...h,...weights),Math.max(0,...h,...weights)];
+  upperBounds=boundsOf([...xExt,...hExt,...xExt.flatMap(x=>hExt.map(v=>x*v))]);
+  outputBounds=state.autoScale?boundsOf(outputData.map(p=>p[1])):[state.yMin,state.yMax];
+  syncUI(force);draw();
+}
+function canvasContext(id) {
+  const canvas=$(id),rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+  const w=Math.max(240,rect.width),h=rect.height;
+  if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);}
+  const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+  return {canvas,ctx,w,h};
+}
+function niceTicks(min,max,count) {
+  const rough=(max-min)/count,power=10**Math.floor(Math.log10(rough));
+  const factor=[1,2,2.5,5,10].find(f=>f*power>=rough),step=factor*power;
+  const list=[];for(let x=Math.ceil(min/step)*step;x<=max+step*1e-8;x+=step)list.push(Math.abs(x)<step*1e-8?0:x);
+  return list;
+}
+function plotFrame(id,yBounds,xName) {
+  const p=canvasContext(id),{ctx,w,h}=p;
+  const box={left:w<450?49:59,right:w-18,top:27,bottom:h-35};
+  const X=x=>box.left+(x-state.tMin)/(state.tMax-state.tMin)*(box.right-box.left);
+  const Y=y=>box.bottom-(y-yBounds[0])/(yBounds[1]-yBounds[0])*(box.bottom-box.top);
+  ctx.font='10px system-ui,sans-serif';ctx.fillStyle=colours.muted;ctx.textBaseline='middle';ctx.lineWidth=1;
+  for(const x of niceTicks(state.tMin,state.tMax,w<450?4:7)) {
+    ctx.strokeStyle=colours.grid;ctx.beginPath();ctx.moveTo(X(x),box.top);ctx.lineTo(X(x),box.bottom);ctx.stroke();
+    ctx.textAlign='center';ctx.fillText(fmt(x),X(x),box.bottom+16);
+  }
+  for(const y of niceTicks(...yBounds,4)) {
+    ctx.strokeStyle=colours.grid;ctx.beginPath();ctx.moveTo(box.left,Y(y));ctx.lineTo(box.right,Y(y));ctx.stroke();
+    ctx.textAlign='right';ctx.fillText(fmt(y),box.left-8,Y(y));
+  }
+  ctx.strokeStyle='#bacdd6';ctx.beginPath();
+  if(yBounds[0]<=0&&yBounds[1]>=0){ctx.moveTo(box.left,Y(0));ctx.lineTo(box.right,Y(0));}
+  if(state.tMin<=0&&state.tMax>=0){ctx.moveTo(X(0),box.top);ctx.lineTo(X(0),box.bottom);}
+  ctx.stroke();ctx.fillStyle=colours.muted;ctx.textAlign='left';ctx.font='10px system-ui,sans-serif';ctx.fillText(id==='overlap'&&engine.impulses.length?'Amplitude / impulse weight':'Amplitude',box.left,12);
+  ctx.textAlign='right';ctx.fillText(xName,box.right,h-6);
+  return {...p,box,X,Y,yBounds};
+}
+function clipPlot(p,fn) {const {ctx,box}=p;ctx.save();ctx.beginPath();ctx.rect(box.left,box.top,box.right-box.left,box.bottom-box.top);ctx.clip();fn();ctx.restore();}
+function line(p,data,colour,dash=[],width=2) {
+  const {ctx,X,Y}=p;ctx.strokeStyle=colour;ctx.lineWidth=width;ctx.setLineDash(dash);ctx.beginPath();
+  data.forEach(([x,y],i)=>i?ctx.lineTo(X(x),Y(y)):ctx.moveTo(X(x),Y(y)));ctx.stroke();ctx.setLineDash([]);
+}
+function shade(p,data) {
+  const {ctx,X,Y}=p;
+  // Individual trapezoids split at zero prevent filling across sign changes.
+  for(let i=1;i<data.length;i++) {
+    let [x0,y0]=data[i-1],[x1,y1]=data[i];
+    const segments=[];
+    if(y0*y1<0){const cross=x0+(x1-x0)*(-y0)/(y1-y0);segments.push([x0,y0,cross,0],[cross,0,x1,y1]);}
+    else segments.push([x0,y0,x1,y1]);
+    for(const [a,b,c,d] of segments){ctx.fillStyle=b+d>=0?'#07837b24':'#c85a712d';ctx.beginPath();ctx.moveTo(X(a),Y(0));ctx.lineTo(X(a),Y(b));ctx.lineTo(X(c),Y(d));ctx.lineTo(X(c),Y(0));ctx.closePath();ctx.fill();}
+  }
+}
+function upperSamples() {
+  const span=state.tMax-state.tMin,eps=span*1e-8;
+  const breaks=state.swapped?[0,state.t0-state.delay,state.t0-state.delay-state.width]:[state.delay,state.delay+state.width,state.t0];
+  const xs=Array.from({length:801},(_,i)=>state.tMin+span*i/800);
+  for(const x of breaks)if(x>state.tMin&&x<state.tMax)xs.push(x-eps,x,x+eps);
+  xs.sort((a,b)=>a-b);
+  return xs.map(q=>{const a=state.swapped?engine.impulse(q):engine.input(q),b=state.swapped?engine.input(state.t0-q):engine.impulse(state.t0-q);return [q,a,b,a*b];});
+}
+function deltaArrow(p,position,weight,colour,hollow=false) {
+  const {ctx,X,Y,box}=p;
+  if(position<state.tMin||position>state.tMax)return;
+  const x=X(position),base=Y(0),tip=Y(weight);
+  ctx.strokeStyle=colour;ctx.fillStyle=colour;ctx.setLineDash([]);ctx.lineWidth=hollow?4:2;
+  if(Math.abs(weight)<1e-12) {if(!hollow){ctx.beginPath();ctx.arc(x,base,2,0,2*Math.PI);ctx.fill();}return;}
+  ctx.beginPath();ctx.moveTo(x,base);ctx.lineTo(x,tip);ctx.stroke();
+  const d=weight>0?1:-1,size=hollow?7:4;
+  ctx.lineWidth=hollow?1.5:1;ctx.beginPath();ctx.moveTo(x-size,tip+d*size);ctx.lineTo(x,tip);ctx.lineTo(x+size,tip+d*size);
+  if(hollow)ctx.stroke();else{ctx.closePath();ctx.fill();}
+}
+function drawOverlap() {
+  const p=plotFrame('overlap',upperBounds,'τ (s)'),data=upperSamples(),product=data.map(v=>[v[0],v[3]]);
+  clipPlot(p,()=>{
+    shade(p,product);
+    if(!(state.swapped&&state.system==='train'))line(p,data.map(v=>[v[0],v[1]]),state.swapped?colours.system:colours.input,[],2);
+    if(!(!state.swapped&&state.system==='train'))line(p,data.map(v=>[v[0],v[2]]),state.swapped?colours.input:colours.system,[6,4],2);
+    if(state.system!=='train')line(p,product,colours.product,[],2.1);
+    const x=state.swapped?state.t0-state.delay:state.t0;
+    p.ctx.strokeStyle='#8ca4ad';p.ctx.setLineDash([3,4]);p.ctx.lineWidth=1;p.ctx.beginPath();p.ctx.moveTo(p.X(x),p.box.top);p.ctx.lineTo(p.X(x),p.box.bottom);p.ctx.stroke();p.ctx.setLineDash([]);
+    for(const mass of engine.impulses) {
+      const at=state.swapped?mass.time:state.t0-mass.time;
+      const sample=mass.weight*engine.input(state.t0-mass.time);
+      deltaArrow(p,at,mass.weight,colours.system,true);
+      deltaArrow(p,at,sample,colours.product);
+      if(p.w>450&&engine.impulses.length<=6&&at>=state.tMin&&at<=state.tMax) {
+        const ctx=p.ctx,x=p.X(at),right=x<p.box.right-65;
+        ctx.font='9px system-ui,sans-serif';ctx.textAlign=right?'left':'right';
+        ctx.fillStyle=colours.system;ctx.fillText(`w = ${fmt(mass.weight)}`,x+(right?9:-9),Math.max(p.box.top+10,Math.min(p.box.bottom-22,p.Y(mass.weight)-9)));
+        ctx.fillStyle=colours.product;ctx.fillText(`xw = ${fmt(sample)}`,x+(right?9:-9),Math.max(p.box.top+22,Math.min(p.box.bottom-9,p.Y(sample)+12)));
+      }
+    }
+  });
+  const areas=convolutionAreas(state,state.t0,state.swapped),visible=convolutionAreas(state,state.t0,state.swapped,[state.tMin,state.tMax]);
+  $('positive-area').textContent=fmt(areas.positive,4);$('negative-area').textContent=fmt(areas.negative,4);
+  const value=engine.response(state.t0);$('net-area').textContent=fmt(value,4);
+  const term=v=>v<0?`(${fmt(v,4)})`:fmt(v,4);
+  if(state.system==='train')$('impulse-summary').textContent=`Impulse sum: ${engine.impulses.map(p=>term(p.weight*engine.input(state.t0-p.time))).join(' + ')} = ${fmt(value,4)}.`;
+  else if(isInductorOutput())$('impulse-summary').textContent=`Impulse contribution ${term(areas.impulseNet)} + continuous contribution ${term(areas.regularNet)} = ${fmt(value,4)}.`;
+  const outside=areas.net-visible.net;
+  const outsidePositive=areas.positive-visible.positive,outsideNegative=areas.negative-visible.negative;
+  $('tail-note').hidden=Math.max(Math.abs(outsidePositive),Math.abs(outsideNegative))<1e-7*Math.max(1,Math.abs(value));
+  $('tail-note').textContent=`Outside the visible τ window: positive contribution ${fmt(outsidePositive,4)}, negative contribution ${fmt(outsideNegative,4)} (net ${fmt(outside,4)}). The output includes the full convolution integral.`;
+}
+function drawOutput() {
+  const p=plotFrame('response',outputBounds,'t (s)');
+  clipPlot(p,()=>{
+    line(p,outputData,colours.output,[],2.3);
+    const x=p.X(state.t0),y=p.Y(engine.response(state.t0)),ctx=p.ctx;
+    ctx.strokeStyle='#688db5';ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(x,p.box.top);ctx.lineTo(x,p.box.bottom);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#fff';ctx.strokeStyle=colours.output;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(x,y,5,0,2*Math.PI);ctx.fill();ctx.stroke();
+  });
+  $('response').setAttribute('aria-label',`Output y(t) versus time. At t zero = ${n(state.t0)} seconds, y = ${n(engine.response(state.t0))}.`);
+  $('response-note').textContent=state.system==='train'?'y(t) = K ∑ x(t − mT), m = 0, …, N − 1. At a jump, the plotted value is the value just after the jump.':isInductorOutput()?'yL(t) = Kx(t) − yC(t) − yR(t). The instantaneous term allows jumps; the plotted value is the value just after each jump.':state.input==='original'?'The two-sided input includes its entire past history; the output is not forced to zero at t = 0.':state.system==='rlc'&&state.zeta===0&&state.input==='sine'&&Math.abs(state.omega-state.wn)<1e-8?'At undamped resonance, the oscillation grows as the sinusoid keeps supplying energy.':'The output at each instant is the signed area under the product above.';
+  $('response')._plot=p;
+}
+function draw() {
+  $('time').value=state.t0;
+  if(document.activeElement!==$('time-value'))$('time-value').value=Number(state.t0.toFixed(4));
+  $('time-readout').textContent=state.t0.toFixed(2).replace('-','−');
+  drawOverlap();drawOutput();
+}
+function announce(text) {$('status').textContent=text;}
+function stop() {
+  playing=false;cancelAnimationFrame(raf);$('play').innerHTML='<span aria-hidden="true" class="play-symbol"></span> Play';$('play').setAttribute('aria-pressed','false');
+}
+function tick(timestamp) {
+  if(!playing)return;
+  if(!lastFrame)lastFrame=timestamp;
+  const delta=Math.min(.12,(timestamp-lastFrame)/1000);lastFrame=timestamp;
+  state.t0=Math.min(state.tMax,state.t0+delta*state.speed*(state.tMax-state.tMin)/14);
+  if(timestamp-lastPaint>30||state.t0===state.tMax){draw();lastPaint=timestamp;}
+  if(state.t0>=state.tMax){stop();announce('Animation complete. Press Play to start again.');}
+  else raf=requestAnimationFrame(tick);
+}
+$('play').addEventListener('click',()=>{
+  if(playing){stop();return;}
+  if(state.t0>=state.tMax)state.t0=state.tMin;
+  playing=true;lastFrame=0;$('play').innerHTML='<span aria-hidden="true" class="pause-symbol"></span> Pause';$('play').setAttribute('aria-pressed','true');announce('');raf=requestAnimationFrame(tick);
+});
+$('restart').addEventListener('click',()=>{stop();state.t0=state.tMin;draw();});
+$('time').addEventListener('input',e=>{stop();state.t0=Number(e.target.value);draw();});
+$('time-value').addEventListener('input',e=>{if(e.target.value===''||!Number.isFinite(e.target.valueAsNumber))return;stop();state.t0=clamp(e.target.valueAsNumber,state.tMin,state.tMax);draw();});
+$('time-value').addEventListener('change',()=>{$('time-value').value=Number(state.t0.toFixed(4));});
+$('response').addEventListener('click',e=>{stop();const p=$('response')._plot,rect=$('response').getBoundingClientRect();state.t0=clamp(state.tMin+(e.clientX-rect.left-p.box.left)/(p.box.right-p.box.left)*(state.tMax-state.tMin),state.tMin,state.tMax);draw();});
+for(const key of Object.keys(defaults)) {
+  const el=$(key);if(!el)continue;
+  el.addEventListener(el.type==='number'?'input':'change',()=>{
+    let v=el.type==='checkbox'?el.checked:el.type==='number'?el.valueAsNumber:el.value;
+    if(key==='speed')v=Number(v);
+    if(key in numericBounds&&(!Number.isFinite(v)||v<numericBounds[key][0]||v>numericBounds[key][1]))return;
+    if(key==='count'&&!Number.isInteger(v)){announce('The number of impulses must be a whole number.');return;}
+    if(key==='zeta'&&isResistorOutput()&&v<.01) {
+      el.setAttribute('aria-invalid','true');
+      announce('For resistor voltage, choose ζ ≥ 0.01. At ζ = 0, R = 0 and the resistor output is zero.');
+      return;
+    }
+    if((key==='tMin'&&v>=state.tMax)||(key==='tMax'&&v<=state.tMin)||(key==='yMin'&&v>=state.yMax)||(key==='yMax'&&v<=state.yMin)){announce('The minimum must be less than the maximum.');return;}
+    announce('');state[key]=v;
+    if(['tMin','tMax'].includes(key))state.autoTime=false;
+    if(['yMin','yMax'].includes(key))state.autoScale=false;
+    if(key==='speed')return;
+    stop();$('example').value='custom';rebuild();
+  });
+  if(el.type==='number') {
+    const commitValue=()=>{
+      if(key==='zeta'&&el.getAttribute('aria-invalid')==='true') {
+        el.removeAttribute('aria-invalid');
+        announce(`Resistor voltage requires positive damping. Kept ζ = ${n(state.zeta)}.`);
+      }
+      el.value=state[key];
+    };
+    el.addEventListener('change',commitValue);
+    el.addEventListener('blur',commitValue);
+  }
+}
+document.querySelectorAll('[data-zeta]').forEach(b=>b.addEventListener('click',()=>{if(b.hidden)return;stop();state.zeta=Number(b.dataset.zeta);$('example').value='custom';rebuild(true);}));
+const examples={
+  pulseRC:{input:'pulse',system:'rc',width:2,tau:1,t0:1.5},
+  stepRLC:{input:'step',system:'rlc',wn:2,zeta:.25,t0:2},
+  highpass:{input:'step',system:'rlc',output:'inductor',wn:2,zeta:.25,t0:.7},
+  impulseTrain:{input:'pulse',width:2,system:'train',spacing:1.5,count:4,t0:1.8,swapped:true},
+  resonance:{input:'sine',system:'rlc',omega:2,wn:2,zeta:0,t0:7},
+  signed:{input:'pulse',width:2,system:'rlc',output:'resistor',wn:2,zeta:.25,t0:3},
+  original:{input:'original',system:'integrator',rate:.5,t0:-2.5,autoTime:false,tMin:-10,tMax:10}
+};
+$('example').addEventListener('change',()=>{const ex=examples[$('example').value];if(!ex)return;stop();state={...defaults,...ex};rebuild(true);announce($('example').selectedOptions[0].textContent+' loaded.');});
+$('download').addEventListener('click',()=>{
+  stop();
+  const copy=document.documentElement.cloneNode(true);
+  copy.querySelector('#saved-state').textContent=JSON.stringify(state).replace(/</g,'\\u003c');
+  copy.querySelector('#status').textContent='';
+  const html='<!DOCTYPE html>\n'+copy.outerHTML;
+  const url=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
+  const link=document.createElement('a');link.href=url;link.download='Convolution_Explorer.html';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  announce('Downloaded Convolution_Explorer.html with the current experiment settings.');
+});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});
+new ResizeObserver(()=>{if(engine)draw();}).observe($('overlap').parentElement);
+if(Object.keys(saved).length)$('example').value='custom';
+rebuild(true);
+</script>
+</body>
+</html>

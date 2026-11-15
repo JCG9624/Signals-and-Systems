@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Interactive series RLC capacitor-voltage response to a sinusoidal input: steady state, switching transient, and initial-condition response, with a static time slider.">
-<title>RLC Capacitor Voltage — Interactive Response</title>
+<meta name="description" content="RLC Studio: capacitor, resistor and inductor voltage responses to a sinusoidal input, with damping controls, initial conditions and exact transient cancellation.">
+<title>RLC Studio — Three Voltage Outputs</title>
 <style>
 :root{--navy:#133b62;--navy2:#235276;--teal:#008e9a;--orange:#e87528;--purple:#8155b6;--slate:#9aabba;--ink:#1b344a;--muted:#59758b;--line:#dbe6ed;--bg:#f6f9fc;--shadow:0 2px 13px rgba(20,61,96,.045)}
 *{box-sizing:border-box}
@@ -12,6 +12,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,-apple-sys
 main{max-width:1420px;margin:auto;padding:25px 27px 40px}
 header{display:flex;gap:20px;justify-content:space-between;align-items:start;margin-bottom:15px}
 h1{font-size:clamp(23px,2.5vw,35px);font-weight:745;color:var(--navy);letter-spacing:-.045em;margin:0 0 5px}
+.title-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}.title-row h1{margin:0}.brand-mark{display:grid;place-items:center;width:46px;height:46px;flex-shrink:0;border-radius:11px;background:var(--navy);color:#bde9e8}.brand-mark svg{width:40px;height:36px;display:block}
 .eyebrow{color:#5987a3;letter-spacing:.16em;text-transform:uppercase;font-size:11px;font-weight:780;margin-bottom:6px}
 .subtitle{color:var(--muted);font-size:14px;max-width:880px;margin:0}
 .formula{background:#e9f4f9;border:1px solid #d0e8f4;border-radius:12px;padding:12px 16px;font-family:Georgia,"Times New Roman",serif;font-size:21px;color:var(--navy);text-align:center;min-width:315px;white-space:nowrap}
@@ -25,6 +26,7 @@ h1{font-size:clamp(23px,2.5vw,35px);font-weight:745;color:var(--navy);letter-spa
 .control-head label{font-size:12px;color:var(--navy);font-weight:720}
 .number-wrap{display:flex;gap:5px;align-items:center;flex-shrink:0;color:#647f93;font-size:12px}
 .number-wrap input{width:72px;text-align:right;font-size:15px;padding:4px 5px;background:#f8fbfd;border:1px solid #ccdeea;color:var(--navy);border-radius:7px;font-variant-numeric:tabular-nums;font-weight:750}
+.control-head{flex-wrap:wrap}.number-wrap input:disabled{background:#edf4f8;color:#3b5d78;opacity:1}#vcNum,#ilNum{width:110px}.output-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:13px}.output-row label{font-size:12px;font-weight:750;color:var(--navy)}.output-row select{max-width:100%;min-height:38px;border:1px solid #bfd8e4;border-radius:9px;padding:7px 28px 7px 10px;color:var(--navy);background:#f7fbfd;font:inherit;font-size:13px;font-weight:600;cursor:pointer}.filter-type{font-size:11px;font-weight:700;color:var(--teal);background:#eef8f7;border:1px solid #d3ebe8;padding:5px 9px;border-radius:7px}.initial-options{margin-top:13px;padding:11px 12px;border:1px solid #dcebe9;border-radius:9px;background:#f7fbfa}.cancel-toggle{display:flex;align-items:center;gap:7px;color:var(--navy);font-size:12px;font-weight:700;cursor:pointer}.cancel-toggle input{width:16px;height:16px;accent-color:var(--teal);cursor:pointer}.matched-values{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:11px;color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums}.matched-values strong{color:var(--navy);font-weight:700}.initial-help,.parameter-note{font-size:11px;line-height:1.5;color:var(--muted);margin:6px 0 0}.parameter-note math{font-size:13px;font-family:"Cambria Math","STIX Two Math",math}.range-note{color:#705931}.cancel-note{margin:3px 20px 10px;padding:9px 12px;background:#edf8f7;border:1px solid #d2ece9;color:#176b70;border-radius:8px;font-size:12px;line-height:1.5}input:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid #9dd5d9;outline-offset:3px}
 input[type=range]{cursor:pointer;width:100%;accent-color:var(--teal);height:18px;margin:0}
 .range-label{display:flex;justify-content:space-between;font-size:10px;color:#91a1af}
 .preset-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:13px;padding-top:11px;border-top:1px solid #edf2f6}
@@ -73,45 +75,48 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
 <body>
 <main>
 <header>
- <div><div class="eyebrow">Signals &amp; Systems · series RLC circuit</div><h1>Sinusoidal response of a series RLC circuit</h1><p class="subtitle">Output: capacitor voltage. Adjust the frequency, R, L, C and initial conditions to explore oscillatory, critically damped and overdamped responses. The full curves update immediately; use the static slider to inspect any instant.</p></div>
- <div class="formula"><span class="orange">H</span>(s) = <span class="frac"><span class="num">1</span><span class="den">LCs² + RCs + 1</span></span></div>
+ <div><div class="eyebrow">Signals &amp; Systems · series RLC circuit</div><div class="title-row"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 64 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h6l2-4 4 8 4-8 4 8 2-4h4c0-10 6-10 6 0 0-10 6-10 6 0 0-10 6-10 6 0h7v12M47 25h14M47 30h14M54 30v12H3"/></svg></span><h1>RLC Studio</h1></div><p class="subtitle">Choose capacitor, resistor or inductor voltage as the output. Adjust the frequency, R, L, C and initial conditions, or match the initial state to cancel the net transient. The full curves update immediately.</p></div>
+ <div class="formula"><span class="orange">H<sub id="transferSub">C</sub></span>(s) = <span class="frac"><span class="num" id="transferNumerator">1</span><span class="den">LCs² + RCs + 1</span></span></div>
 </header>
 <div class="top-row">
 <section class="panel controls" aria-label="RLC circuit parameters">
- <h2 class="section-name">Parameters and initial conditions</h2>
+ <h2 class="section-name">Output, parameters and initial conditions</h2>
+ <div class="output-row"><label for="output">Measured output</label><select id="output"><option value="capacitor">Capacitor voltage · low-pass</option><option value="resistor">Resistor voltage · band-pass</option><option value="inductor">Inductor voltage · high-pass</option></select><span class="filter-type" id="filterType">Low-pass</span></div>
  <div class="control-grid">
   <div><div class="control-head"><label for="freq">Input frequency</label><span class="number-wrap"><input id="freqNum" type="number" min="0.2" max="12" step="0.05" value="1.50"><span>Hz</span></span></div><input id="freq" type="range" min="0.2" max="12" step="0.05" value="1.50"><div class="range-label"><span>0.2 Hz</span><span>12 Hz</span></div></div>
   <div><div class="control-head"><label for="res">Resistance R</label><span class="number-wrap"><input id="resNum" type="number" min="0.1" max="120" step="any" value="3"><span>Ω</span></span></div><input id="res" type="range" min="0.1" max="120" step="any" value="3"><div class="range-label"><span>0.1 Ω</span><span>120 Ω</span></div></div>
   <div><div class="control-head"><label for="ind">Inductance L</label><span class="number-wrap"><input id="indNum" type="number" min="0.1" max="1.5" step="0.01" value="0.4"><span>H</span></span></div><input id="ind" type="range" min="0.1" max="1.5" step="0.01" value="0.4"><div class="range-label"><span>0.10 H</span><span>1.50 H</span></div></div>
   <div><div class="control-head"><label for="cap">Capacitance C</label><span class="number-wrap"><input id="capNum" type="number" min="2" max="80" step="0.5" value="15"><span>mF</span></span></div><input id="cap" type="range" min="2" max="80" step="0.5" value="15"><div class="range-label"><span>2 mF</span><span>80 mF</span></div></div>
-  <div><div class="control-head"><label for="vc">Initial capacitor voltage</label><span class="number-wrap"><input id="vcNum" type="number" min="-2" max="2" step="0.05" value="0.45"><span>V</span></span></div><input id="vc" type="range" min="-2" max="2" step="0.05" value="0.45"><div class="range-label"><span>−2 V</span><span>+2 V</span></div></div>
-  <div><div class="control-head"><label for="il">Initial inductor current</label><span class="number-wrap"><input id="ilNum" type="number" min="-0.3" max="0.3" step="0.01" value="0"><span>A</span></span></div><input id="il" type="range" min="-0.3" max="0.3" step="0.01" value="0"><div class="range-label"><span>−0.3 A</span><span>+0.3 A</span></div></div>
+  <div><div class="control-head"><label for="vc">Initial capacitor voltage</label><span class="number-wrap"><input id="vcNum" aria-label="Initial capacitor voltage number" type="number" min="-2" max="2" step="0.05" value="0.45"><span>V</span></span></div><input id="vc" type="range" min="-2" max="2" step="0.05" value="0.45"><div class="range-label"><span id="vcMinLabel">−2 V</span><span id="vcMaxLabel">+2 V</span></div></div>
+  <div><div class="control-head"><label for="il">Initial inductor current</label><span class="number-wrap"><input id="ilNum" aria-label="Initial inductor current number" type="number" min="-0.3" max="0.3" step="0.01" value="0"><span>A</span></span></div><input id="il" type="range" min="-0.3" max="0.3" step="0.01" value="0"><div class="range-label"><span id="ilMinLabel">−0.3 A</span><span id="ilMaxLabel">+0.3 A</span></div></div>
  </div>
+ <div class="initial-options"><label class="cancel-toggle"><input id="cancelTransient" type="checkbox" aria-describedby="initialHelp">Cancel net transient for all three outputs</label><div class="matched-values"><span>Match V<sub>C</sub>(0<sup>−</sup>): <strong id="matchV">—</strong></span><span>Match i<sub>L</sub>(0<sup>−</sup>): <strong id="matchI">—</strong></span></div><p class="initial-help" id="initialHelp">Match both stored-energy states to their steady-state values at t = 0.</p><p class="initial-help range-note" id="matchedRangeNote" hidden>Near resonance, the required stored voltage or current can exceed the usual manual ranges. The matching values are applied without clipping.</p></div>
  <div class="preset-row"><span class="preset-title">Damping examples:</span><button class="preset" type="button" data-zeta="0.3">Underdamped</button><button class="preset" type="button" data-zeta="1">Critical damping</button><button class="preset" type="button" data-zeta="2">Overdamped</button><span class="stat" style="margin-left:auto">Input amplitude: <b>1 V</b></span></div>
- <div class="statbar"><span class="regime" id="regime">Underdamped</span><span class="stat">ζ = <b id="zetaStat">0.290</b></span><span class="stat">Natural frequency fₙ = <b id="fnStat">2.055 Hz</b></span><span class="stat">Critical resistance R<sub>crit</sub> = <b id="rcritStat">10.328 Ω</b></span><span class="stat">|H(jω)| = <b id="gainStat">0.000</b></span><span class="stat">Phase = <b id="phaseStat">0°</b></span></div>
+ <div class="statbar"><span class="regime" id="regime">Underdamped</span><span class="stat">ζ = <b id="zetaStat">0.290</b></span><span class="stat">Input ω₀ = <b id="omegaStat">—</b></span><span class="stat">Natural ωₙ = <b id="wnStat">—</b></span><span class="stat">fₙ = <b id="fnStat">2.055 Hz</b></span><span class="stat">r = ω₀/ωₙ = <b id="ratioStat">—</b></span><span class="stat">R<sub>crit</sub> = <b id="rcritStat">10.328 Ω</b></span><span class="stat">|H(jω₀)| = <b id="gainStat">0.000</b></span><span class="stat">Phase = <b id="phaseStat">0°</b></span></div>
+ <p class="parameter-note"><math><msub><mi>ω</mi><mn>0</mn></msub><mo>=</mo><mn>2</mn><mi>π</mi><mi>f</mi></math> is the input angular frequency; <math><msub><mi>ω</mi><mi>n</mi></msub><mo>=</mo><mfrac><mn>1</mn><msqrt><mrow><mi>L</mi><mi>C</mi></mrow></msqrt></mfrac></math> is the natural angular frequency; ζ = (R/2)√(C/L). The frequency ratio r = ω₀/ωₙ is dimensionless.</p>
 </section>
-<section class="panel schematic" aria-label="Series RLC schematic, capacitor-voltage output">
- <div class="section-name" style="align-self:start;margin:0">Series RLC · capacitor output</div>
- <svg viewBox="0 0 310 200" role="img" aria-label="Sinusoidal voltage source connected in series to a resistor and inductor, then a capacitor to ground. Output measured across capacitor.">
+<section class="panel schematic" id="schematicPanel" aria-label="Series RLC schematic, capacitor-voltage output">
+ <div class="section-name" id="schematicTitle" style="align-self:start;margin:0">Series RLC · capacitor output</div>
+ <svg id="circuitDiagram" viewBox="0 0 310 200" role="img" aria-label="Series RLC circuit; output measured across the capacitor.">
  <g fill="none" stroke="#1e4b70" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
  <path d="M24 62 L24 82 M24 122 L24 165 L263 165 L263 130"/><circle cx="24" cy="102" r="20"/>
- <path d="M24 62 H57 l7 -8 12 16 12 -16 12 16 12 -16 9 8 H139"/>
- <path d="M139 62 C139 45,151 45,151 62 C151 45,163 45,163 62 C163 45,175 45,175 62 C175 45,187 45,187 62 H263 V93"/>
- <path d="M245 96 H281 M245 109 H281 M263 109 V130"/>
+ <path id="schematicR" d="M24 62 H57 l7 -8 12 16 12 -16 12 16 12 -16 9 8 H139"/>
+ <path id="schematicL" d="M139 62 C139 45,151 45,151 62 C151 45,163 45,163 62 C163 45,175 45,175 62 C175 45,187 45,187 62 H263 V93"/>
+ <path id="schematicC" d="M245 96 H281 M245 109 H281 M263 109 V130"/>
  <path d="M11 102 Q17 90 24 102 T37 102" stroke="#e87528"/>
  <path d="M245 170 H281 M251 176 H275 M257 182 H269" stroke="#7291a8" stroke-width="2"/>
  </g>
- <g font-size="15" font-family="system-ui,Arial,sans-serif" fill="#1c496e" font-weight="650"><text x="83" y="40">R</text><text x="167" y="35">L</text><text x="289" y="106">C</text><text x="4" y="138" font-size="13">u(t)</text><text x="226" y="80" fill="#008e9a">+</text><text x="226" y="140" fill="#008e9a">−</text><text x="207" y="113" fill="#008e9a">v<tspan baseline-shift="sub" font-size="11">C</tspan></text></g>
+ <g font-size="15" font-family="system-ui,Arial,sans-serif" fill="#1c496e" font-weight="650"><text x="83" y="87">R</text><text x="162" y="87">L</text><text x="289" y="106">C</text><text x="4" y="138" font-size="13">u(t)</text><text id="outputPlus" x="226" y="80" fill="#008e9a">+</text><text id="outputMinus" x="226" y="140" fill="#008e9a">−</text><text id="voltageLabel" x="207" y="113" fill="#008e9a">v<tspan id="voltageSub" baseline-shift="sub" font-size="11">C</tspan></text></g>
  <circle cx="263" cy="62" r="4" fill="#008e9a"/>
  </svg>
- <div class="schematic-caption">LC ÿ(t) + RC ẏ(t) + y(t) = u(t)</div>
+ <div class="schematic-caption" id="outputRelation">y(t) = vC(t)</div><div class="schematic-caption">C v̇C = iL; &nbsp; L i̇L = u − RiL − vC</div>
 </section>
 </div>
-<section class="panel chart-card" aria-label="Capacitor response plots">
- <div class="chart-head"><h2>Input and capacitor output</h2><span>Curves show the whole time interval · click on a plot to inspect a time</span></div>
+<section class="panel chart-card" id="responsePlots" aria-label="Capacitor response plots">
+ <div class="chart-head"><h2 id="outputPlotTitle">Input and capacitor output</h2><span>Curves show the whole time interval · click on a plot to inspect a time</span></div>
  <div class="legend">
   <label style="--color:var(--slate)"><input data-series="input" type="checkbox" checked><span class="swatch dotted"></span>Input u(t)</label>
-  <label style="--color:var(--teal)"><input data-series="total" type="checkbox" checked><span class="swatch"></span>Total output v<sub>C</sub>(t)</label>
+  <label style="--color:var(--teal)"><input data-series="total" type="checkbox" checked><span class="swatch"></span>Total output v<sub class="output-sub">C</sub>(t)</label>
   <label style="--color:var(--navy)"><input data-series="steady" type="checkbox" checked><span class="swatch dashed"></span>Steady state</label>
  </div>
  <svg id="mainPlot" class="chart-svg" viewBox="0 0 1120 325" role="img" aria-label="Input voltage, capacitor total voltage and steady-state voltage over time"></svg>
@@ -122,6 +127,7 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
   <label style="--color:var(--orange)"><input data-series="transient" type="checkbox" checked><span class="swatch"></span>Switching transient</label>
   <label style="--color:var(--purple)"><input data-series="initial" type="checkbox" checked><span class="swatch"></span>Initial conditions</label>
  </div>
+ <p class="cancel-note" id="cancellationNote" hidden>Both initial states match steady state. The switching and initial-condition contributions cancel for the selected output, so total output equals steady state.</p>
  <svg id="partsPlot" class="chart-svg" viewBox="0 0 1120 272" role="img" aria-label="Sinusoidal steady state, switching transient and initial-condition response over time"></svg>
  <div class="bottom-row"><label for="scrub">Inspect at time</label><input type="range" min="0" max="1000" step="1" value="0" id="scrub"><output id="scrubTime" class="time-read">0.000 s</output><span class="bottom-hint">Static slider — no running-time animation</span><label for="window" style="margin-left:auto">Time window</label><select id="window" style="background:#fff;border:1px solid #d6e5ee;border-radius:7px;padding:5px;color:#284f6f"><option value="2">2 s</option><option value="4" selected>4 s</option><option value="6">6 s</option><option value="10">10 s</option><option value="15">15 s</option></select></div>
  <div class="readouts" aria-label="Curve values at selected time">
@@ -129,18 +135,66 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
   <div class="readout" style="--color:var(--navy)"><div class="key">Steady-state voltage</div><div class="value" id="ssRead">0.000 V</div></div>
   <div class="readout" style="--color:var(--orange)"><div class="key">Switching transient</div><div class="value" id="trRead">0.000 V</div></div>
   <div class="readout" style="--color:var(--purple)"><div class="key">Initial-condition response</div><div class="value" id="icRead">0.000 V</div></div>
-  <div class="readout" style="--color:var(--teal)"><div class="key">Total capacitor voltage</div><div class="value" id="yRead">0.000 V</div></div>
+  <div class="readout" style="--color:var(--teal)"><div class="key" id="outputReadLabel">Total capacitor voltage</div><div class="value" id="yRead">0.000 V</div></div>
  </div>
 </section>
 <section class="equations" aria-label="Analytical expressions">
- <div class="eqcard" style="--color:var(--navy)"><h3><span class="eqdot"></span>Sinusoidal steady state</h3><div class="eq">y<sub>ss</sub>(t) = M sin(ωt + φ)</div><div class="eqsub">M = 1/√[(1 − LCω²)² + (RCω)²], &nbsp;φ = −atan2(RCω, 1 − LCω²)</div></div>
- <div class="eqcard" style="--color:var(--orange)"><h3><span class="eqdot"></span>Switching transient (zero-state)</h3><div class="eq">y<sub>tr</sub>(t) = −y<sub>ss</sub>(0) g<sub>0</sub>(t) − ẏ<sub>ss</sub>(0) g<sub>1</sub>(t)</div><div class="eqsub">Cancels the initial value and initial slope of the sinusoidal particular solution</div></div>
- <div class="eqcard" style="--color:var(--purple)"><h3><span class="eqdot"></span>Initial-condition response (zero-input)</h3><div class="eq">y<sub>IC</sub>(t) = V<sub>C</sub>(0<sup>−</sup>) g<sub>0</sub>(t) + [i<sub>L</sub>(0<sup>−</sup>)/C] g<sub>1</sub>(t)</div><div class="eqsub">g₀(0) = 1, ġ₀(0) = 0; g₁(0) = 0, ġ₁(0) = 1</div></div>
- <div class="eqcard" style="--color:var(--teal)"><h3><span class="eqdot"></span>Total capacitor voltage</h3><div class="eq">y(t) = y<sub>ss</sub>(t) + y<sub>tr</sub>(t) + y<sub>IC</sub>(t)</div><div class="eqsub">y(0⁺) = V<sub>C</sub>(0⁻), &nbsp;ẏ(0⁺) = i<sub>L</sub>(0⁻)/C</div></div>
+ <div class="eqcard" style="--color:var(--navy)"><h3><span class="eqdot"></span>Sinusoidal steady state</h3><div class="eqtext">y<sub>ss</sub>(t) = M sin(ω₀t + φ)</div><div class="eqsub" id="steadyFormula">M = |HC(jω₀)|; φ = arg HC(jω₀).</div></div>
+ <div class="eqcard" style="--color:var(--orange)"><h3><span class="eqdot"></span>Switching transient (zero-state)</h3><div class="eqtext">y<sub>tr</sub>(t) = −v<sub>C,ss</sub>(0) F<sub>V</sub>(t) − i<sub>L,ss</sub>(0) F<sub>I</sub>(t)</div><div class="eqsub">Cancels the two initial circuit states of the steady-state particular solution.</div></div>
+ <div class="eqcard" style="--color:var(--purple)"><h3><span class="eqdot"></span>Initial-condition response (zero-input)</h3><div class="eqtext">y<sub>IC</sub>(t) = V<sub>C</sub>(0<sup>−</sup>) F<sub>V</sub>(t) + i<sub>L</sub>(0<sup>−</sup>) F<sub>I</sub>(t)</div><div class="eqsub" id="basisFormula">FV = g₀; FI = g₁/C.</div><div class="eqsub">F<sub>V</sub> is the selected output per unit initial capacitor voltage; F<sub>I</sub> is the selected output per unit initial inductor current.</div></div>
+ <div class="eqcard" style="--color:var(--teal)"><h3><span class="eqdot"></span>Total selected voltage</h3><div class="eqtext">y(t) = y<sub>ss</sub>(t) + y<sub>tr</sub>(t) + y<sub>IC</sub>(t)</div><div class="eqsub" id="outputInitialValue">vC(0⁺) = VC(0⁻).</div><div class="eqsub">g₀(0) = 1, ġ₀(0) = 0; g₁(0) = 0, ġ₁(0) = 1. Both solve g̈ + (R/L)ġ + g/(LC) = 0.</div></div>
 </section>
-<p class="explanation"><b>What to notice:</b> unlike the RC circuit, the RLC transient can oscillate, and the rate of decay depends on the damping ratio ζ. The <b>switching transient</b> belongs to the response to the input with zero initial conditions; the <b>initial-condition response</b> is the separate response caused by energy already stored in the capacitor and inductor. Both contributions use the same natural modes.</p>
-<footer>Ideal series RLC circuit · u(t) = sin(2πft) V for t ≥ 0 · v<sub>C</sub>(t) is the output · static inspection slider · standalone HTML / JavaScript without external libraries</footer>
+<p class="explanation"><b>What to notice:</b> all three outputs belong to the same circuit and share its two stored-energy states. Capacitor voltage gives a low-pass response, resistor voltage a band-pass response, and inductor voltage a high-pass response. The <b>switching transient</b> is part of the zero-state response; the <b>initial-condition response</b> comes from stored capacitor and inductor energy. Matching both initial states to steady state cancels the net transient for all three outputs. Their total voltages always satisfy vC + vR + vL = u.</p>
+<footer>Ideal series RLC circuit · u(t) = sin(2πft) V for t ≥ 0 · output selected across C, R or L · static inspection slider · standalone HTML / JavaScript without external libraries</footer>
 </main>
+<script id="rlc-math">
+(function(root){
+  'use strict';
+  const sinc=x=>Math.abs(x)<1e-4?1-x*x/6+x**4/120:Math.sin(x)/x;
+  function parameters(s){
+    const {f,R,L,C}=s,omega0=2*Math.PI*f,wn=1/Math.sqrt(L*C),alpha=R/(2*L),zeta=alpha/wn;
+    const a=1-L*C*omega0**2,b=R*C*omega0,den=a*a+b*b;
+    const capacitor={re:a/den,im:-b/den};
+    const resistor={re:-b*capacitor.im,im:b*capacitor.re};
+    const inductor={re:-L*C*omega0**2*capacitor.re,im:-L*C*omega0**2*capacitor.im};
+    const phasors={capacitor,resistor,inductor},selected=phasors[s.output]||capacitor;
+    return {omega0,wn,alpha,zeta,ratio:omega0/wn,Rcrit:2*Math.sqrt(L/C),phasors,
+      M:Math.hypot(selected.re,selected.im),phase:Math.atan2(selected.im,selected.re),
+      matchV:capacitor.im,matchI:C*omega0*capacitor.re};
+  }
+  function model(s){
+    const {R,L,C,V0,I0}=s,p=parameters(s),{omega0,wn,alpha}=p;
+    const output=s.output||'capacitor';
+    function basis(t){
+      const d=wn*wn-alpha*alpha;
+      let g0,g1,dg1;
+      if(d>=0){
+        const wd=Math.sqrt(d),e=Math.exp(-alpha*t),c=e*Math.cos(wd*t);
+        g1=e*t*sinc(wd*t);g0=c+alpha*g1;dg1=c-alpha*g1;
+      }else{
+        const beta=Math.sqrt(-d),r1=-wn*wn/(alpha+beta),r2=-alpha-beta,e1=Math.exp(r1*t);
+        g1=e1*(-Math.expm1((r2-r1)*t))/(r1-r2);
+        g0=e1-r1*g1;dg1=e1+r2*g1;
+      }
+      return {g0,g1,dg0:-wn*wn*g1,dg1};
+    }
+    function natural(b,v,i){return {v:v*b.g0+(i/C)*b.g1,i:C*v*b.dg0+i*b.dg1};}
+    function project(x,input=0){return output==='resistor'?R*x.i:output==='inductor'?input-x.v-R*x.i:x.v;}
+    return {...p,basis,values(t){
+      const sin=Math.sin(omega0*t),cos=Math.cos(omega0*t),h=p.phasors.capacitor;
+      const steadyState={v:h.re*sin+h.im*cos,i:C*omega0*(h.re*cos-h.im*sin)};
+      const b=basis(t),steady=project(steadyState,sin);
+      const transient=-project(natural(b,p.matchV,p.matchI));
+      const initial=project(natural(b,V0,I0));
+      // Subtract physical states before propagation. Exact matching therefore
+      // leaves an exactly zero natural response, without display rounding.
+      const error=natural(b,V0-p.matchV,I0-p.matchI);
+      return {input:sin,steady,transient,initial,total:steady+project(error)};
+    }};
+  }
+  root.RLCMath={parameters,model};
+})(globalThis);
+</script>
 <script>
 (()=>{
 'use strict';
@@ -148,46 +202,28 @@ const $=id=>document.getElementById(id);
 const NS='http://www.w3.org/2000/svg';
 const clr={input:'#9aabba',total:'#008e9a',steady:'#173b65',transient:'#e87528',initial:'#8155b6'};
 const enabled={input:true,total:true,steady:true,transient:true,initial:true};
-const state={f:1.5,R:3,L:0.4,C:0.015,V0:0.45,I0:0,T:4,t:0};
+const state={f:1.5,R:3,L:0.4,C:0.015,V0:0.45,I0:0,manualV0:0.45,manualI0:0,output:"capacitor",cancel:false,T:4,t:0};
 const refs=[];
 const paramDefs={freq:{key:'f'},res:{key:'R'},ind:{key:'L'},cap:{key:'C',scale:.001},vc:{key:'V0'},il:{key:'I0'}};
 function svg(tag,props,parent){const el=document.createElementNS(NS,tag); for(const [k,v] of Object.entries(props||{}))el.setAttribute(k,String(v));if(parent)parent.appendChild(el);return el;}
 function text(parent,x,y,value,props={}){const el=svg('text',{x,y,fill:'#607b90','font-size':12,'font-family':'-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif',...props},parent);el.textContent=value;return el;}
 function niceMax(v){const p=Math.pow(10,Math.floor(Math.log10(Math.max(1e-6,v))));const a=[1,1.25,1.5,2,2.5,3,4,5,6,8,10];return (a.find(x=>x*p>=v)||10)*p;}
 function fixed(v,d=3){if(!Number.isFinite(v))return '—';if(Math.abs(v)<0.5*Math.pow(10,-d))v=0;return v.toFixed(d);}
-function model(){
- const {f,R,L,C,V0,I0}=state, w=2*Math.PI*f,wn=1/Math.sqrt(L*C),alpha=R/(2*L),zeta=alpha/wn;
- const a=1-L*C*w*w,b=R*C*w,den=Math.hypot(a,b),M=1/den,phase=-Math.atan2(b,a);
- const yss0=M*Math.sin(phase), yssp0=M*w*Math.cos(phase);
- let g0,g1;
- if (zeta<1-1e-6){
-  const wd=Math.sqrt(wn*wn-alpha*alpha);
-  g1=t=>Math.exp(-alpha*t)*Math.sin(wd*t)/wd;
-  g0=t=>Math.exp(-alpha*t)*(Math.cos(wd*t)+alpha*Math.sin(wd*t)/wd);
- }else if(zeta>1+1e-6){
-  const beta=Math.sqrt(alpha*alpha-wn*wn),r1=-alpha+beta,r2=-alpha-beta,d=r1-r2;
-  g1=t=>(Math.exp(r1*t)-Math.exp(r2*t))/d;
-  g0=t=>(-r2*Math.exp(r1*t)+r1*Math.exp(r2*t))/d;
- }else{
-  g1=t=>t*Math.exp(-alpha*t);
-  g0=t=>(1+alpha*t)*Math.exp(-alpha*t);
- }
- return {w,wn,alpha,zeta,M,phase,yss0,yssp0,g0,g1,values(t){
-  const ss=M*Math.sin(w*t+phase),base0=g0(t),base1=g1(t);
-  const transient=-yss0*base0-yssp0*base1;
-  const initial=V0*base0+(I0/C)*base1;
-  return {input:Math.sin(w*t),steady:ss,transient,initial,total:ss+transient+initial};
- }};
-}
+function model(){return RLCMath.model(state);}
 let currentModel=model();
 function drawPlot(plotId,series,height){
- const el=$(plotId);el.replaceChildren(); const W=1120,left=75,right=25,top=16,bottom=42,pw=W-left-right,ph=height-top-bottom;
+ const el=$(plotId);el.replaceChildren();
+ const W=Math.max(300,el.clientWidth||1120),compact=W<600;
+ if(compact)height=Math.min(height,250);
+ el.setAttribute('viewBox',`0 0 ${W} ${height}`);
+ const left=compact?58:75,right=compact?20:25,top=16,bottom=42,pw=W-left-right,ph=height-top-bottom;
  const N=1300,samples=Array.from({length:N+1},(_,i)=>currentModel.values(state.T*i/N));
  let maximum=0;for(const x of samples)for(const s of series)maximum=Math.max(maximum,Math.abs(x[s]));
  const ym=niceMax(Math.max(.25,maximum*1.1)),xx=t=>left+pw*t/state.T,yy=v=>top+ph*(ym-v)/(2*ym);
  svg('rect',{x:left,y:top,width:pw,height:ph,fill:'#fff'},el);
  for(let i=0;i<=4;i++){const v=ym-i*ym/2,y=yy(v);svg('line',{x1:left,y1:y,x2:left+pw,y2:y,stroke:Math.abs(v)<1e-10?'#aabfcf':'#e8eff4','stroke-width':Math.abs(v)<1e-10?1.5:1},el);text(el,left-10,y+4,fixed(v,ym>=3?1:2),{'text-anchor':'end'});}
- for(let i=0;i<=8;i++){const t=state.T*i/8,x=xx(t);svg('line',{x1:x,y1:top,x2:x,y2:top+ph,stroke:'#edf2f6'},el);text(el,x,top+ph+21,fixed(t,state.T>=10?1:2),{'text-anchor':'middle'});}
+ const tickCount=compact?4:8;
+ for(let i=0;i<=tickCount;i++){const t=state.T*i/tickCount,x=xx(t);svg('line',{x1:x,y1:top,x2:x,y2:top+ph,stroke:'#edf2f6'},el);text(el,x,top+ph+21,fixed(t,state.T>=10?1:2),{'text-anchor':'middle'});}
  svg('line',{x1:left,y1:top,x2:left,y2:top+ph,stroke:'#a6becf','stroke-width':1.2},el);svg('line',{x1:left,y1:top+ph,x2:left+pw,y2:top+ph,stroke:'#a6becf','stroke-width':1.2},el);
  text(el,W/2,height-5,'Time (s)',{'text-anchor':'middle',fill:'#496d85'});const vl=text(el,19,top+ph/2,'Voltage (V)',{'text-anchor':'middle',fill:'#496d85'});vl.setAttribute('transform',`rotate(-90 19 ${top+ph/2})`);
  const paths=[],points=[];
@@ -203,7 +239,7 @@ function drawPlot(plotId,series,height){
  track.addEventListener('click',e=>{const r=el.getBoundingClientRect();const px=(e.clientX-r.left)*W/r.width;state.t=Math.max(0,Math.min(state.T,(px-left)/pw*state.T));updateCursor();});
  refs.push({paths,points,cursor,xx,yy});
 }
-function redraw(){currentModel=model();refs.length=0;drawPlot('mainPlot',['input','steady','total'],325);drawPlot('partsPlot',['steady','transient','initial'],272);updateCursor();}
+function redraw(){currentModel=model();updateStats();updatePresentation();refs.length=0;drawPlot('mainPlot',['input','steady','total'],325);drawPlot('partsPlot',['steady','transient','initial'],272);updateCursor();}
 function updateCursor(){
  const v=currentModel.values(state.t);
  for(const ref of refs){const x=ref.xx(state.t);ref.cursor.setAttribute('x1',x);ref.cursor.setAttribute('x2',x);
@@ -213,24 +249,94 @@ function updateCursor(){
  $('scrub').value=String(Math.round(1000*state.t/state.T));$('scrubTime').textContent=fixed(state.t,3)+' s';
  for(const [id,key] of [['uRead','input'],['ssRead','steady'],['trRead','transient'],['icRead','initial'],['yRead','total']])$(id).textContent=fixed(v[key])+' V';
 }
-function updateStats(){const m=currentModel;const Rcrit=2*Math.sqrt(state.L/state.C);const label=m.zeta<1-1e-6?'Underdamped':m.zeta>1+1e-6?'Overdamped':'Critically damped';$('regime').textContent=label;$('zetaStat').textContent=fixed(m.zeta);$('fnStat').textContent=fixed(m.wn/(2*Math.PI),2)+' Hz';$('rcritStat').textContent=fixed(Rcrit,2)+' Ω';$('gainStat').textContent=fixed(m.M);$('phaseStat').textContent=fixed(m.phase*180/Math.PI,1)+'°';document.querySelectorAll('[data-zeta]').forEach(btn=>{const z=+btn.dataset.zeta;btn.classList.toggle('active',Math.abs(z-m.zeta)<.005);});}
-function changeParameters(){for(const [id,def] of Object.entries(paramDefs))state[def.key]=Number($(id).value)*(def.scale||1);currentModel=model();updateStats();redraw();}
+const outputs={
+ capacitor:{sub:'C',name:'capacitor',type:'Low-pass',numerator:'1',relation:'y(t) = vC(t)',
+  steady:'M = 1/|D(jω₀)|; φ = −atan2(RCω₀, 1 − LCω₀²).',
+  basis:'F<sub>V</sub> = g₀; F<sub>I</sub> = g₁/C.',initial:'vC(0⁺) = VC(0⁻).',
+  plus:[226,80],minus:[226,140],label:[207,113]},
+ resistor:{sub:'R',name:'resistor',type:'Band-pass',numerator:'RCs',relation:'y(t) = vR(t) = RiL(t)',
+  steady:'M = RCω₀/|D(jω₀)|; φ = π/2 − atan2(RCω₀, 1 − LCω₀²).',
+  basis:'F<sub>V</sub> = RC ġ₀; F<sub>I</sub> = R ġ₁.',initial:'vR(0⁺) = R iL(0⁻).',
+  plus:[57,37],minus:[130,37],label:[81,23]},
+ inductor:{sub:'L',name:'inductor',type:'High-pass',numerator:'LCs²',relation:'y(t) = vL(t) = u(t) − vC(t) − RiL(t)',
+  steady:'M = LCω₀²/|D(jω₀)|; φ = π − atan2(RCω₀, 1 − LCω₀²).',
+  basis:'F<sub>V</sub> = −g₀ − RC ġ₀; F<sub>I</sub> = −g₁/C − R ġ₁.',initial:'vL(0⁺) = −VC(0⁻) − R iL(0⁻), since u(0) = 0.',
+  plus:[139,31],minus:[190,31],label:[157,16]}
+};
+const initialDefs={vc:{min:-2,max:2,step:'0.05',unit:'V'},il:{min:-.3,max:.3,step:'0.01',unit:'A'}};
+const precise=x=>Math.abs(x)<1e-12?'0':Number(x.toPrecision(8)).toString();
+function syncInitialControl(id,value,matched){
+ const d=initialDefs[id],lo=matched?Math.min(d.min,value<0?value*1.1:d.min):d.min;
+ const hi=matched?Math.max(d.max,value>0?value*1.1:d.max):d.max;
+ const slider=$(id),num=$(id+'Num');
+ for(const el of [slider,num]){el.min=String(lo);el.max=String(hi);el.step=matched?'any':d.step;el.disabled=matched;}
+ slider.value=String(value);
+ if(matched||document.activeElement!==num)num.value=matched?precise(value):slider.value;
+ $(id+'MinLabel').textContent=precise(lo).replace('-','−')+' '+d.unit;
+ $(id+'MaxLabel').textContent=(hi>0?'+':'')+precise(hi)+' '+d.unit;
+}
+function updatePresentation(){
+ const o=outputs[state.output];
+ $('transferSub').textContent=o.sub;$('transferNumerator').textContent=o.numerator;
+ $('filterType').textContent=o.type;$('outputPlotTitle').textContent='Input and '+o.name+' voltage';
+ $('outputReadLabel').textContent='Total '+o.name+' voltage';
+ document.querySelectorAll('.output-sub').forEach(el=>el.textContent=o.sub);
+ $('mainPlot').setAttribute('aria-label','Input, total '+o.name+' voltage and sinusoidal steady state over time.');
+ $('responsePlots').setAttribute('aria-label',o.name+' voltage response plots');
+ $('schematicPanel').setAttribute('aria-label','Series RLC schematic; '+o.name+' voltage output.');
+ $('circuitDiagram').setAttribute('aria-label','Sinusoidal input drives a series RLC circuit. Output is measured across the '+o.name+'.');
+ $('schematicTitle').textContent='Series RLC · '+o.name+' output';$('voltageSub').textContent=o.sub;
+ for(const sub of ['C','R','L']){$('schematic'+sub).setAttribute('stroke',sub===o.sub?'#008e9a':'#1e4b70');$('schematic'+sub).setAttribute('stroke-width',sub===o.sub?'3.5':'2.5');}
+ for(const [id,coords] of [['outputPlus',o.plus],['outputMinus',o.minus],['voltageLabel',o.label]]){$(id).setAttribute('x',coords[0]);$(id).setAttribute('y',coords[1]);}
+ $('outputRelation').textContent=o.relation;
+ $('steadyFormula').textContent=o.steady+' D(jω₀) = 1 − LCω₀² + jRCω₀.';
+ $('basisFormula').innerHTML=o.basis;$('outputInitialValue').textContent=o.initial;
+ $('cancellationNote').hidden=!state.cancel;
+}
+function updateStats(){
+ const m=currentModel,label=m.zeta<1-1e-6?'Underdamped':m.zeta>1+1e-6?'Overdamped':'Critically damped';
+ $('regime').textContent=label;$('zetaStat').textContent=fixed(m.zeta);
+ $('omegaStat').textContent=fixed(m.omega0,2)+' rad/s';$('wnStat').textContent=fixed(m.wn,2)+' rad/s';
+ $('fnStat').textContent=fixed(m.wn/(2*Math.PI),2)+' Hz';$('ratioStat').textContent=fixed(m.ratio);
+ $('rcritStat').textContent=fixed(m.Rcrit,2)+' Ω';$('gainStat').textContent=fixed(m.M);$('phaseStat').textContent=fixed(m.phase*180/Math.PI,1)+'°';
+ $('matchV').textContent=precise(m.matchV).replace('-','−')+' V';$('matchI').textContent=precise(m.matchI).replace('-','−')+' A';
+ $('initialHelp').textContent=state.cancel?'Both initial states are matched exactly; they update when f, R, L or C changes.':'Match both stored-energy states to their steady-state values at t = 0.';
+ $('matchedRangeNote').hidden=!(state.cancel&&(m.matchV < -2||m.matchV>2||m.matchI<-.3||m.matchI>.3));
+ document.querySelectorAll('[data-zeta]').forEach(btn=>{const active=Math.abs(+btn.dataset.zeta-m.zeta)<.005;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active));});
+}
+function changeParameters(){
+ for(const [id,def] of Object.entries(paramDefs))if(id!=='vc'&&id!=='il')state[def.key]=Number($(id).value)*(def.scale||1);
+ state.output=$('output').value;state.cancel=$('cancelTransient').checked;
+ if(state.cancel){const p=RLCMath.parameters(state);state.V0=p.matchV;state.I0=p.matchI;}
+ else{state.V0=+$('vc').value;state.I0=+$('il').value;state.manualV0=state.V0;state.manualI0=state.I0;}
+ syncInitialControl('vc',state.V0,state.cancel);syncInitialControl('il',state.I0,state.cancel);
+ redraw();
+}
 for(const [id,def] of Object.entries(paramDefs)){
  const slider=$(id),num=$(id+'Num');
+ num.setAttribute('aria-label',({freq:'Input frequency',res:'Resistance',ind:'Inductance',cap:'Capacitance',vc:'Initial capacitor voltage',il:'Initial inductor current'})[id]+' number');
  slider.addEventListener('input',()=>{num.value=slider.value;changeParameters();});
- const numChange=()=>{let n=Number(num.value);if(!Number.isFinite(n))return;n=Math.min(+num.max,Math.max(+num.min,n));if(n!==Number(num.value))num.value=String(n);slider.value=String(n);changeParameters();};
- num.addEventListener('change',numChange);
- num.addEventListener('input',()=>{if(num.value!==''&&Number.isFinite(Number(num.value)))numChange();});
+ const commit=()=>{const v=num.valueAsNumber;if(!Number.isFinite(v)){num.value=slider.value;return;}const n=Math.min(+num.max,Math.max(+num.min,v));slider.value=String(n);num.value=slider.value;changeParameters();};
+ num.addEventListener('input',()=>{const v=num.valueAsNumber;if(!Number.isFinite(v)||v<+num.min||v>+num.max)return;slider.value=String(v);changeParameters();});
+ num.addEventListener('change',commit);num.addEventListener('blur',commit);
 }
+$('output').addEventListener('change',changeParameters);
+$('cancelTransient').addEventListener('change',()=>{
+ if(!$('cancelTransient').checked){syncInitialControl('vc',state.manualV0,false);syncInitialControl('il',state.manualI0,false);}
+ changeParameters();
+});
 document.querySelectorAll('[data-zeta]').forEach(btn=>btn.addEventListener('click',()=>{
- const Rcrit=2*Math.sqrt(state.L/state.C), R=Rcrit*Number(btn.dataset.zeta),value=Math.min(120,Math.max(.1,R));
- $('res').value=String(value);$('resNum').value=fixed(value,4);changeParameters();
+ const Rcrit=2*Math.sqrt(state.L/state.C),value=Math.min(120,Math.max(.1,Rcrit*Number(btn.dataset.zeta)));
+ $('res').value=String(value);$('resNum').value=precise(value);changeParameters();
 }));
 document.querySelectorAll('[data-series]').forEach(inp=>inp.addEventListener('change',()=>{enabled[inp.dataset.series]=inp.checked;updateCursor();document.querySelectorAll(`[data-series="${inp.dataset.series}"]`).forEach(x=>{x.checked=inp.checked;});}));
 $('window').addEventListener('change',()=>{const prev=state.T;state.T=Number($('window').value);state.t=Math.min(state.t,state.T);redraw();});
 $('scrub').addEventListener('input',()=>{state.t=state.T*Number($('scrub').value)/1000;updateCursor();});
-updateStats();redraw();
+let resizeFrame;
+window.addEventListener('resize',()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(redraw);});
+changeParameters();
 })();
 </script>
 </body>
 </html>
+

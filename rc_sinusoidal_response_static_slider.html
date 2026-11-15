@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Interactive RC low-pass sinusoidal response: steady state, switching transient, and initial capacitor voltage contributions.">
-<title>RC Sinusoidal Response — Interactive Simulation</title>
+<title>RC Studio — Sinusoidal Response</title>
 <style>
 :root{--navy:#113a61;--navy2:#234f77;--teal:#0096a1;--orange:#e87528;--purple:#8053b4;--slate:#9aaaba;--ink:#17324a;--muted:#59718a;--line:#dae5ec;--panel:#fff;--bg:#f6f9fc}
 *{box-sizing:border-box}
@@ -13,6 +13,7 @@ main{max-width:1330px;margin:0 auto;padding:24px 28px 40px}
 header{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:16px}
 .eyebrow{font-size:11px;color:#57839c;text-transform:uppercase;letter-spacing:.16em;font-weight:750;margin-bottom:7px}
 h1{font-size:clamp(22px,2.25vw,33px);font-weight:720;letter-spacing:-.04em;color:var(--navy);margin:0 0 7px}
+.title-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}.title-row h1{margin:0}.brand-mark{display:grid;place-items:center;width:44px;height:44px;flex-shrink:0;border-radius:11px;background:var(--navy);color:#bde9e8}.brand-mark svg{width:36px;height:36px;display:block}
 .subtitle{color:var(--muted);font-size:14px;max-width:740px;margin:0}
 .formula{white-space:nowrap;background:#e7f2f7;border:1px solid #d3e7f0;padding:11px 17px;border-radius:12px;font-size:18px;font-family:Georgia,"Times New Roman",serif;color:#183d60;align-self:center}
 .formula strong{font-weight:normal;color:var(--orange);font-style:italic}
@@ -23,6 +24,7 @@ h1{font-size:clamp(22px,2.25vw,33px);font-weight:720;letter-spacing:-.04em;color
 .number-wrap{display:flex;align-items:center;gap:5px;white-space:nowrap}
 .number-wrap input{font-size:17px;color:var(--navy);font-variant-numeric:tabular-nums;text-align:right;width:74px;border:1px solid #cbdfe9;background:#f7fbfd;border-radius:7px;padding:5px 6px;font-weight:730}
 .number-wrap .unit{font-size:12px;color:var(--muted);min-width:12px}
+#vcNum{width:106px}.control-heading{flex-wrap:wrap;row-gap:5px}.number-wrap input:disabled{background:#edf4f8;color:#3b5d78;opacity:1}.cancel-toggle{display:flex;align-items:center;gap:7px;margin-top:9px;font-size:12px;font-weight:650;color:var(--navy);cursor:pointer}.cancel-toggle input{width:16px;height:16px;accent-color:var(--teal);cursor:pointer}.cancel-help{font-size:10px;line-height:1.5;color:var(--muted);margin:5px 0 0}.cancel-help .eq{font-size:12px}.cancel-status{display:block;margin-top:2px}.parameter-note{font-size:11px;line-height:1.5;color:var(--muted);margin:8px 0 0}.parameter-note i{font-family:Georgia,"Times New Roman",serif;color:var(--navy)}.cancellation-note{font-size:12px;line-height:1.5;color:#176b70;background:#edf8f7;border:1px solid #d2ece9;border-radius:8px;padding:9px 12px;margin:3px 22px 10px}input:focus-visible,button:focus-visible{outline:3px solid #a1d8db;outline-offset:3px}
 input[type=range]{width:100%;accent-color:var(--teal);cursor:pointer;height:17px;margin:4px 0 2px}
 .range-label{display:flex;justify-content:space-between;font-size:11px;color:#7b91a2}
 .stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid #edf2f6}
@@ -72,7 +74,7 @@ footer{color:#879aaa;font-size:11px;margin-top:17px}
   <header>
     <div>
       <div class="eyebrow">Signals &amp; Systems · RC low-pass circuit</div>
-      <h1>Sinusoidal response: where the transient comes from</h1>
+      <div class="title-row"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h5l3-5 4 10 4-10 4 10 3-5h15M34 14v11M26 25h16M26 30h16M34 30v10H4M34 40h8"/><circle cx="34" cy="14" r="2" fill="currentColor" stroke="none"/></svg></span><h1>RC Studio</h1></div>
       <p class="subtitle">Change the input frequency, time constant and initial capacitor voltage. Compare the steady state, the switching transient, and the initial-condition contribution. All curves are displayed in full.</p>
     </div>
     <div class="formula"><strong>H</strong>(s) = 1 / (τs + 1)</div>
@@ -94,15 +96,19 @@ footer{color:#879aaa;font-size:11px;margin-top:17px}
         <div class="control-heading"><label for="vc">Initial capacitor voltage</label><span class="number-wrap"><input id="vcNum" type="number" min="-2" max="2" step="0.05" value="1.00" aria-label="Initial capacitor voltage number"><span class="unit">V</span></span></div>
         <input id="vc" type="range" min="-2" max="2" step="0.05" value="1.00" aria-label="Initial capacitor voltage slider">
         <div class="range-label"><span>−2 V</span><span>+2 V</span></div>
+        <label class="cancel-toggle" for="cancelTransient"><input id="cancelTransient" type="checkbox" aria-describedby="cancelHelp">Cancel net transient</label>
+        <p class="cancel-help" id="cancelHelp"><span class="eq">V<sub>C</sub>(0<sup>−</sup>) = −q/(1 + q²) = </span><output id="cancelVoltage">−0.499993 V</output><span class="cancel-status" id="cancelStatus">Select to match the steady-state voltage at t = 0.</span></p>
       </div>
     </div>
     <div class="stats" aria-live="polite">
       <span class="stat">ω₀ = <b id="omegaStat">10.05 rad/s</b></span>
-      <span class="stat">ω₀τ = <b id="qStat">1.005</b></span>
+      <span class="stat">q = ω₀τ = <b id="qStat">1.005</b></span>
       <span class="stat">Steady-state amplitude = <b id="gainStat">0.705 V</b></span>
       <span class="stat">Phase = <b id="phaseStat">−45.14°</b></span>
       <span class="stat">5τ = <b id="fiveStat">0.50 s</b></span>
+      <span class="stat">Net transient coefficient = <b id="netStat">1.500 V</b></span>
     </div>
+    <p class="parameter-note"><i>ω₀ = 2πf</i> is the input angular frequency; <i>τ = RC</i> is the circuit time constant. The parameter <i>q = ω₀τ</i> is dimensionless.</p>
   </section>
 
   <section class="chart-section" aria-label="Response plots">
@@ -120,6 +126,7 @@ footer{color:#879aaa;font-size:11px;margin-top:17px}
       <label style="--color:var(--orange)"><input type="checkbox" data-series="transient" checked style="accent-color:var(--orange)"><span class="swatch"></span>Switching transient</label>
       <label style="--color:var(--purple)"><input type="checkbox" data-series="initial" checked style="accent-color:var(--purple)"><span class="swatch"></span>Initial capacitor voltage</label>
     </div>
+    <p id="cancellationNote" class="cancellation-note" hidden>The switching transient and initial-condition contributions are equal and opposite. The net transient is zero, so the total output follows the steady-state curve from t = 0.</p>
     <svg id="componentPlot" class="chart-svg" viewBox="0 0 1080 257" role="img" aria-label="Graph of the three additive output contributions"></svg>
     <div class="bottom-bar">
       <div class="timeline"><label for="scrub">Inspect at time</label><input id="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Select a fixed time to inspect the values of the curves"><output id="timeValue" class="timevalue">0.00 s</output></div>
@@ -140,9 +147,25 @@ footer{color:#879aaa;font-size:11px;margin-top:17px}
     <section class="eq-card" style="--color:var(--purple)"><h2><span class="dot"></span>Initial-condition contribution</h2><div class="eq">y<sub>IC</sub>(t) = V<sub>C</sub>(0<sup>−</sup>) e<sup>−t/τ</sup></div></section>
     <section class="eq-card" style="--color:var(--teal)"><h2><span class="dot"></span>Total capacitor voltage</h2><div class="eq">y(t) = y<sub>ss</sub>(t) + y<sub>tr</sub>(t) + y<sub>IC</sub>(t)</div></section>
   </div>
-  <div class="note"><strong>What to notice:</strong> the switching transient cancels the steady-state term at <i>t</i> = 0, so y(0<sup>+</sup>) = V<sub>C</sub>(0<sup>−</sup>). Both decaying terms have the same time constant τ, but different amplitudes and physical origins. The input has a fixed amplitude of 1 V.</div>
+  <div class="note"><strong>What to notice:</strong> the switching transient cancels the steady-state term at <i>t</i> = 0, so y(0<sup>+</sup>) = V<sub>C</sub>(0<sup>−</sup>). Both decaying terms have the same time constant τ, but different amplitudes and physical origins. Setting V<sub>C</sub>(0<sup>−</sup>) = −q/(1 + q²) makes their sum zero for every t ≥ 0. The input has a fixed amplitude of 1 V.</div>
   <footer>Ideal unloaded RC low-pass model · u(t) = sin(2πft) for t ≥ 0 · static time-inspection slider · standalone HTML / JavaScript, no external libraries</footer>
 </main>
+<script id="rc-math">
+(function(root){
+  'use strict';
+  function parameters(f,tau){
+    const omega0=2*Math.PI*f,q=omega0*tau,coefficient=q/(1+q*q);
+    return {omega0,q,coefficient,amplitude:1/Math.sqrt(1+q*q),phase:Math.atan(q),cancellationVoltage:-coefficient};
+  }
+  function values(t,f,tau,vc){
+    const p=parameters(f,tau),e=Math.exp(-t/tau);
+    const input=Math.sin(p.omega0*t),steady=p.amplitude*Math.sin(p.omega0*t-p.phase);
+    const transient=p.coefficient*e,initial=vc*e;
+    return {input,steady,transient,initial,total:steady+(p.coefficient+vc)*e};
+  }
+  root.RCMath={parameters,values};
+})(globalThis);
+</script>
 <script>
 (() => {
   'use strict';
@@ -150,13 +173,11 @@ footer{color:#879aaa;font-size:11px;margin-top:17px}
   const ns='http://www.w3.org/2000/svg';
   const colors={input:'#9aaaba',total:'#0096a1',steady:'#173b65',transient:'#e87528',initial:'#8053b4'};
   const enabled={input:true,total:true,steady:true,transient:true,initial:true};
-  const state={f:1.6,tau:0.1,vc:1,T:2,time:0};
+  const state={f:1.6,tau:0.1,vc:1,manualVC:1,cancel:false,T:2,time:0};
   const plotRefs=[];
   const p3=v=>(Math.abs(v)<0.0005?0:v).toFixed(3);
   function values(t){
-    const w=2*Math.PI*state.f,q=w*state.tau, amp=1/Math.sqrt(1+q*q), phi=Math.atan(q),e=Math.exp(-t/state.tau);
-    const input=Math.sin(w*t),steady=amp*Math.sin(w*t-phi),transient=(q/(1+q*q))*e,initial=state.vc*e;
-    return {input,steady,transient,initial,total:steady+transient+initial};
+    return RCMath.values(t,state.f,state.tau,state.vc);
   }
   function svgEl(tag,attrs={},parent){const el=document.createElementNS(ns,tag); for(const [k,v] of Object.entries(attrs))el.setAttribute(k,String(v));if(parent)parent.appendChild(el);return el;}
   function textNode(parent,x,y,s,attrs={}){const el=svgEl('text',{x,y,'font-size':12,fill:'#607b90','font-family':'-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif',...attrs},parent);el.textContent=s;return el;}
@@ -215,18 +236,38 @@ footer{color:#879aaa;font-size:11px;margin-top:17px}
     $('trRead').textContent=p3(v.transient)+' V';$('icRead').textContent=p3(v.initial)+' V';$('yRead').textContent=p3(v.total)+' V';
   }
   function setParams(){
-    state.f=+$('freq').value;state.tau=+$('tau').value;state.vc=+$('vc').value;
-    const w=2*Math.PI*state.f,q=w*state.tau;
+    state.f=+$('freq').value;state.tau=+$('tau').value;state.cancel=$('cancelTransient').checked;
+    const p=RCMath.parameters(state.f,state.tau),w=p.omega0,q=p.q;
+    $('vc').disabled=state.cancel;$('vcNum').disabled=state.cancel;
+    $('vc').step=state.cancel?'any':'0.05';$('vcNum').step=state.cancel?'any':'0.05';
+    if(state.cancel){
+      state.vc=p.cancellationVoltage;
+      $('vc').value=String(state.vc);$('vcNum').value=state.vc.toFixed(6);
+    }else{state.vc=+$('vc').value;state.manualVC=state.vc;}
+    $('cancelVoltage').textContent=p.cancellationVoltage.toFixed(6).replace('-','−')+' V';
+    $('cancelStatus').textContent=state.cancel?'Matched automatically; updates when f or τ changes.':'Select to match the steady-state voltage at t = 0.';
+    $('cancellationNote').hidden=!state.cancel;
+    $('netStat').textContent=p3(p.coefficient+state.vc)+' V';
     state.T=Math.min(34,Math.ceil(Math.max(2,3.25/state.f,6.5*state.tau)*2)/2);
     $('omegaStat').textContent=w.toFixed(2)+' rad/s';$('qStat').textContent=q.toFixed(3);
     $('gainStat').textContent=(1/Math.sqrt(1+q*q)).toFixed(3)+' V';$('phaseStat').textContent='−'+(Math.atan(q)*180/Math.PI).toFixed(2)+'°';
     $('fiveStat').textContent=(5*state.tau).toFixed(2)+' s';state.time=0;redraw();
   }
+  $('cancelTransient').addEventListener('change',()=>{
+    if($('cancelTransient').checked)state.manualVC=state.vc;
+    else{
+      $('vc').step='0.05';$('vcNum').step='0.05';
+      $('vc').value=String(state.manualVC);$('vcNum').value=$('vc').value;
+    }
+    setParams();
+  });
   for(const name of ['freq','tau','vc']){
     const range=$(name),num=$(name+'Num');
     range.addEventListener('input',()=>{num.value=range.value;setParams();});
-    const adjust=()=>{const v=parseFloat(num.value);if(!Number.isFinite(v))return;const rounded=Math.max(+num.min,Math.min(+num.max,v));range.value=String(rounded);num.value=range.value;setParams();};
+    const adjust=()=>{const v=num.valueAsNumber;if(!Number.isFinite(v)){num.value=range.value;return;}const rounded=Math.max(+num.min,Math.min(+num.max,v));range.value=String(rounded);num.value=range.value;setParams();};
+    num.addEventListener('input',()=>{const v=num.valueAsNumber;if(!Number.isFinite(v)||v<+num.min||v>+num.max)return;range.value=String(v);setParams();});
     num.addEventListener('change',adjust);
+    num.addEventListener('blur',adjust);
   }
   // The same 'steady' key appears in both legends; keep the two checkboxes synchronised.
   document.querySelectorAll('[data-series]').forEach(c=>c.addEventListener('change',()=>{
@@ -243,3 +284,4 @@ footer{color:#879aaa;font-size:11px;margin-top:17px}
 </script>
 </body>
 </html>
+

@@ -1,5 +1,6 @@
 <!doctype html>
-<html lang="en"><head>
+<html lang="en">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Edit poles and zeros on the complex plane. Compare exact and asymptotic Bode plots and time responses to step, impulse, ramp and sinusoidal inputs.">
@@ -11,6 +12,7 @@
 .analysis-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 17px;border-bottom:1px solid var(--line);background:#f8fafb}.analysis-nav h2{font-size:14px}.analysis-nav .view-switch button{font-size:11px}.time-head{padding:15px 18px 10px}.time-head p{color:var(--muted);font-size:11px;margin-top:3px}.time-controls{display:flex;align-items:end;flex-wrap:wrap;gap:9px;padding:0 17px 13px}.time-controls label{display:flex;flex-direction:column;gap:4px;font-size:10px;color:var(--muted)}.time-controls input{width:90px;font-size:12px}.time-controls select{font-size:12px;min-width:127px}.time-controls button{font-size:11px;min-height:33px}.time-controls .auto-duration{display:flex;flex-direction:row;align-items:center;gap:5px;margin-left:auto;min-height:32px}.time-chart canvas{height:365px}.time-status{padding:10px 18px;border-top:1px solid var(--line);color:var(--muted);background:#f8fafb;font-size:11px;min-height:53px}.time-status.warn{background:#fff7ed;color:#925623}.both-views #time-panel{border-top:2px solid var(--line)}.both-views .time-chart canvas{height:275px}.time-input-formula{padding:0 18px 9px;color:#435d75;font:16px Cambria,"Times New Roman",serif}.time-legend{padding-bottom:8px}.time-chart.empty canvas{opacity:.45}.time-empty{position:absolute;inset:25px 35px 45px 70px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;color:#617187;line-height:1.7;pointer-events:none}.time-chart:not(.empty) .time-empty{display:none}
 .time-controls input[type=checkbox]{width:auto;min-height:0}.both-views .chart canvas{height:170px}.both-views .time-chart canvas{height:250px}
 .time-scale-controls{padding-top:10px;border-top:1px solid #edf0f4;background:#fafbfc}.time-controls .auto-amplitude{flex-direction:row;align-items:center;gap:5px;min-height:33px}.scale-help{flex:1 1 155px;align-self:center;color:var(--muted);font-size:10px;line-height:1.5}
+.pair-editor-choice{display:flex;align-items:center;gap:9px;margin-bottom:10px;color:var(--muted);font-size:11px}.pair-editor-choice select{font-size:12px;max-width:100%}.pair-help{margin-top:8px;color:var(--muted);font-size:10px;line-height:1.6}
 @media(max-width:1050px){.analysis-nav{padding:11px 12px;flex-wrap:wrap}.time-controls{padding-left:13px;padding-right:13px;gap:7px}.time-controls input{width:80px}.time-controls .auto-duration{margin-left:0}.time-controls input[type=checkbox]{width:auto}}
 @media(max-width:480px){.analysis-nav{gap:7px}.analysis-nav h2{font-size:13px}.analysis-nav .view-switch button{font-size:10px;padding:5px 7px}.time-chart canvas{height:310px}.time-controls select{min-width:118px}.time-controls input{width:77px}}
 @media(min-width:1450px){.plane-wrap canvas{height:365px}.chart canvas{height:241px}}
@@ -18,24 +20,24 @@
 @media(max-width:800px){.top{align-items:flex-start;flex-wrap:wrap}.top-actions{width:100%}.top-actions select{max-width:none;flex:1}.workspace{grid-template-columns:minmax(0,1fr)}.formula-label{display:none}.formula-card{padding:11px 13px;gap:10px}.gain-control{padding-left:10px}.plane-wrap canvas{height:360px}.factor-list{max-height:150px}.chart canvas{height:245px}.plots-head h2{font-size:15px}.view-switch button{font-size:11px;padding:5px 9px}.frequency-bar{gap:10px;padding:12px 15px}.frequency-bar input{width:90px}.frequency-bar .units{display:block}.notes{gap:16px}}
 @media(max-width:480px){main{padding:14px 10px}.brandmark{width:37px;height:37px;font-size:24px}h1{font-size:25px}.intro{font-size:11px}.top-actions{gap:5px}.top-actions button{font-size:10px;padding:7px 8px}.top-actions select{font-size:10px;width:110px;min-width:0}.top-actions .download{margin:0}.formula{font-size:18px;min-height:43px}.gain-control{font-size:11px;gap:4px}.gain-control input{width:64px;font-size:12px}.plane-wrap canvas{height:310px}.plane-footer{font-size:9px}.mode-sub{font-size:10px}.plane-tools{padding-left:11px;padding-right:11px}.modes button{font-size:11px}.frequency-bar{gap:7px;padding:10px}.frequency-bar input{width:79px}.frequency-bar .units{display:none}.frequency-bar button{font-size:10px}.plot-legend{gap:10px;font-size:10px;padding-left:13px;padding-right:13px}.plot-legend #view-caption{max-width:120px;text-overflow:ellipsis;white-space:nowrap;overflow:hidden}.hover-readout{font-size:10px;padding-left:13px}.notes{grid-template-columns:1fr;gap:12px}.coordinates{gap:6px}.coordinates button{font-size:10px}.bottom{font-size:9px}}
 </style>
-<style>@media print{.gr_no_print, :host(.gr_no_print), [data-grammarly-part]{display:none !important}}.f1l1o3bf{font-family:Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif, Arial;font-style:normal;font-weight:400}.f1l1o3bf button, .f1l1o3bf input, .f1l1o3bf textarea{font-family:inherit}.f4ofdyf{border:0.5px solid var(--origin-color-border-base-subdued);border-radius:8px;cursor:pointer;height:24px;transition:width 150ms cubic-bezier(0.05, 0.6, 0, 1), height 150ms cubic-bezier(0.05, 0.6, 0, 1), border-radius 150ms cubic-bezier(0.05, 0.6, 0, 1);width:24px}.f137tu7e{flex-shrink:0;transform:scale(1);transition:transform 150ms cubic-bezier(0.05, 0.6, 0, 1)}[data-origin-mode="dark"] .f137tu7e{--origin-color-logo-grammarly-light:var(--origin-color-logo-grammarly-dark);--origin-color-logo-grammarly-primary:var(--origin-color-logo-grammarly-default)}.ftwgcg0{-moz-appearance:none;-webkit-appearance:none;align-items:flex-start;appearance:none;background:transparent;border:none;color:inherit;cursor:pointer;display:flex;font:inherit;height:32px;justify-content:flex-start;padding:0;width:32px}.ftwgcg0:hover .f4ofdyf{border-radius:12px;height:32px;width:32px}.ftwgcg0:hover .f137tu7e{transform:scale(1.25)}.f13cnbb7 .f4ofdyf{border-radius:12px;height:32px;width:32px}.f13cnbb7 .f137tu7e{transform:scale(1.25)}.f8ia88a{--origin-color-button-ghost-content-default:#714cb6;--origin-color-button-ghost-content-states:#533192;--origin-color-button-primary-fill-active:#3f256f;--origin-color-button-primary-fill-default:#714cb6;--origin-color-button-primary-fill-hover:#533192;--origin-font-weight-heading-xsmall:600}[data-origin-mode="dark"] .f8ia88a{--origin-color-button-ghost-content-default:#d4c7ff;--origin-color-button-ghost-content-states:#bea1f5;--origin-color-button-primary-content-default:#141413;--origin-color-button-primary-fill-active:#e8e0ff;--origin-color-button-primary-fill-default:#bea1f5;--origin-color-button-primary-fill-hover:#d4c7ff}.f347vxz{font-weight:600}</style></head>
-<body data-new-gr-c-s-check-loaded="14.1347.0" data-gr-ext-installed="">
+</head>
+<body>
 <main>
   <header class="top">
     <div class="brand"><div class="brandmark" aria-hidden="true">×○</div><div><div class="eyebrow">Signals &amp; Systems</div><h1>Bode Studio</h1><p class="intro">Build a transfer function directly on the complex plane.</p></div></div>
     <div class="top-actions">
       <select id="preset" aria-label="Load an example"><option value="">Examples…</option><option value="resonance">Resonance + a zero</option><option value="leadlag">Real pole + zero</option><option value="rhpzero">Right-half-plane zero</option><option value="unstable">Unstable pole pair</option><option value="imaginary">Imaginary-axis poles</option><option value="mixed">All four factor types</option><option value="empty">Empty plane</option></select>
-      <button id="undo" disabled="" title="Undo (Ctrl/Cmd+Z)">Undo</button><button id="redo" disabled="" title="Redo (Ctrl/Cmd+Shift+Z)">Redo</button>
+      <button id="undo" disabled title="Undo (Ctrl/Cmd+Z)">Undo</button><button id="redo" disabled title="Redo (Ctrl/Cmd+Shift+Z)">Redo</button>
       <button id="download" class="primary download">Download HTML</button>
     </div>
   </header>
   <section class="card formula-card" aria-label="Current transfer function">
-    <div class="formula-label">Transfer function</div><div class="formula" id="formula" aria-live="polite" aria-label="H of s equals 9 times the product of 1 zero factors divided by 1 pole factors."><i>H</i>(s) = 9 × <span class="frac"><span><span class="factor">(s + 1)</span></span><span><span class="factor">(s² + 1.2s + 9)</span></span></span></div>
+    <div class="formula-label">Transfer function</div><div class="formula" id="formula" aria-live="polite"></div>
     <div class="gain-settings">
-      <label class="gain-control" for="gain">Gain K <input id="gain" type="number" step="any" value="9" aria-describedby="gain-description" title="Constant factor K"></label>
-      <label class="dc-lock-control" for="dc-lock" title="Keep the current signed H(0) as roots change."><input id="dc-lock" type="checkbox" aria-describedby="dc-readout dc-status">Keep DC gain</label>
-      <div class="dc-readout" id="dc-readout" aria-live="polite">H(0) = 1</div>
-      <div class="dc-status" id="dc-status" role="status" hidden=""></div>
+      <label class="gain-control" for="gain">Gain K <input id="gain" type="number" step="any" value="9" aria-describedby="gain-description"></label>
+      <label class="dc-lock-control" for="dc-lock"><input id="dc-lock" type="checkbox" aria-describedby="dc-readout dc-status">Keep DC gain</label>
+      <div class="dc-readout" id="dc-readout" aria-live="polite"></div>
+      <div class="dc-status" id="dc-status" role="status" hidden></div>
     </div>
     <span id="gain-description" class="sr-only">The factor gain K is not generally the DC gain. Negative and zero gains are supported.</span>
   </section>
@@ -44,22 +46,25 @@
       <div class="card-title"><h2 id="plane-title">Complex plane</h2><span class="badge" id="pole-status">Poles in the left half-plane</span></div>
       <div class="plane-tools">
         <div class="modes" aria-label="Complex plane tools"><button class="active" data-mode="move" aria-pressed="true">Move / select</button><button data-mode="pole" aria-pressed="false"><span class="pole-icon" aria-hidden="true">×</span> Add pole</button><button data-mode="zero" aria-pressed="false"><span class="zero-icon" aria-hidden="true">○</span> Add zero</button><button data-mode="erase" aria-pressed="false">Erase</button></div>
-        <div class="mode-sub"><label for="form">Add as <select id="form"><option value="real">Real root</option><option value="pair" selected="">Conjugate pair</option></select></label><label class="snap"><input id="snap" type="checkbox"> Snap to 0.1</label></div>
+        <div class="mode-sub"><label for="form">Add as <select id="form"><option value="real">Real root</option><option value="pair" selected>Conjugate pair</option></select></label><label class="snap"><input id="snap" type="checkbox"> Snap to 0.1</label></div>
       </div>
-      <div class="plane-wrap"><canvas id="plane" tabindex="0" role="img" aria-label="Editable complex plane. Select an add tool and click to place roots. Drag crosses for poles and circles for zeros. Conjugate roots move together. Use the coordinate fields for keyboard editing." class="" width="1113" height="730">Interactive pole-zero plane. All editing actions are also available through the controls and coordinate fields.</canvas></div>
+      <div class="plane-wrap"><canvas id="plane" tabindex="0" role="img" aria-label="Editable complex plane. Select an add tool and click to place roots. Drag crosses for poles and circles for zeros. Conjugate roots move together. Use the coordinate fields for keyboard editing.">Interactive pole-zero plane. All editing actions are also available through the controls and coordinate fields.</canvas></div>
       <div class="plane-footer"><span id="plane-coordinate">× Pole &nbsp; ○ Zero &nbsp; · &nbsp; units s⁻¹</span><div class="zoom"><button id="zoom-in" aria-label="Zoom in on the complex plane">+</button><span id="plane-range">±5</span><button id="zoom-out" aria-label="Zoom out on the complex plane">−</button><button id="fit-plane">Fit</button></div></div>
       <div class="hint" id="hint" role="status">Drag a root to move it. Conjugate pairs stay together.</div>
-      <div class="factors-title"><h3>Factors</h3><span id="factor-count">2 poles · 1 zero · strictly proper</span></div>
-      <div id="factor-list" class="factor-list" aria-label="Transfer function factors"><div class="factor-row"><button class="factor-pick" data-select="gain"><span class="color-dot" style="background:#8a95a3"></span><span class="name">K</span><span class="coord">9</span></button></div><div class="factor-row selected"><button class="factor-pick" data-select="1" aria-label="Select P1, pole pair −0.6 ± j2.939"><span class="color-dot" style="background:#7756b6"></span><span class="name">P1</span><span class="coord">−0.6 ± j2.939</span></button><button class="remove" data-remove="1" aria-label="Remove P1">×</button></div><div class="factor-row"><button class="factor-pick" data-select="2" aria-label="Select Z2, zero −1"><span class="color-dot" style="background:#168c82"></span><span class="name">Z2</span><span class="coord">−1</span></button><button class="remove" data-remove="2" aria-label="Remove Z2">×</button></div></div>
+      <div class="factors-title"><h3>Factors</h3><span id="factor-count">2 poles · 1 zero</span></div>
+      <div id="factor-list" class="factor-list" aria-label="Transfer function factors"></div>
       <div class="inspector" id="inspector">
-        <div class="inspector-head"><h3 id="selected-title">P1 · Pole pair</h3><span id="selected-form">Conjugate roots</span></div>
+        <div class="inspector-head"><h3 id="selected-title">Selected factor</h3><span id="selected-form"></span></div>
+        <label class="pair-editor-choice" id="pair-editor-choice" for="pair-editor" hidden>Edit pair using <select id="pair-editor" aria-label="Edit pair using"><option value="cartesian">Real / imaginary parts</option><option value="natural">ωₙ / ζ</option></select></label>
         <div class="coordinates" id="coordinates"><label for="root-real">Real part <input id="root-real" type="number" step="0.1"></label><label for="root-imag">Imaginary magnitude <input id="root-imag" type="number" min="0.0001" step="0.1"></label><button id="remove-selected">Remove</button></div>
-        <div class="factor-details" id="factor-details">ωn = 3 rad/s · ζ = 0.2. Phase transition: 1.893 to 4.755 rad/s. Peak at 2.877 rad/s.</div>
+        <div class="coordinates" id="pair-parameters" hidden><label for="pair-wn">ωₙ (rad/s)<input id="pair-wn" type="number" min="0.00000001" max="10000" step="0.1" aria-label="Natural frequency ωₙ (rad/s)" aria-describedby="pair-help"></label><label for="pair-zeta">ζ (damping ratio)<input id="pair-zeta" type="number" min="-1" max="1" step="0.05" aria-label="Damping ratio ζ" aria-describedby="pair-help"></label><button id="remove-pair">Remove</button></div>
+        <p class="pair-help" id="pair-help" hidden>Roots: −ζωₙ ± jωₙ√(1−ζ²). Use ωₙ &gt; 0 and −1 &lt; ζ &lt; 1 for a complex pair. Negative ζ places the pair in the right half-plane.</p>
+        <div class="factor-details" id="factor-details"></div>
       </div>
     </section>
     <section class="card plot-card" id="analysis-card" aria-labelledby="analysis-title">
       <div class="analysis-nav"><h2 id="analysis-title">System response</h2><div class="view-switch" aria-label="Analysis section"><button data-analysis="frequency" aria-pressed="false">Bode</button><button class="active" data-analysis="time" aria-pressed="true">Time response</button><button data-analysis="both" aria-pressed="false">Both</button></div></div>
-      <div id="frequency-panel" hidden="">
+      <div id="frequency-panel" hidden>
       <div class="plots-head"><h2 id="bode-title">Bode plots</h2><div class="view-switch" aria-label="Bode plot view"><button class="active" data-view="total" aria-pressed="true">Total</button><button data-view="selected" aria-pressed="false">Selected</button><button data-view="all" aria-pressed="false">All factors</button></div></div>
       <div class="plot-legend"><span><i class="line exact"></i>Exact</span><span><i class="line asym"></i>Asymptotic</span><span id="view-caption">Combined response</span></div>
       <div id="factor-legend" class="factor-legend"></div>
@@ -69,26 +74,26 @@
       <div class="frequency-bar"><label for="omega-min">ω min <input id="omega-min" type="number" min="0.00001" step="any" value="0.01"></label><label for="omega-max">ω max <input id="omega-max" type="number" min="0.00001" step="any" value="100"></label><span class="units">rad/s</span><button id="fit-frequency">Fit frequencies</button><button id="clear">Clear roots</button></div>
       </div>
       <section id="time-panel" aria-labelledby="time-title">
-        <div class="time-head"><h2 id="time-title">Step response</h2><p>Total transfer function · zero initial conditions</p></div>
+        <div class="time-head"><h2 id="time-title">Time-domain response</h2><p>Total transfer function · zero initial conditions</p></div>
         <div class="time-controls">
           <label for="input-type">Input signal <select id="input-type" aria-label="Input signal"><option value="step">Step</option><option value="impulse">Impulse</option><option value="ramp">Ramp</option><option value="sine">Sinusoid</option></select></label>
           <label for="input-amplitude"><span id="amplitude-label">Amplitude</span><input id="input-amplitude" type="number" step="any" value="1"></label>
-          <label for="input-omega" id="input-omega-label" hidden="">ω₀ (rad/s)<input id="input-omega" type="number" min="0.00001" step="any" value="1"></label>
+          <label for="input-omega" id="input-omega-label" hidden>ω₀ (rad/s)<input id="input-omega" type="number" min="0.00001" step="any" value="1"></label>
           <label for="time-duration">Duration (s)<input id="time-duration" type="number" min="0.00001" step="any" value="12"></label>
-          <label class="auto-duration" for="time-auto"><input id="time-auto" type="checkbox" checked=""> Auto duration</label>
+          <label class="auto-duration" for="time-auto"><input id="time-auto" type="checkbox" checked> Auto duration</label>
         </div>
         <div class="time-controls time-scale-controls" role="group" aria-label="Time plot amplitude limits">
           <label for="amplitude-min">Amplitude min<input id="amplitude-min" type="number" step="any" value="-1" aria-describedby="amplitude-scale-help"></label>
           <label for="amplitude-max">Amplitude max<input id="amplitude-max" type="number" step="any" value="1" aria-describedby="amplitude-scale-help"></label>
-          <label class="auto-amplitude" for="amplitude-auto"><input id="amplitude-auto" type="checkbox" checked="" aria-describedby="amplitude-scale-help"> Auto amplitude scale</label>
+          <label class="auto-amplitude" for="amplitude-auto"><input id="amplitude-auto" type="checkbox" checked aria-describedby="amplitude-scale-help"> Auto amplitude scale</label>
           <span class="scale-help" id="amplitude-scale-help">Edit a limit to fix the vertical axis.</span>
         </div>
-        <div class="time-input-formula" id="input-formula">x(t) = 1 u(t)</div>
+        <div class="time-input-formula" id="input-formula">x(t) = u(t)</div>
         <div class="plot-legend time-legend"><span><i class="line exact"></i>Output y(t)</span><span><i class="line asym"></i>Input x(t)</span></div>
         <div class="chart-label">Amplitude <span id="time-scale-caption">auto amplitude · linear time axis</span></div>
-        <div class="chart time-chart" id="time-chart"><canvas id="time-response" role="img" aria-label="Time-domain input and total output with zero initial conditions. Output is red and input is dashed blue." width="1741" height="482">Input and output versus time in seconds.</canvas><div class="time-empty" id="time-empty"></div></div>
+        <div class="chart time-chart" id="time-chart"><canvas id="time-response" role="img" aria-label="Time-domain input and total output with zero initial conditions. Output is red and input is dashed blue.">Input and output versus time in seconds.</canvas><div class="time-empty" id="time-empty"></div></div>
         <div class="hover-readout" id="time-readout">Move over the time plot to inspect the input and output.</div>
-        <div class="time-status" id="time-status" role="status">Input applied at t = 0; all initial conditions are zero.</div>
+        <div class="time-status" id="time-status" role="status"></div>
       </section>
     </section>
   </div>
@@ -98,7 +103,7 @@
   </div>
   <footer class="bottom"><span>Real roots stay on the axis · pairs are mirrored automatically · Delete removes a selection · Esc selects Move</span><button id="fullscreen">Full screen</button></footer>
 </main>
-<div class="toast" id="toast" role="status" hidden=""></div>
+<div class="toast" id="toast" role="status" hidden></div>
 <script type="application/json" id="initial-model">{"gain":9,"domain":5,"min":0.01,"max":100,"roots":[{"id":1,"kind":"pole","form":"pair","re":-0.6,"im":2.939387691339814},{"id":2,"kind":"zero","form":"real","re":-1,"im":0}],"analysis":"time","time":{"input":"step","amplitude":1,"omega":1,"duration":12,"auto":true},"timeScale":{"auto":true,"min":-1,"max":1},"dcLock":false,"dcTarget":null}</script>
 <script id="bode-math">
 (function(root){
@@ -108,6 +113,16 @@
   function stepCoordinate(value,delta){
     var next=value+delta,tolerance=64*Number.EPSILON*Math.max(Math.abs(value),Math.abs(delta));
     return Math.abs(next)<=tolerance?0:Number(next.toPrecision(15));
+  }
+  function pairParameters(g){
+    var wn=Math.hypot(g.re,g.im),zeta=-g.re/wn;
+    if(g.im>0&&Math.abs(zeta)>=1)zeta=Math.sign(zeta)*(1-Number.EPSILON);
+    return {wn:wn,zeta:zeta};
+  }
+  function pairFromParameters(wn,zeta){
+    if(!Number.isFinite(wn)||wn<=0||!Number.isFinite(zeta)||Math.abs(zeta)>=1)return null;
+    var re=-zeta*wn,im=wn*Math.sqrt((1-zeta)*(1+zeta));
+    return Number.isFinite(re)&&Number.isFinite(im)&&im>0?{re:re,im:im}:null;
   }
   function factor(g,w){
     var sign=g.kind==='zero'?1:-1, mag,phase,ma,pa;
@@ -180,7 +195,7 @@
     });
     return Array.from(new Set(a)).sort(function(a,b){return a-b;});
   }
-  root.BodeMath={factor:factor,gain:gain,reduce:reduce,total:total,frequencies:frequencies,clamp:clamp,stepCoordinate:stepCoordinate,dcGain:dcGain,gainForDC:gainForDC};
+  root.BodeMath={factor:factor,gain:gain,reduce:reduce,total:total,frequencies:frequencies,clamp:clamp,stepCoordinate:stepCoordinate,pairParameters:pairParameters,pairFromParameters:pairFromParameters,dcGain:dcGain,gainForDC:gainForDC};
 })(typeof globalThis!=='undefined'?globalThis:this);
 </script>
 <script id="time-math">
@@ -290,15 +305,16 @@
   var $=function(id){return document.getElementById(id);}, M=BodeMath;
   var palette=['#7756b6','#168c82','#b07627','#477ab6','#bd5e8d','#6b8e35','#b86e52','#6c71ad'];
   var initial=JSON.parse($('initial-model').textContent);
-  var state={roots:initial.roots,gain:initial.gain,domain:initial.domain,min:initial.min,max:initial.max,selected:initial.roots.length?initial.roots[0].id:'gain',mode:'move',form:'pair',snap:false,view:'total',analysis:initial.analysis||'time',time:Object.assign({input:'step',amplitude:1,omega:1,duration:12,auto:true},initial.time||{}),timeScale:Object.assign({auto:true,min:-1,max:1},initial.timeScale||{}),dcLock:initial.dcLock===true&&Number.isFinite(initial.dcTarget),dcTarget:Number.isFinite(initial.dcTarget)?initial.dcTarget:null};
+  var state={roots:initial.roots,gain:initial.gain,domain:initial.domain,min:initial.min,max:initial.max,selected:initial.roots.length?initial.roots[0].id:'gain',mode:'move',form:'pair',snap:false,view:'total',pairEditor:initial.pairEditor==='natural'?'natural':'cartesian',analysis:initial.analysis||'time',time:Object.assign({input:'step',amplitude:1,omega:1,duration:12,auto:true},initial.time||{}),timeScale:Object.assign({auto:true,min:-1,max:1},initial.timeScale||{}),dcLock:initial.dcLock===true&&Number.isFinite(initial.dcTarget),dcTarget:Number.isFinite(initial.dcTarget)?initial.dcTarget:null};
   var nextId=state.roots.reduce(function(n,g){return Math.max(n,g.id+1);},1),past=[],future=[],drag=null,rootEdit=null,planeBox=null,plotBoxes={},cache=null,hover=null,toastTimer=0,renderPending=false,timeCache=null,timeKey='',timeBox=null,timeHover=null,dcNotice='';
   function num(n,d){if(!Number.isFinite(n))return Number.isNaN(n)?'undefined':n>0?'+∞':'−∞';if(n===0)return '0';if(Math.abs(n)>=1e4||Math.abs(n)<.001)return n.toExponential(2).replace('-','−');return Number(n.toFixed(d===undefined?3:d)).toString().replace('-','−');}
   function plain(n){return Number(n.toPrecision(8)).toString();}
+  function parameterText(n){var rounded=Number(n.toPrecision(12));return String(Math.abs(n)<1&&Math.abs(rounded)>=1?n:rounded);}
   function name(g){return (g.kind==='pole'?'P':'Z')+g.id;}
   function color(g){return palette[(g.id-1)%palette.length];}
   function selected(){return state.roots.find(function(g){return g.id===state.selected;})||null;}
   function coord(g){return num(g.re)+(g.form==='pair'?' ± j'+num(g.im):'');}
-  function snapshot(){return JSON.stringify({roots:state.roots,gain:state.gain,domain:state.domain,min:state.min,max:state.max,selected:state.selected,nextId:nextId,time:state.time,timeScale:state.timeScale,analysis:state.analysis,dcLock:state.dcLock,dcTarget:state.dcTarget});}
+  function snapshot(){return JSON.stringify({roots:state.roots,gain:state.gain,domain:state.domain,min:state.min,max:state.max,selected:state.selected,nextId:nextId,time:state.time,timeScale:state.timeScale,pairEditor:state.pairEditor,analysis:state.analysis,dcLock:state.dcLock,dcTarget:state.dcTarget});}
   function remember(before){past.push(before||snapshot());if(past.length>80)past.shift();future=[];}
   function restore(s){var v=JSON.parse(s);Object.assign(state,v);nextId=v.nextId;render();}
   function message(t){$('toast').textContent=t;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(function(){$('toast').hidden=true;},2800);}
@@ -326,8 +342,10 @@
     $('factor-list').innerHTML=gainRow+state.roots.map(function(g){return '<div class="factor-row'+(g.id===state.selected?' selected':'')+'"><button class="factor-pick" data-select="'+g.id+'" aria-label="Select '+name(g)+', '+g.kind+' '+(g.form==='pair'?'pair ':'')+coord(g)+'"><span class="color-dot" style="background:'+color(g)+'"></span><span class="name">'+name(g)+'</span><span class="coord">'+coord(g)+'</span>'+(cancelled.has(g.id)?'<span class="cancelled">cancels</span>':'')+'</button><button class="remove" data-remove="'+g.id+'" aria-label="Remove '+name(g)+'">×</button></div>';}).join('');
   }
   function renderInspector(){
-    var g=selected();
-    $('coordinates').hidden=!g;
+    var g=selected(),pair=g&&g.form==='pair',natural=pair&&state.pairEditor==='natural';
+    $('coordinates').hidden=!g||natural;
+    $('pair-editor-choice').hidden=!pair;$('pair-editor').value=state.pairEditor;
+    $('pair-parameters').hidden=!natural;$('pair-help').hidden=!natural;
     if(!g){
       $('selected-title').textContent='Constant gain K';$('selected-form').textContent='No roots';
       $('factor-details').textContent=state.gain===0?'K = 0 gives the zero transfer function. Its magnitude is −∞ dB and its phase is undefined.':'Magnitude: '+num(M.gain(state.gain).mag)+' dB · phase: '+num(M.gain(state.gain).phase)+'°. K is the factor gain, not generally H(0).';
@@ -340,7 +358,9 @@
     $('root-imag').disabled=g.form!=='pair';
     var text='';
     if(g.form==='pair'){
-      var wn=Math.hypot(g.re,g.im),z=-g.re/wn;
+      var parameters=M.pairParameters(g),wn=parameters.wn,z=parameters.zeta;
+      if(document.activeElement!==$('pair-wn'))$('pair-wn').value=parameterText(wn);
+      if(document.activeElement!==$('pair-zeta'))$('pair-zeta').value=parameterText(z);
       text='ωn = '+num(wn)+' rad/s · ζ = '+num(z)+'. ';
       if(g.re===0)text+='Phase is undefined at ωn.';
       else text+='Phase transition: '+num(wn*Math.pow(10,-Math.abs(z)))+' to '+num(wn*Math.pow(10,Math.abs(z)))+' rad/s.';
@@ -605,37 +625,48 @@
   $('factor-legend').addEventListener('click',function(e){var b=e.target.closest('[data-inspect]');if(!b)return;state.selected=b.dataset.inspect==='gain'?'gain':Number(b.dataset.inspect);state.view='selected';render();});
   function beginRootEdit(field){
     var g=selected();if(!g)return null;
-    if(!rootEdit||rootEdit.id!==g.id||rootEdit.field!==field.id)rootEdit={id:g.id,field:field.id,before:snapshot(),remembered:false};
+    if(!rootEdit||rootEdit.id!==g.id||rootEdit.field!==field.id){var p=g.form==='pair'?M.pairParameters(g):null;rootEdit={id:g.id,field:field.id,before:snapshot(),remembered:false,wn:p&&p.wn,zeta:p&&p.zeta};}
     return rootEdit;
   }
+  function rootFieldValue(field,g){if(field.id==='pair-wn')return M.pairParameters(g).wn;if(field.id==='pair-zeta')return M.pairParameters(g).zeta;return field.id==='root-real'?g.re:g.im;}
   function editRoot(field){
     var edit=beginRootEdit(field);if(!edit)return;
-    var g=state.roots.find(function(g){return g.id===edit.id;}),key=field.id==='root-real'?'re':'im',value=field.valueAsNumber;
+    var g=state.roots.find(function(g){return g.id===edit.id;}),key=field.id==='root-real'?'re':'im',value=field.valueAsNumber,natural=field.id==='pair-wn'||field.id==='pair-zeta',pair=null;
     if(!Number.isFinite(value)){field.setAttribute('aria-invalid','true');return;}
+    if(natural){
+      var wn=field.id==='pair-wn'?value:edit.wn,zeta=field.id==='pair-zeta'?value:edit.zeta;
+      pair=g.form==='pair'&&wn>=1e-8&&wn<=1e4?M.pairFromParameters(wn,zeta):null;
+      if(!pair){field.setAttribute('aria-invalid','true');return;}
+    }else{
+      if(value===g[key]){field.removeAttribute('aria-invalid');return;}
+      value=key==='re'?M.clamp(value,-1e4,1e4):g.form==='pair'?M.clamp(Math.abs(value),.0001,1e4):0;
+    }
     field.removeAttribute('aria-invalid');
-    value=key==='re'?M.clamp(value,-1e4,1e4):g.form==='pair'?M.clamp(Math.abs(value),.0001,1e4):0;
-    if(value===g[key])return;
+    if(natural?pair.re===g.re&&pair.im===g.im:value===g[key])return;
     if(!edit.remembered){remember(edit.before);edit.remembered=true;}
-    g[key]=value;render();
-  }
-  function finishRootEdit(field){
-    var valid=Number.isFinite(field.valueAsNumber);editRoot(field);
-    var g=selected();if(g)field.value=String(field.id==='root-real'?g.re:g.im);
-    field.removeAttribute('aria-invalid');rootEdit=null;
-    if(!valid)message('Enter a finite root coordinate. The last valid value has been restored.');
+    if(natural){g.re=pair.re;g.im=pair.im;}else g[key]=value;
     render();
   }
-  ['root-real','root-imag'].forEach(function(id){var field=$(id);
+  function finishRootEdit(field){
+    var valid=Number.isFinite(field.valueAsNumber)&&field.getAttribute('aria-invalid')!=='true',natural=field.id==='pair-wn'||field.id==='pair-zeta';
+    var g=selected();if(g)field.value=natural?parameterText(rootFieldValue(field,g)):String(rootFieldValue(field,g));
+    field.removeAttribute('aria-invalid');rootEdit=null;
+    if(!valid)message(natural?'Use 1e−8 ≤ ωₙ ≤ 10000 rad/s and −1 < ζ < 1 for a complex pair. The last valid value has been restored.':'Enter a finite root coordinate. The last valid value has been restored.');
+    render();
+  }
+  ['root-real','root-imag','pair-wn','pair-zeta'].forEach(function(id){var field=$(id);
     field.addEventListener('focus',function(){beginRootEdit(field);});
     field.addEventListener('input',function(){editRoot(field);});
     field.addEventListener('change',function(){finishRootEdit(field);});
     field.addEventListener('blur',function(){finishRootEdit(field);});
     field.addEventListener('keydown',function(e){
       if(e.key==='Enter'){e.preventDefault();finishRootEdit(field);}
-      else if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();var g=selected();if(!g)return;var value=Number.isFinite(field.valueAsNumber)?field.valueAsNumber:field.id==='root-real'?g.re:g.im,next=M.stepCoordinate(value,(e.key==='ArrowUp'?1:-1)*(e.shiftKey?1:.1));field.value=String(field.id==='root-real'?M.clamp(next,-1e4,1e4):M.clamp(next,.0001,1e4));editRoot(field);}
+      else if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();var g=selected();if(!g)return;var value=Number.isFinite(field.valueAsNumber)?field.valueAsNumber:rootFieldValue(field,g),damping=field.id==='pair-zeta',delta=damping?(e.shiftKey ? .1 : .05):(e.shiftKey?1:.1),next=M.stepCoordinate(value,(e.key==='ArrowUp'?1:-1)*delta);field.value=String(field.id==='pair-wn'?M.clamp(next,1e-8,1e4):damping?M.clamp(next,-1+Number.EPSILON,1-Number.EPSILON):field.id==='root-real'?M.clamp(next,-1e4,1e4):M.clamp(next,.0001,1e4));editRoot(field);}
     });
   });
+  $('pair-editor').addEventListener('change',function(){remember();state.pairEditor=$('pair-editor').value;rootEdit=null;render();});
   $('remove-selected').addEventListener('click',function(){if(selected())remove(state.selected);});
+  $('remove-pair').addEventListener('click',function(){if(selected())remove(state.selected);});
   $('gain').addEventListener('change',function(){if(state.dcLock)return;var v=$('gain').valueAsNumber;if(!Number.isFinite(v)||Math.abs(v)>1e100){message('Enter a finite gain with magnitude at most 1e100.');$('gain').value=plain(state.gain);return;}remember();state.gain=v;render();});
   $('dc-lock').addEventListener('change',function(){var enabled=$('dc-lock').checked,dc=M.dcGain(state.roots,state.gain);if(enabled&&dc.kind!=='finite'){message(dc.reason);render();return;}remember();state.dcLock=enabled;if(enabled)state.dcTarget=dc.value;render();});
   $('undo').addEventListener('click',function(){if(!past.length)return;future.push(snapshot());restore(past.pop());});
@@ -657,7 +688,7 @@
     empty:{gain:1,roots:[]}
   };
   $('preset').addEventListener('change',function(){var key=$('preset').value,p=presets[key];if(!p)return;remember();state.gain=p.gain;state.roots=p.roots.map(function(g){return {id:nextId++,kind:g[0],form:g[1],re:g[2],im:g[3]};});state.domain=5;state.min=.01;state.max=100;state.selected=state.roots.length?state.roots[0].id:'gain';state.mode='move';hover=null;$('preset').value='';render();});
-  $('download').addEventListener('click',function(){var clone=document.documentElement.cloneNode(true),data={gain:state.gain,domain:state.domain,min:state.min,max:state.max,roots:state.roots,analysis:state.analysis,time:state.time,timeScale:state.timeScale,dcLock:state.dcLock,dcTarget:state.dcTarget};clone.querySelector('#initial-model').textContent=JSON.stringify(data);clone.querySelector('#toast').hidden=true;var blob=new Blob(['<!doctype html>\n'+clone.outerHTML],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Bode_Pole_Zero_Explorer.html';a.click();setTimeout(function(){URL.revokeObjectURL(url);},2000);message('Downloaded a self-contained HTML tool with this model and input.');});
+  $('download').addEventListener('click',function(){var clone=document.documentElement.cloneNode(true),data={gain:state.gain,domain:state.domain,min:state.min,max:state.max,roots:state.roots,analysis:state.analysis,time:state.time,timeScale:state.timeScale,pairEditor:state.pairEditor,dcLock:state.dcLock,dcTarget:state.dcTarget};clone.querySelector('#initial-model').textContent=JSON.stringify(data);clone.querySelector('#toast').hidden=true;var blob=new Blob(['<!doctype html>\n'+clone.outerHTML],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Bode_Pole_Zero_Explorer.html';a.click();setTimeout(function(){URL.revokeObjectURL(url);},2000);message('Downloaded a self-contained HTML tool with this model and input.');});
   $('fullscreen').addEventListener('click',async function(){try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch(e){message('Full screen is unavailable in this view.');}});
   document.addEventListener('fullscreenchange',function(){$('fullscreen').textContent=document.fullscreenElement?'Exit full screen':'Full screen';render();});
   document.addEventListener('keydown',function(e){if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName))return;if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();$(e.shiftKey?'redo':'undo').click();}else if(e.key==='Escape'){state.mode='move';render();}else if((e.key==='Delete'||e.key==='Backspace')&&selected()){e.preventDefault();remove(state.selected);}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)&&document.activeElement===$('plane')&&selected()){e.preventDefault();var g=selected(),delta=e.shiftKey?1:.1;remember();if(e.key==='ArrowLeft')g.re=M.stepCoordinate(g.re,-delta);if(e.key==='ArrowRight')g.re=M.stepCoordinate(g.re,delta);if(g.form==='pair'&&e.key==='ArrowUp')g.im=M.stepCoordinate(g.im,delta);if(g.form==='pair'&&e.key==='ArrowDown')g.im=Math.max(.0001,M.stepCoordinate(g.im,-delta));render();}});
@@ -665,6 +696,5 @@
   render();
 })();
 </script>
-<script type="module">import { mountAutoSiteWidget } from "/_sites/dispatch-assets/sites-widget.js";mountAutoSiteWidget({"kind":"auto","toolbarOrigin":null,"viewerRemixEnabled":false,"invitationBanner":true,"mobileEnabled":false,"environment":"production","chatgptOrigin":"https://chatgpt.com","locale":"en-US","accountId":"personal","projectId":"appgprj_6af86f46aea881918928498dffcfa0f1","projectTitle":"Bode Studio — Poles and Zeros"});</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5ad690f09e729c7',t:'MTc5NDczNjg0Mg=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5ad690f09e729c7',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; visibility: hidden;"></iframe>
-
-<div data-sites-widget="editor-composer" popover="manual"></div></body><div id="aiFabShadowRoot" data-fab-type="react" style="opacity: 1;"></div><grammarly-desktop-integration data-grammarly-shadow-root="true" style="visibility: visible !important;"></grammarly-desktop-integration></html>
+</body>
+</html>

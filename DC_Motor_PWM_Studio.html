@@ -255,21 +255,21 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   <div class="freq-intro-heading"><div><h2>From PWM harmonics to the motor response</h2><p>Resolve the rectangular input into sinusoids; inspect the RL filter and full motor frequency responses; then reconstruct the periodic output.</p></div><span class="freq-tag">PERIODIC STEADY STATE</span></div>
   <div class="freq-controls">
    <div class="freq-control"><label for="harmonicCount">Harmonics included, N</label><div class="freq-control-range"><input id="harmonicCount" type="range" min="1" max="20" step="1" value="10"/><output id="harmonicCountValue">10</output></div></div>
-   <div class="freq-control"><label for="freqOutput">Output to analyse</label><select id="freqOutput"><option value="current">Armature current i(t)</option><option value="speed">Motor speed ω(t)</option></select></div>
+   <div class="freq-control"><label for="freqOutput">Output to analyse</label><select id="freqOutput"><option value="speed" selected>Motor speed ω(t)</option><option value="current">Armature current i(t)</option></select></div>
   </div>
-  <p class="freq-intro-note" id="freqIntroNote">The PWM has a DC component and harmonics at integer multiples of the switching frequency. Bars represent the peak amplitudes of the non-DC sinusoids.</p>
+  <p class="freq-intro-note" id="freqIntroNote">The mean (DC) value is n = 0. AC harmonics are at n × fPWM. In the graph, each input or output spectrum is divided by its own largest component, including DC.</p>
  </section>
  <section class="card spectrum-card spectrum-comparison" aria-label="Linked input and output harmonic spectrum">
   <div class="card-header"><div><h2>Input and output harmonics · compare each frequency</h2>
-  <div class="scope-desc">Paired Fourier lines at n × f<sub>PWM</sub>, following the peak-rectifier spectrum</div></div>
-  <label class="inspect-harmonic" for="inspectHarmonic">Inspect harmonic
-    <select id="inspectHarmonic" aria-label="Choose a PWM harmonic to compare"></select>
+  <div class="scope-desc">DC at 0 Hz; paired Fourier lines at n × f<sub>PWM</sub> for n ≥ 1</div></div>
+  <label class="inspect-harmonic" for="inspectHarmonic">Inspect component
+    <select id="inspectHarmonic" aria-label="Choose the DC component or a PWM harmonic to compare"></select>
   </label></div>
-  <div class="spectrum-legend"><span><i class="spectrum-key" style="--c:var(--slate)"></i>Input voltage</span><span><i class="spectrum-key" style="--c:var(--orange)"></i><span id="spectrumOutputLegend">Output current</span></span><span class="spectrum-comparison-hint">Selected harmonic highlighted</span></div>
-  <canvas id="pwmSpectrumPlot" role="img" aria-label="Combined normalized one-sided PWM input voltage and output current or speed Fourier spectra, with a highlighted selected harmonic" tabindex="0"></canvas>
-  <div class="spectrum-detail" aria-live="polite"><div class="spectrum-detail-card"><span class="detail-label" id="inspectFreq">Harmonic 1</span><strong id="inspectInput">—</strong><small>Input voltage, peak</small></div><div class="spectrum-detail-card"><span class="detail-label">Output harmonic</span><strong id="inspectOutput">—</strong><small id="inspectOutputType">Armature current, peak</small></div><div class="spectrum-detail-card"><span class="detail-label">Motor response at this frequency</span><strong id="inspectGain">—</strong><small id="inspectPhase">Magnitude and phase</small></div></div>
-  <div class="scope-footer"><b>How to read this comparison:</b> each spectrum is divided by <b>its own first-harmonic peak amplitude</b>, so both first harmonics have height 1. These are relative amplitudes, <b>not volts and amperes on the same scale</b>. Select or click a harmonic for the actual input/output amplitudes and the motor's gain and phase. The DC components are displayed separately below.</div>
-  <div class="spectrum-dc-note" id="spectrumDCInfo">DC input — · DC output —</div>
+  <div class="spectrum-legend"><span><i class="spectrum-key" style="--c:var(--slate)"></i>Input voltage</span><span><i class="spectrum-key" style="--c:var(--orange)"></i><span id="spectrumOutputLegend">Output current</span></span><span class="spectrum-comparison-hint">Max. spectral component = 1 for each signal</span></div>
+  <canvas id="pwmSpectrumPlot" role="img" aria-label="PWM input and motor output spectra separately normalized to their respective largest components, including the DC component at n equals zero" tabindex="0"></canvas>
+  <div class="spectrum-detail" aria-live="polite"><div class="spectrum-detail-card"><span class="detail-label" id="inspectFreq">Harmonic 1</span><strong id="inspectInput">—</strong><small id="inspectInputType">Input voltage · sinusoidal peak</small></div><div class="spectrum-detail-card"><span class="detail-label" id="inspectOutputLabel">Output component</span><strong id="inspectOutput">—</strong><small id="inspectOutputType">Armature current, peak</small></div><div class="spectrum-detail-card"><span class="detail-label">Motor response at this frequency</span><strong id="inspectGain">—</strong><small id="inspectPhase">Magnitude and phase</small></div></div>
+  <div class="scope-footer"><b>How to read this comparison:</b> the graph includes <b>DC (n = 0)</b> and has a fixed vertical scale from <b>0 to 1</b>. Each signal is divided by <b>its own maximum spectral amplitude, including DC</b>—not by its fundamental. For n ≥ 1, amplitudes are the <b>peaks</b> of the sinusoidal components; at n = 0, the plotted amplitude is the <b>absolute mean</b>. Voltage and current/speed have different units, so equal heights do not imply equal physical amplitudes. Click any component for the actual values.</div>
+  <div class="spectrum-dc-note" id="spectrumDCInfo">DC (n = 0): input — · output —</div>
  </section>
  <section class="card bode-card"><div class="card-header"><div><h2>Frequency response · ideal RL approximation versus the coupled motor</h2><div class="scope-desc">Current response to a small sinusoidal terminal-voltage perturbation; markers identify PWM harmonics</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--purple)"></i>RL circuit</span><span><i class="legend-line" style="--c:var(--teal)"></i>Full motor</span><span><i class="legend-line dash" style="--c:var(--orange)"></i>RL cutoff</span></div></div>
  <div class="frequency-grid bode-grid"><div><div class="plot-mini-title">Magnitude · dB re 1 A/V</div><canvas id="bodeMagnitudePlot" role="img" aria-label="Bode magnitude for the RL current response and the full coupled DC motor"></canvas></div><div><div class="plot-mini-title">Phase · degrees</div><canvas id="bodePhasePlot" role="img" aria-label="Bode phase for the RL current response and the full coupled DC motor"></canvas></div></div>
@@ -532,55 +532,98 @@ function harmonicSeries(){
   }
   return {p,N,output,scale,harmonics,outputDC:(output==='speed'?data.wss:data.losses.iAvg)*scale};
 }
+function normalizedSpectrum(q){
+  // Spectral convention: DC = |mean|; each non-DC height = peak amplitude (2|c_n|).
+  // The input and output are in different units, so normalize their spectra independently.
+  const inputRef=Math.max(1e-20,Math.abs(data.vbar),...q.harmonics.map(h=>amp(h.input)));
+  const outputRef=Math.max(1e-20,Math.abs(q.outputDC),...q.harmonics.map(h=>amp(h.output)));
+  const values=[{n:0,input:Math.abs(data.vbar)/inputRef,output:Math.abs(q.outputDC)/outputRef},
+    ...q.harmonics.map(h=>({n:h.n,input:amp(h.input)/inputRef,output:amp(h.output)/outputRef}))];
+  return {inputRef,outputRef,values};
+}
 function drawHarmonicComparison(q){
-  const {harmonics,N}=q,sel=Math.min(N,Math.max(1,Number($('inspectHarmonic').value)||1));
+  const {N}=q,sel=Math.min(N,Math.max(0,Number($('inspectHarmonic').value)));
+  const {values}=normalizedSpectrum(q);
   const z=ctxSetup('pwmSpectrumPlot'),{ctx,W,H}=z;
-  const L=55,R=16,T=19,B=40,plotW=W-L-R,plotH=H-T-B;
-  const a1=Math.max(1e-20,amp(harmonics[0].input)),b1=Math.max(1e-20,amp(harmonics[0].output));
-  const values=harmonics.map(h=>({n:h.n,input:amp(h.input)/a1,output:amp(h.output)/b1}));
-  const maxValue=Math.max(1,...values.map(v=>Math.max(v.input,v.output)));
-  const yTop=Math.max(1.10,maxValue*1.14),baseline=T+plotH;
-  const yy=v=>baseline-v/yTop*plotH;
-  const xx=n=>L+(n-.5)*plotW/N;
-  // Matched grid and a softly shaded selected harmonic, as in the peak rectifier.
+  const L=55,R=16,T=20,B=43,plotW=W-L-R,plotH=H-T-B;
+  const baseline=T+plotH,yy=v=>baseline-Math.max(0,Math.min(1,v))*plotH;
+  const xx=n=>L+(n+.5)*plotW/(N+1);
   ctx.font='11px system-ui,Segoe UI,Arial,sans-serif';ctx.lineWidth=1;
+  // Fixed 0..1 scale: the largest displayed input and output component is exactly 1.
   for(let j=0;j<=4;j++){
-    const v=yTop*j/4,y=yy(v);ctx.strokeStyle=C.grid;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(W-R,y);ctx.stroke();
-    ctx.fillStyle=C.text;ctx.textAlign='right';ctx.fillText(v.toFixed(2),L-7,y+4);
+    const v=j/4,y=yy(v);ctx.strokeStyle=j===4?'#9ebacb':C.grid;
+    ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(W-R,y);ctx.stroke();
+    ctx.fillStyle=j===4?C.navy:C.text;ctx.textAlign='right';ctx.fillText(v.toFixed(2),L-7,y+4);
   }
-  const band=plotW/N;
-  ctx.fillStyle='rgba(178,123,19,.115)';ctx.fillRect(xx(sel)-band*.48,T,band*.96,plotH);
-  const offset=Math.min(9,Math.max(3.2,band*.16)),dotRadius=3.7;
-  for(const q of values){
-    for(const [ampNorm,col,off] of [[q.input,C.slate,-offset],[q.output,C.orange,offset]]){
-      const px=xx(q.n)+off,py=yy(ampNorm);
-      ctx.strokeStyle=col;ctx.lineWidth=q.n===sel?3.3:2.4;
+  const band=plotW/(N+1);
+  ctx.fillStyle='rgba(178,123,19,.115)';ctx.fillRect(xx(sel)-band*.47,T,band*.94,plotH);
+  const offset=Math.min(9,Math.max(2.4,band*.17));
+  const dotRadius=band<18?2.65:3.7;
+  for(const item of values){
+    for(const [v,col,off] of [[item.input,C.slate,-offset],[item.output,C.orange,offset]]){
+      const px=xx(item.n)+off,py=yy(v);
+      ctx.strokeStyle=col;ctx.lineWidth=item.n===sel?3.3:2.4;
       ctx.beginPath();ctx.moveTo(px,baseline);ctx.lineTo(px,py);ctx.stroke();
-      ctx.fillStyle=col;ctx.beginPath();ctx.arc(px,py,q.n===sel?dotRadius+1:dotRadius,0,Math.PI*2);ctx.fill();
-      if(q.n===sel){ctx.lineWidth=1.4;ctx.strokeStyle='#fff';ctx.stroke();}
+      ctx.fillStyle=col;ctx.beginPath();ctx.arc(px,py,item.n===sel?dotRadius+.8:dotRadius,0,Math.PI*2);ctx.fill();
+      if(item.n===sel){ctx.lineWidth=1.35;ctx.strokeStyle='#fff';ctx.stroke();}
     }
-    if(N<=12||q.n%2===0||q.n===1||q.n===sel){ctx.textAlign='center';ctx.fillStyle=q.n===sel?C.navy:C.text;ctx.font=q.n===sel?'bold 11px system-ui':'11px system-ui';ctx.fillText(String(q.n),xx(q.n),baseline+16);}
+    if(N<=12||item.n===0||item.n===1||item.n===sel||item.n%2===0){
+      ctx.textAlign='center';ctx.fillStyle=item.n===sel?C.navy:C.text;
+      ctx.font=item.n===sel?'bold 11px system-ui':'11px system-ui';
+      ctx.fillText(item.n===0?'DC':String(item.n),xx(item.n),baseline+16);
+    }
   }
-  ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillStyle=C.text;ctx.fillText('Harmonic n · frequency = n × fPWM',L+plotW/2,H-7);
-  ctx.save();ctx.translate(15,T+plotH/2);ctx.rotate(-Math.PI/2);ctx.fillText('Relative peak amplitude',0,0);ctx.restore();
+  ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillStyle=C.text;
+  ctx.fillText('DC (n = 0)  |  AC harmonics n ≥ 1 at n × fPWM',L+plotW/2,H-7);
+  ctx.save();ctx.translate(15,T+plotH/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText('Relative amplitude (maximum = 1)',0,0);ctx.restore();
 }
 function syncInspectedHarmonic(N){
-  const sel=$('inspectHarmonic'),old=Math.max(1,Number(sel.value)||1),selected=Math.min(old,N);
-  if(sel.options.length!==N){sel.replaceChildren();for(let n=1;n<=N;n++){const option=document.createElement('option');option.value=String(n);option.textContent=n+' · '+(n===1?'fundamental':'harmonic');sel.append(option);}}
+  const sel=$('inspectHarmonic');
+  const old=sel.value===''?0:Number(sel.value);
+  const selected=Math.min(N,Math.max(0,Number.isFinite(old)?old:0));
+  if(sel.options.length!==N+1){
+    sel.replaceChildren();
+    for(let n=0;n<=N;n++){
+      const opt=document.createElement('option');opt.value=String(n);
+      opt.textContent=n===0?'0 · DC (mean)':n===1?'1 · fundamental':n+' · harmonic';sel.append(opt);
+    }
+  }
   sel.value=String(selected);
 }
 function updateInspectedHarmonic(q){
-  const {harmonics,p,output,outputDC}=q,n=Math.min(harmonics.length,Math.max(1,Number($('inspectHarmonic').value)||1));
-  const h=harmonics[n-1],f=h.f,ip=amp(h.input),op=amp(h.output),H=amp(h.response)*q.scale,ph=phase(h.response);
-  const fmtSmall=(v)=>v>=1e-2?fmt(v,3):v>=1e-5?fmt(v,6):v.toExponential(2);
-  $('inspectFreq').textContent='n = '+n+' · '+(f<1e3?fmt(f,1)+' Hz':fmt(f/1000,2)+' kHz');
-  $('inspectInput').textContent=fmtSmall(ip)+' V';
-  $('inspectOutput').textContent=fmtSmall(op)+' '+outputUnit();
-  $('inspectOutputType').textContent=(output==='speed'?'Motor speed':'Armature current')+' · sinusoidal peak';
-  $('inspectGain').textContent=fmtSmall(H)+' '+(output==='speed'?(state.units==='rpm'?'rpm/V':'(rad/s)/V'):'A/V');
-  $('inspectPhase').textContent='Phase shift = '+fmt(ph,1)+'° · output phasor = H(j2πf) × input phasor';
+  const {harmonics,output,outputDC}=q;
+  const n=Math.min(harmonics.length,Math.max(0,Number($('inspectHarmonic').value)));
+  const {inputRef,outputRef,values}=normalizedSpectrum(q);
+  const fmtSmall=(v)=>Math.abs(v)>=1e-2?fmt(v,3):Math.abs(v)>=1e-5?fmt(v,6):v.toExponential(2);
   $('spectrumOutputLegend').textContent=output==='speed'?'Output speed':'Output current';
-  $('spectrumDCInfo').innerHTML='DC (not shown in the harmonic plot): input <b>'+fmt(data.vbar,3)+' V</b> · output <b>'+fmt(outputDC,output==='speed'?3:5)+' '+outputUnit()+'</b>. The selected input and output spectral lines occur at the same frequency.';
+  if(n===0){
+    $('inspectFreq').textContent='n = 0 · DC / mean (0 Hz)';
+    $('inspectInputType').textContent='Input voltage · signed DC mean';
+    $('inspectOutputLabel').textContent='Output DC component';
+    $('inspectInput').textContent=fmtSmall(data.vbar)+' V';
+    $('inspectOutput').textContent=fmtSmall(outputDC)+' '+outputUnit();
+    $('inspectOutputType').textContent=(output==='speed'?'Mean motor speed':'Mean armature current')+' · signed DC value';
+    $('inspectGain').textContent='DC operating point';
+    $('inspectPhase').textContent='No oscillatory phase at 0 Hz. Load torque also affects the DC output.';
+  }else{
+    const h=harmonics[n-1],f=h.f,ip=amp(h.input),op=amp(h.output),H=amp(h.response)*q.scale,ph=phase(h.response);
+    $('inspectFreq').textContent='n = '+n+' · '+(f<1e3?fmt(f,1)+' Hz':fmt(f/1000,2)+' kHz');
+    $('inspectInputType').textContent='Input voltage · sinusoidal peak';
+    $('inspectOutputLabel').textContent='Output harmonic';
+    $('inspectInput').textContent=fmtSmall(ip)+' V';
+    $('inspectOutput').textContent=fmtSmall(op)+' '+outputUnit();
+    $('inspectOutputType').textContent=(output==='speed'?'Motor speed':'Armature current')+' · sinusoidal peak';
+    $('inspectGain').textContent=fmtSmall(H)+' '+(output==='speed'?(state.units==='rpm'?'rpm/V':'(rad/s)/V'):'A/V');
+    $('inspectPhase').textContent='Phase shift = '+fmt(ph,1)+'° · output phasor = H(j2πf) × input phasor';
+  }
+  const dcRatio=values[0].output;
+  const lesson=output==='speed'
+    ? 'For a motor drive, the intended speed is typically a <b>steady (DC) speed</b>; the non-DC components represent unwanted speed ripple.'
+    : dcRatio<.1
+      ? 'With very little opposing load, <b>mean current can be small</b> even while current ripple is appreciable. A small DC current is not necessarily a problem.'
+      : 'The <b>DC current produces mean torque</b>; AC current components produce torque ripple and extra copper heating.';
+  $('spectrumDCInfo').innerHTML='DC at <b>n = 0</b>: input <b>'+fmt(data.vbar,3)+' V</b> · output <b>'+fmt(outputDC,output==='speed'?3:5)+' '+outputUnit()+'</b>. Normalisation references: input <b>'+fmtSmall(inputRef)+' V</b>; output <b>'+fmtSmall(outputRef)+' '+outputUnit()+'</b>. '+lesson;
 }
 function bodeAxes(id,ymin,ymax){
   const z=ctxSetup(id),{ctx,W,H}=z,l=62,r=14,t=20,b=37,w=W-l-r,h=H-t-b,minF=5,maxF=2e6;
@@ -665,7 +708,7 @@ function updateFrequencyText(){
   $('harmonicCountValue').textContent=String(N);
   $('outputFourierTitle').textContent='Reconstruct the '+outName;
   $('outputFourierInfo').textContent='Two periods · exact periodic output versus '+N+' harmonic'+(N===1?'':'s');
-  $('freqIntroNote').textContent='The PWM has a DC component and harmonics at n × '+fmt(p.f/1000,3)+' kHz. The paired spectral lines below show how each input sinusoid maps to an output sinusoid; increasing N also improves the Fourier reconstruction.';
+  $('freqIntroNote').textContent='DC (n = 0) is the average value. AC harmonics are at n × '+fmt(p.f/1000,3)+' kHz. Each plotted spectrum is divided by its own maximum spectral amplitude (DC included), giving a common 0–1 vertical scale.';
 }
 function drawFrequency(){
   if($('frequencyDomain').hidden||!data)return;
@@ -690,13 +733,13 @@ $('freqOutput').addEventListener('change',()=>drawFrequency());
 $('inspectHarmonic').addEventListener('change',()=>drawFrequency());
 $('pwmSpectrumPlot').addEventListener('click',e=>{
   const rect=e.currentTarget.getBoundingClientRect(),N=Number($('harmonicCount').value),left=55,right=16;
-  const order=Math.round((e.clientX-rect.left-left)/(rect.width-left-right)*N+.5);
-  $('inspectHarmonic').value=String(Math.max(1,Math.min(N,order)));drawFrequency();
+  const order=Math.round((e.clientX-rect.left-left)/(rect.width-left-right)*(N+1)-.5);
+  $('inspectHarmonic').value=String(Math.max(0,Math.min(N,order)));drawFrequency();
 });
 $('pwmSpectrumPlot').addEventListener('keydown',e=>{
   if(!['ArrowLeft','ArrowRight'].includes(e.key))return;e.preventDefault();
   const d=e.key==='ArrowRight'?1:-1,N=Number($('harmonicCount').value);
-  $('inspectHarmonic').value=String(Math.max(1,Math.min(N,Number($('inspectHarmonic').value)+d)));drawFrequency();
+  $('inspectHarmonic').value=String(Math.max(0,Math.min(N,Number($('inspectHarmonic').value)+d)));drawFrequency();
 });
 
 function renderInfo(){const s=at(time),p=data.p,volt=pwm(time);$('scrub').value=Math.round(time/HORIZON*1000);$('now').textContent=`${fmt(time*1000,2)} ms`;

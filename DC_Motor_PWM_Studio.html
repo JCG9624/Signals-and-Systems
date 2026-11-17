@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="PWM Motor Studio: explore armature current ripple, back EMF, motor speed and frequency-domain harmonics of a DC motor.">
+<title>PWM Motor Studio — Signals &amp; Systems</title>
+<style>
+:root{color-scheme:light;--navy:#113a61;--navy2:#234f77;--teal:#0096a1;--orange:#e87528;--purple:#8053b4;--slate:#9aaaba;--ink:#17324a;--muted:#59718a;--line:#dae5ec;--panel:#fff;--bg:#f6f9fc;--green:#0b7c74}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);line-height:1.4}
+main{max-width:1390px;margin:0 auto;padding:23px 25px 36px}header{display:flex;justify-content:space-between;gap:22px;align-items:center;margin-bottom:18px}.eyebrow{font-size:11px;color:#5e849d;text-transform:uppercase;letter-spacing:.15em;font-weight:760;margin-bottom:8px}.title-row{display:flex;gap:12px;align-items:center}.brand-mark{width:49px;height:49px;display:grid;place-items:center;flex-shrink:0;border-radius:12px;background:var(--navy);color:#bde9e8}.brand-mark svg{width:36px;height:36px}h1{font-size:clamp(23px,2.8vw,34px);color:var(--navy);font-weight:780;letter-spacing:-.04em;margin:0}.subtitle{font-size:13.5px;line-height:1.55;color:var(--muted);max-width:780px;margin:7px 0 0}.top-formula{background:#e7f2f7;border:1px solid #d3e7f0;border-radius:12px;font-family:Georgia,"Times New Roman",serif;color:#214e6d;font-size:15px;line-height:1.7;padding:11px 15px;flex-shrink:0;white-space:nowrap}.top-formula b{color:var(--orange);font-weight:normal;font-style:italic}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 2px 12px #17365306}.control-panel{padding:16px 20px 13px}.section-line{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:14px}.section-line h2,.card-header h2{color:var(--navy);font-size:15px;margin:0;font-weight:750}.mini-hint{font-size:11px;color:#7890a3}.preset{font-size:12px;background:#f8fbfd;border:1px solid #d3e2eb;border-radius:9px;padding:8px 9px;color:var(--navy);max-width:100%}.control-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px 25px}.control-head{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:4px;flex-wrap:wrap}.control-head label{font-size:12px;font-weight:730;color:var(--navy)}.num-wrap{display:flex;align-items:center;gap:5px}.num-wrap input{font-size:14px;font-weight:760;font-variant-numeric:tabular-nums;text-align:right;background:#f7fbfd;color:var(--navy);border:1px solid #d1e1ec;border-radius:7px;padding:5px 6px;width:69px}.num-wrap span{color:var(--muted);font-size:11px;min-width:28px}.control-field input[type=range]{width:100%;accent-color:var(--teal);height:19px;margin:2px 0 0;cursor:pointer}.range-row{display:flex;justify-content:space-between;color:#8ba0af;font-size:10px}.stat-strip{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-top:13px;padding-top:12px;border-top:1px solid #ecf2f6}.chip{border-radius:8px;border:1px solid #dfe9f1;background:#f4f9fc;color:#60798f;font-size:11px;padding:6px 10px;white-space:nowrap}.chip b{color:#1b4666;font-weight:750;font-variant-numeric:tabular-nums}.math-note{color:#6b8092;font-size:11px;margin:9px 0 0}
+.circuit{margin-top:14px;padding:15px 20px 12px;overflow:hidden}.circuit-top{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:7px}.circuit svg{display:block;width:100%;height:auto;max-height:126px}.system-block{fill:#f5fafe;stroke:#8fb0c9;stroke-width:1.6}.system-text{font:650 15px Inter,Arial,sans-serif;fill:#173e5c}.system-sub{font:12px Inter,Arial,sans-serif;fill:#708a9a}.circuit-line{fill:none;stroke:#7299b2;stroke-width:2.5}.feedback-line{fill:none;stroke:#db8a52;stroke-width:2;stroke-dasharray:5 5}.state-chip{font-size:11px;color:var(--navy);font-weight:740;background:#e9f3f7;border-radius:15px;padding:5px 10px;border:1px solid #d5e5ee}.state-chip.on{background:#e0f5ed;color:#136452;border-color:#bce5d4}.wheel-core{fill:#e3eff5;stroke:#5789a2;stroke-width:2.2}
+.player{padding:12px 18px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:13px;margin-top:14px}.play-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.btn{border:1px solid #cbdde9;border-radius:9px;background:#fff;color:var(--navy);font-size:12px;font-weight:740;padding:9px 14px;cursor:pointer;min-height:37px}.btn:hover{background:#edf6fa}.btn.primary{background:var(--navy);color:#fff;border-color:var(--navy);min-width:100px}.btn.primary:hover{background:var(--navy2)}.btn.muted{background:#f8fbfd}.player label{font-size:11px;color:var(--muted)}.player select{border:1px solid #d3e2eb;background:#fff;border-radius:7px;color:var(--navy);font-size:12px;padding:6px;min-height:34px}.timeline{display:flex;align-items:center;gap:9px;flex:1;min-width:280px}.timeline input{accent-color:var(--teal);flex:1;min-width:90px}.time-read{font-size:13px;color:var(--navy);font-weight:750;font-variant-numeric:tabular-nums;min-width:73px;text-align:right}.readouts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:13px}.readout{border-radius:10px;border:1px solid #e1eaf2;border-left:4px solid var(--accent);background:#fff;padding:10px 13px;min-width:0}.readout .key{font-size:11px;color:#6a8294}.readout .val{font-size:20px;font-weight:760;letter-spacing:-.035em;color:var(--navy);font-variant-numeric:tabular-nums;margin-top:3px;white-space:nowrap}
+.two-scopes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}.scope{overflow:hidden}.card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;padding:15px 18px 8px;flex-wrap:wrap}.scope-desc{font-size:11px;color:var(--muted);margin-top:4px}.small-legend{display:flex;gap:13px;flex-wrap:wrap;color:#607a8b;font-size:11px;align-items:center}.legend-line{display:inline-block;vertical-align:middle;width:19px;height:0;border-top:3px solid var(--c);margin-right:5px}.legend-line.dash{border-top-style:dashed}canvas{display:block;width:100%;height:236px;touch-action:pan-y}.speed-scope{margin-top:14px;overflow:hidden}.speed-scope canvas{height:278px}.scope-footer{font-size:11px;color:#6a8596;border-top:1px solid #eaf0f5;padding:9px 18px 11px;background:#fbfdff}
+.lower{display:grid;grid-template-columns:1.12fr .88fr;gap:14px;margin-top:14px}.teach{padding:17px 19px}.teach h2{font-size:15px;margin:0 0 13px;color:var(--navy)}.math-box{border:1px solid #e3edf4;border-radius:9px;background:#f7fbfd;padding:11px 14px;font:16px/1.85 Georgia,"Times New Roman",serif;color:#224a68;margin-bottom:12px}.teach p,.teach li{font-size:12px;line-height:1.55;color:#536d80}.teach p{margin:9px 0}.teach strong{color:var(--navy)}.harmonics table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:11px;text-align:right}.harmonics th{text-align:right;border-bottom:1px solid var(--line);padding:9px 8px;color:#486b83;font-weight:740;white-space:nowrap}.harmonics th:first-child,.harmonics td:first-child{text-align:left}.harmonics td{padding:8px;border-bottom:1px solid #eff4f8;color:#466276}.harmonics td:nth-child(2){color:var(--slate);font-weight:740}.harmonics td:nth-child(3){color:#b85f20;font-weight:740}.harmonics td:nth-child(4){color:var(--teal);font-weight:740}.harmonics .foot{font-size:11px;color:#6d8497;line-height:1.5;margin-top:10px}.questions{margin-top:14px;padding:17px 20px}.questions h2{font-size:15px;color:var(--navy);margin:0 0 9px}.questions ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin:0;padding-left:21px}.questions li{font-size:12px;color:#5d7386;line-height:1.55}footer{font-size:11px;color:#8195a5;padding:17px 5px 3px;display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #a1d8db;outline-offset:2px}
+@media(max-width:1050px){.top-formula{display:none}.control-grid{gap:13px 17px}.two-scopes{grid-template-columns:1fr}.scope canvas{height:235px}}
+@media(max-width:730px){main{padding:15px 11px 27px}header{margin-bottom:15px}.control-grid{grid-template-columns:1fr 1fr}.control-panel{padding:15px 14px}.circuit{padding:13px 10px}.player{padding:12px}.timeline{min-width:100%}.readouts{grid-template-columns:repeat(2,minmax(0,1fr))}.readout .val{font-size:17px}.lower{grid-template-columns:1fr}.questions ol{grid-template-columns:1fr;gap:9px}.circuit .circuit-label{font-size:12px}.math-box{font-size:14px}}
+@media(max-width:430px){.control-grid{grid-template-columns:1fr}.readouts{grid-template-columns:1fr 1fr}.small-legend{gap:7px}.card-header{padding:13px 12px 6px}.harmonics th,.harmonics td{padding:6px 4px;font-size:10px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* Classroom layout: block diagram first, controls remain alongside all response figures. */
+.circuit{margin-top:0;margin-bottom:16px}
+.workspace{display:grid;grid-template-columns:minmax(285px,340px) minmax(0,1fr);gap:17px;align-items:start}
+.sidebar{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow-y:auto;overflow-x:hidden;padding-right:4px;scrollbar-color:#c0d3df transparent;scrollbar-width:thin}
+.sidebar .control-panel{padding:17px 17px 13px}
+.sidebar .section-line{align-items:flex-start;gap:9px;margin-bottom:17px}
+.sidebar .section-line>div{width:100%}.sidebar .section-line label{display:block;margin-bottom:4px}
+.sidebar .section-line .preset{width:100%}
+.sidebar .control-grid{grid-template-columns:1fr;gap:10px}
+.sidebar .control-head{margin-bottom:2px}
+.sidebar .control-field{border-bottom:1px solid #edf2f6;padding-bottom:4px}
+.sidebar .control-field:last-child{border-bottom:0}
+.sidebar .stat-strip{gap:5px;margin-top:10px;padding-top:9px}
+.sidebar .chip{font-size:10px;padding:4px 6px;white-space:normal}
+.sidebar .math-note{font-size:10px;line-height:1.5}
+.view-unit{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-top:12px;font-size:11px;font-weight:720;color:var(--navy)}
+.sidebar .player{display:flex;flex-direction:column;align-items:stretch;gap:10px;justify-content:flex-start;margin-top:12px;padding:13px}
+.sidebar .player .play-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.sidebar .player .play-actions button{padding:8px 3px;font-size:11px}
+.sidebar .player label[for="playSpeed"]{align-self:center}
+.sidebar .player select{width:100%}
+.sidebar .timeline{min-width:0;width:100%;display:grid;grid-template-columns:1fr auto;gap:4px 7px}
+.sidebar .timeline input{grid-column:1/-1;min-width:0;width:100%;grid-row:2}
+.sidebar .timeline label{grid-column:1;grid-row:1}
+.sidebar .timeline output{grid-column:2;grid-row:1;min-width:0}
+.sidebar .readouts{grid-template-columns:1fr 1fr;gap:6px;margin-top:11px}
+.sidebar .readout{padding:7px 8px}.sidebar .readout .key{font-size:10px}.sidebar .readout .val{font-size:15px}
+.sidebar .readout:last-child{grid-column:1/-1}
+.plots{min-width:0}.plots .two-scopes{margin-top:0;gap:12px}
+.plots .card-header{padding:14px 16px 7px}
+.plots .scope canvas{height:213px}.plots .speed-scope canvas{height:250px}
+.plots #currentTrendPlot{height:205px}
+.trend-divider{margin:0 17px;padding:11px 0 4px;border-top:1px solid #eaf0f5;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:11px;font-weight:730;color:var(--navy)}
+.trend-divider span:last-child{font-weight:500;color:var(--muted)}
+@media(max-width:1070px){.workspace{grid-template-columns:minmax(260px,310px) minmax(0,1fr)}.plots .two-scopes{grid-template-columns:1fr}.plots .scope canvas{height:210px}}
+@media(max-width:730px){.workspace{display:flex;flex-direction:column;gap:13px}.sidebar{position:static;max-height:none;overflow:visible;width:100%;padding-right:0}.sidebar .control-grid{grid-template-columns:1fr 1fr;gap:10px}.sidebar .readouts{grid-template-columns:repeat(3,minmax(0,1fr))}.sidebar .readout:last-child{grid-column:auto}.plots{width:100%}.plots .two-scopes{grid-template-columns:1fr}.plots .scope canvas{height:245px}.plots .speed-scope canvas{height:235px}}
+@media(max-width:430px){.sidebar .control-grid{grid-template-columns:1fr}.sidebar .readouts{grid-template-columns:1fr 1fr}.sidebar .readout:last-child{grid-column:1/-1}}
+
+/* Keep transport controls visible while scrolling the parameter sidebar. */
+.sidebar{display:flex;flex-direction:column;gap:10px;overflow:hidden;padding-right:0}
+.sidebar>.player{margin-top:0;flex:none}
+.sidebar-scroll{overflow-y:auto;overflow-x:hidden;min-height:0;padding-right:5px;scrollbar-color:#c0d3df transparent;scrollbar-width:thin}
+.sidebar-scroll>.control-panel{margin:0}
+@media(max-width:730px){.sidebar{max-height:none;overflow:visible}.sidebar-scroll{overflow:visible;padding-right:0}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div>
+    <div class="eyebrow">Signals &amp; Systems · Chapter 11 · Electromechanical systems</div>
+    <div class="title-row"><div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2.1"><path d="M3 28h8v-13h9v13h9V15h9v13h7"/><circle cx="24" cy="39" r="5"/><path d="M24 30v4m-9 5h4m10 0h5M24 44v3M6 6h7M6 10h12M32 7h9"/></svg></div><h1>PWM Motor Studio</h1></div>
+    <p class="subtitle">Follow a pulse-width-modulated voltage through the motor: rapid switching produces <strong>current ripple</strong>, while electrical dynamics, back EMF and inertia determine the much slower <strong>speed response</strong>.</p>
+  </div>
+  <div class="top-formula"><b>L</b><sub>tot</sub> di/dt = v<sub>PWM</sub> − Ri − k<sub>e</sub>ω<br><b>J</b> dω/dt = k<sub>t</sub>i − bω − T<sub>L</sub></div>
+</header>
+<section class="card circuit" aria-label="Motor model block diagram">
+  <div class="circuit-top"><h2 style="font-size:14px;color:var(--navy);margin:0">From electrical switching to mechanical motion</h2><span id="switchState" class="state-chip">SWITCH ON · 12 V</span></div>
+  <svg viewBox="0 0 1160 119" role="img" aria-label="PWM source, armature resistance and inductance, current-to-torque conversion, mechanical shaft, and back-EMF coupling">
+    <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7" fill="#7299b2"/></marker><marker id="arrOrange" markerWidth="8" markerHeight="8" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7" fill="#db8a52"/></marker></defs>
+    <rect class="system-block" x="15" y="12" width="180" height="56" rx="10"/><text class="system-text" x="105" y="35" text-anchor="middle">PWM driver</text><text class="system-sub" x="105" y="53" text-anchor="middle">0 ↔ Vdc</text>
+    <path id="pwmPath" class="circuit-line" d="M195 40H253" marker-end="url(#arr)"/><text class="system-sub" x="208" y="28">v<tspan baseline-shift="sub" font-size="10">PWM</tspan></text>
+    <rect class="system-block" x="255" y="12" width="235" height="56" rx="10"/><text class="system-text" x="373" y="35" text-anchor="middle">Armature R, L + L<tspan baseline-shift="sub" font-size="10">add</tspan></text><text class="system-sub" x="373" y="53" text-anchor="middle">current i(t)</text>
+    <path class="circuit-line" d="M490 40H544" marker-end="url(#arr)"/><text class="system-sub" x="507" y="28">i</text>
+    <rect class="system-block" x="547" y="12" width="152" height="56" rx="10"/><text class="system-text" x="623" y="35" text-anchor="middle">Torque</text><text class="system-sub" x="623" y="53" text-anchor="middle">T = k<tspan baseline-shift="sub" font-size="10">t</tspan> i</text>
+    <path class="circuit-line" d="M699 40H752" marker-end="url(#arr)"/>
+    <rect class="system-block" x="754" y="12" width="196" height="56" rx="10"/><text class="system-text" x="852" y="35" text-anchor="middle">Shaft: J, b, T<tspan baseline-shift="sub" font-size="10">L</tspan></text><text class="system-sub" x="852" y="53" text-anchor="middle">ω(t) = speed</text>
+    <path class="circuit-line" d="M950 40H1042" marker-end="url(#arr)"/><g id="rotor" transform="translate(1068 40)"><circle class="wheel-core" r="23"/><path d="M-19 0H19M0 -19V19M-13 -13L13 13M-13 13L13 -13" stroke="#5789a2" stroke-width="2.3" stroke-linecap="round"/><circle r="5" fill="#5789a2"/></g>
+    <path class="feedback-line" d="M1014 41V98H406V69" marker-end="url(#arrOrange)"/><text x="721" y="92" fill="#bd783f" font-size="12" font-weight="650">Back EMF: e<tspan baseline-shift="sub" font-size="10">m</tspan> = k<tspan baseline-shift="sub" font-size="10">e</tspan>ω</text>
+  </svg>
+</section>
+<div class="workspace">
+<aside class="sidebar" aria-label="Parameters and animation controls">
+<section class="card player" aria-label="Animation controls">
+  <div class="play-actions"><button class="btn primary" id="play" aria-pressed="false">▶ Play</button><button class="btn" id="restart">↺ Restart</button><button class="btn muted" id="reset">Reset parameters</button><button class="btn muted" id="download">↓ Download HTML</button><label for="playSpeed">Playback</label><select id="playSpeed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></div>
+  <div class="timeline"><label for="scrub">Inspect at</label><input id="scrub" type="range" min="0" max="1000" step="1" value="0" aria-label="Simulation time"><output id="now" class="time-read">0.00 ms</output></div>
+</section>
+<div class="sidebar-scroll">
+<section class="card control-panel" aria-label="PWM and motor settings">
+  <div class="section-line"><h2>Experiment settings</h2><div><label for="preset" class="mini-hint">Try an example &nbsp;</label><select class="preset" id="preset" aria-label="Select a teaching preset">
+    <option value="baseline">20 kHz · natural armature filtering</option><option value="slow">2 kHz · pronounced current ripple</option><option value="fast">40 kHz · higher switching frequency</option><option value="inductor">20 kHz · extra series inductance</option><option value="inertia">20 kHz · tenfold inertia</option>
+  </select></div></div>
+  <div class="control-grid">
+    <div class="control-field"><div class="control-head"><label for="duty">PWM duty cycle, D</label><div class="num-wrap"><input id="dutyNum" type="number" min="10" max="90" step="1" value="60"><span>%</span></div></div><input id="duty" type="range" min="10" max="90" step="1" value="60"><div class="range-row"><span>10%</span><span>90%</span></div></div>
+    <div class="control-field"><div class="control-head"><label for="freq">Switching frequency, f<sub>PWM</sub></label><div class="num-wrap"><input id="freqNum" type="number" min="1" max="40" step="1" value="20"><span>kHz</span></div></div><input id="freq" type="range" min="1" max="40" step="1" value="20"><div class="range-row"><span>1 kHz</span><span>40 kHz</span></div></div>
+    <div class="control-field"><div class="control-head"><label for="bus">DC supply voltage</label><div class="num-wrap"><input id="busNum" type="number" min="4" max="12" step="0.5" value="12"><span>V</span></div></div><input id="bus" type="range" min="4" max="12" step="0.5" value="12"><div class="range-row"><span>4 V</span><span>12 V</span></div></div>
+    <div class="control-field"><div class="control-head"><label for="extraL">Extra series inductance, L<sub>add</sub></label><div class="num-wrap"><input id="extraLNum" type="number" min="0" max="3" step="0.1" value="0"><span>mH</span></div></div><input id="extraL" type="range" min="0" max="3" step="0.1" value="0"><div class="range-row"><span>0 mH</span><span>3 mH</span></div></div>
+    <div class="control-field"><div class="control-head"><label for="inertia">Mechanical inertia multiplier</label><div class="num-wrap"><input id="inertiaNum" type="number" min="1" max="10" step="1" value="1"><span>× J</span></div></div><input id="inertia" type="range" min="1" max="10" step="1" value="1"><div class="range-row"><span>1×</span><span>10×</span></div></div>
+    <div class="control-field"><div class="control-head"><label for="load">Opposing load torque, T<sub>L</sub></label><div class="num-wrap"><input id="loadNum" type="number" min="0" max="8" step="0.5" value="0"><span>mN·m</span></div></div><input id="load" type="range" min="0" max="8" step="0.5" value="0"><div class="range-row"><span>No load</span><span>8 mN·m</span></div></div>
+
+    <div class="control-field"><div class="control-head"><label for="horizon">Figure 3 · time horizon</label><div class="num-wrap"><input id="horizonNum" type="number" min="20" max="320" step="10" value="80"><span>ms</span></div></div><input id="horizon" type="range" min="20" max="320" step="10" value="80"><div class="range-row"><span>20 ms</span><span>320 ms</span></div></div>
+  </div>
+  <div class="stat-strip" aria-live="polite"><span class="chip">Average voltage = <b id="avgV">7.20 V</b></span><span class="chip">τ<sub>e</sub> = L<sub>tot</sub>/R = <b id="tauE">23.1 µs</b></span><span class="chip">τ<sub>m</sub> ≈ <b id="tauM">11.0 ms</b></span><span class="chip">Steady current ripple ≈ <b id="ripple">—</b></span><span class="chip">Steady speed ≈ <b id="steadySpeed">—</b></span></div>
+  <div class="view-unit"><label for="units">Speed units</label><select class="preset" id="units"><option value="rad">rad/s</option><option value="rpm">rpm</option></select></div>
+  <div class="math-note">Motor: approximate FAULHABER 2224B012SR parameters from Chapter 11 (R = 8.77 Ω, L = 203 µH, k<sub>t</sub> = 0.0146, k<sub>e</sub> = 0.0145, J = 2.7 × 10<sup>−7</sup>, b = 3.8 × 10<sup>−7</sup>). An optional series inductor adds to the armature inductance, reducing current ripple.</div>
+</section>
+
+
+<div class="readouts" aria-live="off">
+  <div class="readout" style="--accent:var(--slate)"><div class="key">PWM voltage now</div><div class="val" id="vNow">12.00 V</div></div>
+  <div class="readout" style="--accent:var(--orange)"><div class="key">Armature current now</div><div class="val" id="iNow">0.000 A</div></div>
+  <div class="readout" style="--accent:var(--teal)"><div class="key">Speed now</div><div class="val" id="wNow">0 rad/s</div></div>
+  <div class="readout" style="--accent:var(--purple)"><div class="key">Motor back EMF now</div><div class="val" id="emNow">0.00 V</div></div>
+  <div class="readout" style="--accent:var(--green)"><div class="key">Electromagnetic torque now</div><div class="val" id="torqueNow">0.00 mN·m</div></div>
+</div>
+</div>
+</aside>
+<div class="plots" aria-label="Linked motor response plots">
+<div class="two-scopes">
+  <section class="card scope"><div class="card-header"><div><h2>1 · PWM source</h2><div class="scope-desc">Switching-time microscope: six PWM periods around the cursor</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--slate)"></i>v<sub>PWM</sub>(t)</span><span><i class="legend-line dash" style="--c:var(--teal)"></i>average voltage</span></div></div><canvas id="voltagePlot" role="img" aria-label="Zoomed PWM voltage waveform with its average voltage"></canvas><div class="scope-footer">The duty cycle controls the <b>average voltage</b>: V̄ = D V<sub>dc</sub>.</div></section>
+  <section class="card scope"><div class="card-header"><div><h2>2 · Armature current ripple</h2><div class="scope-desc">Same six periods; current cannot jump instantaneously</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--orange)"></i>i(t)</span><span><i class="legend-line dash" style="--c:var(--navy)"></i>local cycle mean</span></div></div><canvas id="currentPlot" role="img" aria-label="Armature current showing ripple and local cycle mean"></canvas><div class="scope-footer">The armature inductance (plus any extra series inductance) limits <b>di/dt</b>.</div></section>
+</div>
+<section class="card speed-scope"><div class="card-header"><div><h2>3 · Motor speed and current: the start-up transient</h2><div class="scope-desc">Common time horizon: compare speed build-up with the evolving mean armature current</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--teal)"></i>two-pole motor, PWM</span><span><i class="legend-line dash" style="--c:var(--purple)"></i>one-pole motor, averaged voltage</span></div></div><canvas id="speedPlot" role="img" aria-label="Long-time motor speed compared with the one-pole average-voltage approximation"></canvas><div class="trend-divider"><span>Armature current during start-up (cycle average and switching envelope)</span><span>Shared time axis</span></div><canvas id="currentTrendPlot" role="img" aria-label="Motor armature current versus time, including average and switching envelope"></canvas><div class="scope-footer" id="speedNote">The current rises and then changes as back EMF builds. The fine switching ripple is still visible in Figure 2, while Figure 3 shows its longer-term evolution.</div></section>
+</div>
+</div>
+<div class="lower">
+ <section class="card teach" aria-label="Mathematical model and interpretation"><h2>What is the model doing?</h2><div class="math-box">(L + L<sub>add</sub>) di/dt = v<sub>PWM</sub>(t) − Ri(t) − k<sub>e</sub>ω(t)<br>J dω/dt = k<sub>t</sub>i(t) − bω(t) − T<sub>L</sub></div><p><strong>Start-up:</strong> the current reacts quickly to the ON/OFF transitions; accumulated torque accelerates the shaft more slowly.</p><p><strong>Back EMF:</strong> as ω increases, k<sub>e</sub>ω opposes the applied armature voltage, reducing the mean current and driving the motor towards a steady speed.</p><p><strong>Model comparison:</strong> the dashed curve uses the one-pole approximation with V̄ = DV<sub>dc</sub>. It is a good approximation to the <em>slow speed response</em>, not to the switching-frequency current ripple.</p><p><strong>Frequency-domain view:</strong> for voltage-to-current and voltage-to-speed analysis, with L<sub>tot</sub> = L + L<sub>add</sub> and Δ(s) = (R + sL<sub>tot</sub>)(Js + b) + k<sub>e</sub>k<sub>t</sub>, the transfer functions are H<sub>i</sub>(s) = (Js + b)/Δ(s) and H<sub>ω</sub>(s) = k<sub>t</sub>/Δ(s).</p><p><strong>Drive assumption:</strong> the source is an ideal, actively driven 0/V<sub>dc</sub> PWM terminal voltage (including a 0 V freewheel state); signed armature current is allowed. A real nonsynchronous diode/freewheel stage or current limit can change the waveform.</p></section>
+ <section class="card teach harmonics" aria-label="Fourier harmonic response"><h2>Fourier view: steady-state harmonics</h2><p>The PWM contains a DC component and harmonics at n f<sub>PWM</sub>. Each harmonic is multiplied by the motor's frequency response. Its voltage amplitude is 2V<sub>dc</sub>|sin(πnD)|/(πn).</p><table><thead><tr><th>n</th><th>Voltage peak</th><th>Current peak</th><th>Speed peak</th></tr></thead><tbody id="harmonicRows"></tbody></table><p class="foot">Peak (not RMS) amplitudes of individual sinusoids in the <strong>periodic steady state</strong>. These are not start-up contributions. Fourier is especially convenient here because each harmonic can be handled independently.</p></section>
+</div>
+<section class="card questions"><h2>Learning outcomes · Investigate</h2><ol><li>Reduce the switching frequency from 20 kHz to 2 kHz. Which variable shows the larger change in ripple: armature current or speed?</li><li>Add 1 mH of series inductance. Why does the current ripple fall even though the average source voltage is unchanged?</li><li>Increase the mechanical inertia. Why does the speed transient become slower without substantially changing the final speed?</li></ol></section>
+<footer><span>Signals &amp; Systems · Chapter 11 · DC motor and PWM · Interactive HTML / JavaScript</span><span>Prompts provided by Joaquin Carrasco · Code produced by ChatGPT · No external libraries</span></footer>
+</main>
+<script id="saved-state" type="application/json">{"duty":60,"freq":20,"bus":12,"extraL":0,"inertia":1,"load":0,"units":"rad"}</script>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+const C={navy:'#113a61',teal:'#0096a1',orange:'#e87528',purple:'#8053b4',slate:'#9aaaba',grid:'#e7eff5',text:'#607d91',ink:'#17324a'};
+const fixed={R:8.77,L:203e-6,kt:.0146,ke:.0145,J:2.7e-7,b:3.8e-7};
+const defaults={duty:60,freq:20,bus:12,extraL:0,inertia:1,load:0,horizon:80,units:'rad'};
+let state={...defaults};try{const saved=JSON.parse($('saved-state').textContent);for(const k of Object.keys(defaults))if(saved[k]!==undefined)state[k]=saved[k]}catch(e){}
+const bounds={duty:[10,90],freq:[1,40],bus:[4,12],extraL:[0,3],inertia:[1,10],load:[0,8],horizon:[20,320]};
+const displayFmt={duty:v=>String(Math.round(v)),freq:v=>String(Math.round(v)),bus:v=>String(v),extraL:v=>String(Number(v.toFixed(1))),inertia:v=>String(Math.round(v)),load:v=>String(Number(v.toFixed(1))),horizon:v=>String(Math.round(v))};
+const NPER=24; let HORIZON=state.horizon/1000;
+let data=null,playing=false,raf=0,lastTs=0,time=0,playback=1;
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function fmt(v,n=2){return Number.isFinite(v)?v.toFixed(n):'—'}
+function formatCurrent(v){return Math.abs(v)<.1?`${fmt(v,3)} A`:`${fmt(v,2)} A`}
+function speedUnit(w){return state.units==='rpm'?w*60/(2*Math.PI):w}
+function speedLabel(v,n=0){return `${fmt(speedUnit(v),n)} ${state.units==='rpm'?'rpm':'rad/s'}`}
+function motor(){return {R:fixed.R,L:fixed.L+state.extraL*1e-3,kt:fixed.kt,ke:fixed.ke,J:fixed.J*state.inertia,b:fixed.b,TL:state.load*1e-3,bus:state.bus,D:state.duty/100,f:state.freq*1000}}
+// Exact matrix exponential for the two-dimensional LTI system on an ON or OFF interval.
+// Splitting a sampling step at a switching edge ensures duty cycles are not rounded to the sample grid.
+function transition(p,dt,u){
+  if(dt<=0)return (i,w)=>[i,w];
+  const a11=-p.R/p.L,a12=-p.ke/p.L,a21=p.kt/p.J,a22=-p.b/p.J;
+  const tr=(a11+a22)/2,disc=((a11-a22)/2)**2+a12*a21;
+  let m,n;
+  if(disc>1e-18){const d=Math.sqrt(disc),ea=Math.exp((tr+d)*dt),eb=Math.exp((tr-d)*dt);m=(ea+eb)/2;n=(ea-eb)/(2*d);}
+  else if(disc < -1e-18){const d=Math.sqrt(-disc),ea=Math.exp(tr*dt);m=ea*Math.cos(d*dt);n=ea*Math.sin(d*dt)/d;}
+  else{const ea=Math.exp(tr*dt);m=ea;n=dt*ea;}
+  const e11=m+n*(a11-tr),e12=n*a12,e21=n*a21,e22=m+n*(a22-tr);
+  const den=p.R*p.b+p.ke*p.kt;
+  const iw=(p.b*u+p.ke*p.TL)/den,ww=(p.kt*u-p.R*p.TL)/den;
+  return (i,w)=>{const di=i-iw,dw=w-ww;return [iw+e11*di+e12*dw,ww+e21*di+e22*dw]};
+}
+function simulate(){
+  const p=motor(),period=1/p.f,dt=period/NPER,steps=Math.ceil(HORIZON/dt);
+  const i=new Float64Array(steps+1),w=new Float64Array(steps+1),theta=new Float64Array(steps+1),edgeI=new Float64Array(Math.ceil(steps/NPER)+1);
+  const fullOn=transition(p,dt,p.bus),fullOff=transition(p,dt,0),toOff=transition(p,p.D*period,p.bus),switchSample=p.D*NPER;
+  const crossIdx=Math.floor(switchSample);
+  const hasSplit=Math.abs(switchSample-Math.round(switchSample))>1e-10;
+  const onPart=hasSplit?transition(p,dt*(switchSample-crossIdx),p.bus):null;
+  const offPart=hasSplit?transition(p,dt*(1-switchSample+crossIdx),0):null;
+  let si=0,sw=0,th=0;
+  for(let k=0;k<steps;k++){
+    const phase=k%NPER;
+    if(phase===0)edgeI[Math.floor(k/NPER)]=toOff(si,sw)[0];
+    let next;
+    if(hasSplit&&phase===crossIdx){const x=onPart(si,sw);next=offPart(x[0],x[1]);}
+    else next=phase<switchSample?fullOn(si,sw):fullOff(si,sw);
+    const ni=next[0],nw=next[1];th+=(sw+nw)*.5*dt;si=ni;sw=nw;
+    i[k+1]=si;w[k+1]=sw;theta[k+1]=th;
+  }
+  const den=p.R*p.b+p.ke*p.kt;
+  const vbar=p.bus*p.D;
+  const wss=(p.kt*vbar-p.R*p.TL)/den,iss=(p.b*vbar+p.ke*p.TL)/den;
+  const tauM=p.J*p.R/den;
+  const tauE=p.L/p.R;
+  const windowSteps=Math.min(steps,4*NPER);
+  let imin=Infinity,imax=-Infinity;
+  for(let k=steps-windowSteps;k<=steps;k++){imin=Math.min(imin,i[k]);imax=Math.max(imax,i[k]);}
+  for(let cycle=Math.max(0,Math.floor((steps-windowSteps)/NPER));cycle<=Math.floor((steps-1)/NPER);cycle++){imin=Math.min(imin,edgeI[cycle]);imax=Math.max(imax,edgeI[cycle]);}
+  const nCycles=Math.ceil(steps/NPER),cycleStats=[];
+  for(let c=0;c<nCycles;c++){
+    const lo=c*NPER,hi=Math.min(steps,(c+1)*NPER);let isum=0,low=Infinity,high=-Infinity;
+    for(let k=lo;k<hi;k++){isum+=(i[k]+i[k+1])*.5;low=Math.min(low,i[k],i[k+1]);high=Math.max(high,i[k],i[k+1]);}
+    if(c<edgeI.length){low=Math.min(low,edgeI[c]);high=Math.max(high,edgeI[c]);}
+    cycleStats.push({t:(lo+hi)*.5*dt,avg:isum/(hi-lo),low,high});
+  }
+  return {p,period,dt,steps,i,w,theta,edgeI,cycleStats,vbar,wss,iss,tauM,tauE,ripple:imax-imin};
+}
+function at(t){
+  t=clamp(t,0,HORIZON);
+  const z=clamp(t/data.dt,0,data.steps),k=Math.min(data.steps-1,Math.floor(z)),h=z-k;
+  const theta=data.theta[k]*(1-h)+data.theta[k+1]*h;
+  const cycle=Math.min(Math.floor(t/data.period),Math.floor((data.steps-1)/NPER));
+  const t0=cycle*data.period,phase=clamp(t-t0,0,data.period),ix=cycle*NPER;
+  let x=[data.i[ix],data.w[ix]];
+  if(phase>0){
+    const onDuration=Math.min(phase,data.p.D*data.period);
+    x=transition(data.p,onDuration,data.p.bus)(x[0],x[1]);
+    if(phase>onDuration)x=transition(data.p,phase-onDuration,0)(x[0],x[1]);
+  }
+  return {i:x[0],w:x[1],theta};
+}
+function pwm(t){const q=t/data.period,fract=q-Math.floor(q);return fract<data.p.D?data.p.bus:0;}
+function niceStep(range,target=5){const raw=Math.max(1e-10,range/target),pow=10**Math.floor(Math.log10(raw));for(const m of [1,2,2.5,5,10])if(m*pow>=raw)return m*pow;return 10*pow}
+function formatTick(x){if(Math.abs(x)>=100)return `${Math.round(x)}`;if(Math.abs(x)>=10)return `${fmt(x,1)}`;if(Math.abs(x)>=1)return `${fmt(x,2)}`;return `${fmt(x,3)}`}
+function ctxSetup(id){const c=$(id),rect=c.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);const W=Math.max(300,rect.width),H=Math.max(180,rect.height);c.width=Math.round(W*dpr);c.height=Math.round(H*dpr);const ctx=c.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);return {ctx,W,H}}
+function axes(z,opts){const {ctx,W,H}=z,l=64,r=18,t=15,b=38,bw=W-l-r,bh=H-t-b;
+  const {x0,x1,y0,y1,xUnit,yUnit}=opts;
+  const xx=x=>l+(x-x0)/(x1-x0)*bw,yy=y=>t+(y1-y)/(y1-y0)*bh;
+  ctx.font='11px system-ui,Segoe UI,Arial,sans-serif';ctx.strokeStyle=C.grid;ctx.lineWidth=1;
+  const ys=niceStep(y1-y0,5);const first=Math.ceil(y0/ys)*ys;
+  for(let y=first;y<=y1+ys*1e-5;y+=ys){const py=yy(y);ctx.beginPath();ctx.moveTo(l,py);ctx.lineTo(W-r,py);ctx.stroke();ctx.fillStyle=C.text;ctx.textAlign='right';ctx.fillText(formatTick(y),l-9,py+4)}
+  const xs=niceStep(x1-x0,6);const xfirst=Math.ceil(x0/xs)*xs;
+  for(let x=xfirst;x<=x1+xs*1e-5;x+=xs){const px=xx(x);ctx.beginPath();ctx.moveTo(px,t);ctx.lineTo(px,H-b);ctx.stroke();ctx.fillStyle=C.text;ctx.textAlign='center';ctx.fillText(formatTick(x),px,H-b+17)}
+  ctx.fillStyle=C.text;ctx.textAlign='center';ctx.font='11px system-ui,Segoe UI,Arial,sans-serif';ctx.fillText(xUnit,(l+W-r)/2,H-6);
+  ctx.save();ctx.translate(15,(t+H-b)/2);ctx.rotate(-Math.PI/2);ctx.fillText(yUnit,0,0);ctx.restore();
+  ctx.beginPath();ctx.rect(l,t,bw,bh);ctx.clip();return {xx,yy,l,r,t,b,bw,bh};
+}
+function drawCurve(ctx,xvalues,yvalues,ax,color,width=2.5,dash=[]){ctx.strokeStyle=color;ctx.lineWidth=width;ctx.setLineDash(dash);ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();for(let q=0;q<xvalues.length;q++){const xx=ax.xx(xvalues[q]),yy=ax.yy(yvalues[q]);if(q===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy)}ctx.stroke();ctx.setLineDash([])}
+function marker(ctx,ax,x,y,color){ctx.strokeStyle='#fff';ctx.fillStyle=color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(ax.xx(x),ax.yy(y),4.5,0,2*Math.PI);ctx.fill();ctx.stroke()}
+function drawCursor(ctx,ax,x){ctx.strokeStyle='#6f8fa3';ctx.lineWidth=1.4;ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(ax.xx(x),ax.t);ctx.lineTo(ax.xx(x),ax.t+ax.bh);ctx.stroke();ctx.setLineDash([])}
+function zoomWindow(){const start=clamp(time-3*data.period,0,Math.max(0,HORIZON-6*data.period));return [start,start+6*data.period]}
+function drawVoltage(){const z=ctxSetup('voltagePlot'),{ctx}=z,[t0,t1]=zoomWindow(),x0=t0*1000,x1=t1*1000;
+  const ax=axes(z,{x0,x1,y0:-data.p.bus*.07,y1:data.p.bus*1.18,xUnit:'Time (ms)',yUnit:'Voltage (V)'});
+  const avg=data.vbar;ctx.strokeStyle=C.teal;ctx.lineWidth=2;ctx.setLineDash([7,5]);ctx.beginPath();ctx.moveTo(ax.xx(x0),ax.yy(avg));ctx.lineTo(ax.xx(x1),ax.yy(avg));ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle=C.slate;ctx.lineWidth=2.8;ctx.lineJoin='miter';ctx.beginPath();let first=true;
+  const firstPeriod=Math.max(0,Math.floor(t0/data.period)-1),lastPeriod=Math.ceil(t1/data.period)+1;
+  for(let k=firstPeriod;k<=lastPeriod;k++){
+    const pts=[[k*data.period,data.p.bus],[(k+data.p.D)*data.period,data.p.bus],[(k+data.p.D)*data.period,0],[(k+1)*data.period,0]];
+    for(const [t,v] of pts){const sx=ax.xx(t*1000),sy=ax.yy(v);if(first){ctx.moveTo(sx,sy);first=false}else ctx.lineTo(sx,sy)}
+  }ctx.stroke();drawCursor(ctx,ax,time*1000);marker(ctx,ax,time*1000,pwm(time),C.slate);ctx.restore();
+}
+function drawCurrent(){const z=ctxSetup('currentPlot'),{ctx}=z,[t0,t1]=zoomWindow(),xs=[],ys=[],avs=[];
+  const startIdx=Math.max(0,Math.floor(t0/data.dt)),endIdx=Math.min(data.steps,Math.ceil(t1/data.dt));
+  let ymin=Infinity,ymax=-Infinity;
+  for(let k=startIdx;k<=endIdx;k++){const tt=k*data.dt;if(tt<t0-data.dt||tt>t1+data.dt)continue;const v=data.i[k];xs.push(tt*1000);ys.push(v);ymin=Math.min(ymin,v);ymax=Math.max(ymax,v);
+    const cc=Math.floor(k/NPER),lo=cc*NPER,hi=Math.min(data.steps,(cc+1)*NPER);let mean=0;for(let j=lo;j<hi;j++)mean+=(data.i[j]+data.i[j+1])*.5;mean/=Math.max(1,hi-lo);avs.push(mean);
+  }
+  // Include the exact switching peaks even if the 24-point sample grid misses the duty boundary.
+  for(let cycle=Math.max(0,Math.floor(t0/data.period)-1);cycle<=Math.ceil(t1/data.period);cycle++){
+    const edgeTime=(cycle+data.p.D)*data.period;
+    if(edgeTime<t0||edgeTime>t1||cycle*NPER>=data.steps)continue;
+    const v=data.edgeI[cycle];xs.push(edgeTime*1000);ys.push(v);
+    const lo=cycle*NPER,hi=Math.min(data.steps,(cycle+1)*NPER);let mean=0;
+    for(let j=lo;j<hi;j++)mean+=(data.i[j]+data.i[j+1])*.5;
+    avs.push(mean/Math.max(1,hi-lo));ymin=Math.min(ymin,v);ymax=Math.max(ymax,v);
+  }
+  const sorted=xs.map((x,j)=>({x,y:ys[j],a:avs[j]})).sort((a,b)=>a.x-b.x);
+  xs.length=0;ys.length=0;avs.length=0;for(const q of sorted){xs.push(q.x);ys.push(q.y);avs.push(q.a)}
+  const m=at(time).i;ymin=Math.min(ymin,m,0);ymax=Math.max(ymax,m,0);const pad=Math.max(.04,.15*(ymax-ymin));
+  const ax=axes(z,{x0:t0*1000,x1:t1*1000,y0:ymin-pad,y1:ymax+pad,xUnit:'Time (ms)',yUnit:'Armature current (A)'});
+  drawCurve(ctx,xs,avs,ax,C.navy,1.6,[7,5]);drawCurve(ctx,xs,ys,ax,C.orange,2.8);drawCursor(ctx,ax,time*1000);marker(ctx,ax,time*1000,m,C.orange);ctx.restore();
+}
+function drawSpeed(){const z=ctxSetup('speedPlot'),{ctx}=z,tw=HORIZON*1000,scale=state.units==='rpm'?60/(2*Math.PI):1;
+  const wss=data.wss*scale,vmax=Math.max(Math.abs(wss),Math.abs(data.w[data.steps]*scale),1);let lo=Math.min(0,wss)*1.17,hi=Math.max(0,wss)*1.17;
+  if(hi-lo<.01){hi=1;lo=-.05}if(lo===0)lo=-.025*vmax;
+  const ax=axes(z,{x0:0,x1:tw,y0:lo,y1:hi,xUnit:'Time (ms)',yUnit:state.units==='rpm'?'Speed (rpm)':'Speed (rad/s)'});
+  const xs=[],ys=[],one=[];const stride=Math.max(1,Math.floor(data.steps/1500));for(let k=0;k<=data.steps;k+=stride){const t=k*data.dt;xs.push(t*1000);ys.push(data.w[k]*scale);one.push(data.wss*(1-Math.exp(-t/data.tauM))*scale)}
+  if(xs[xs.length-1]<tw){xs.push(tw);ys.push(data.w[data.steps]*scale);one.push(data.wss*(1-Math.exp(-HORIZON/data.tauM))*scale)}
+  drawCurve(ctx,xs,one,ax,C.purple,2.2,[8,5]);drawCurve(ctx,xs,ys,ax,C.teal,2.8);
+  ctx.strokeStyle='#9cbaaa';ctx.setLineDash([3,7]);ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(ax.xx(0),ax.yy(wss));ctx.lineTo(ax.xx(tw),ax.yy(wss));ctx.stroke();ctx.setLineDash([]);
+  drawCursor(ctx,ax,time*1000);marker(ctx,ax,time*1000,at(time).w*scale,C.teal);ctx.restore();
+}
+
+function drawCurrentTrend(){
+  const z=ctxSetup('currentTrendPlot'),{ctx}=z,tw=HORIZON*1000;
+  const cs=data.cycleStats,scaleStep=Math.max(1,Math.floor(cs.length/1650));
+  let min=0,max=0;
+  for(const q of cs){min=Math.min(min,q.low);max=Math.max(max,q.high);}
+  const room=Math.max(.075,(max-min)*.11);min-=room;max+=room;
+  const ax=axes(z,{x0:0,x1:tw,y0:min,y1:max,xUnit:'Time (ms)',yUnit:'Current (A)'});
+  const pts=[{t:0,avg:0,low:0,high:0}];
+  for(let n=0;n<cs.length;n+=scaleStep){
+    // When downsampling, retain the extrema of the intervening PWM cycles.
+    const slice=cs.slice(n,n+scaleStep);
+    pts.push({t:slice[Math.floor(slice.length/2)].t,avg:slice.reduce((a,q)=>a+q.avg,0)/slice.length,
+      low:Math.min(...slice.map(q=>q.low)),high:Math.max(...slice.map(q=>q.high))});
+  }
+  if(pts[pts.length-1].t<HORIZON)pts.push({t:HORIZON,avg:cs[cs.length-1].avg,low:cs[cs.length-1].low,high:cs[cs.length-1].high});
+  // Shaded band: extrema within PWM periods, which become subpixel at high switching frequency.
+  ctx.fillStyle='rgba(232,117,40,.12)';ctx.beginPath();
+  for(let k=0;k<pts.length;k++){const q=pts[k];if(k===0)ctx.moveTo(ax.xx(q.t*1000),ax.yy(q.high));else ctx.lineTo(ax.xx(q.t*1000),ax.yy(q.high));}
+  for(let k=pts.length-1;k>=0;k--){const q=pts[k];ctx.lineTo(ax.xx(q.t*1000),ax.yy(q.low));}ctx.closePath();ctx.fill();
+  drawCurve(ctx,pts.map(q=>q.t*1000),pts.map(q=>q.avg),ax,C.orange,2.8);
+  drawCursor(ctx,ax,time*1000);marker(ctx,ax,time*1000,data.cycleStats[Math.min(data.cycleStats.length-1,Math.floor(time/data.period))].avg,C.orange);ctx.restore();
+}
+function harmonicTable(){const p=data.p,rows=[];
+  for(let n=1;n<=6;n++){const Om=n*2*Math.PI*p.f;
+    const V=2*p.bus*Math.abs(Math.sin(Math.PI*n*p.D))/(Math.PI*n);
+    const re=p.R*p.b+p.ke*p.kt-p.L*p.J*Om**2,im=(p.R*p.J+p.L*p.b)*Om;
+    const denom=Math.hypot(re,im),I=V*Math.hypot(p.b,p.J*Om)/denom,W=V*p.kt/denom;
+    rows.push(`<tr><td>${n}</td><td>${fmt(V,3)} V</td><td>${fmt(I*1000,1)} mA</td><td>${fmt(W,3)} rad/s</td></tr>`);
+  }$('harmonicRows').innerHTML=rows.join('');
+}
+function renderInfo(){const s=at(time),p=data.p,volt=pwm(time);$('scrub').value=Math.round(time/HORIZON*1000);$('now').textContent=`${fmt(time*1000,2)} ms`;
+  $('vNow').textContent=`${fmt(volt,2)} V`;$('iNow').textContent=formatCurrent(s.i);$('wNow').textContent=speedLabel(s.w,1);$('emNow').textContent=`${fmt(p.ke*s.w,2)} V`;$('torqueNow').textContent=`${fmt(1000*p.kt*s.i,2)} mN·m`;
+  const on=volt>0,sc=$('switchState');sc.textContent=on?`SWITCH ON · ${fmt(volt,1)} V`:'SWITCH OFF · 0 V';sc.classList.toggle('on',on);$('pwmPath').style.stroke=on?'#00a58b':'#9db2c2';$('rotor').setAttribute('transform',`translate(1068 40) rotate(${s.theta*180/Math.PI})`);
+}
+function draw(){if(!data)return;renderInfo();drawVoltage();drawCurrent();drawSpeed();drawCurrentTrend();}
+function stop(){playing=false;cancelAnimationFrame(raf);raf=0;$('play').textContent='▶ Play';$('play').setAttribute('aria-pressed','false');}
+function animate(ts){if(!playing)return;if(!lastTs)lastTs=ts;const dt=Math.min(.10,(ts-lastTs)/1000);lastTs=ts;time=Math.min(HORIZON,time+dt*playback*HORIZON/12);draw();if(time>=HORIZON)stop();else raf=requestAnimationFrame(animate)}
+function updateStats(){$('avgV').textContent=`${fmt(data.vbar,2)} V`;$('tauE').textContent=`${fmt(data.tauE*1e6,1)} µs`;$('tauM').textContent=`${fmt(data.tauM*1000,2)} ms`;$('ripple').textContent=`${fmt(data.ripple,3)} A p–p`;$('steadySpeed').textContent=speedLabel(data.wss,1);}
+function syncControls(){for(const k of Object.keys(bounds)){const val=displayFmt[k](state[k]);$(k).value=val;$(k+'Num').value=val}$('units').value=state.units;}
+function recalc(resetTime=true){stop();HORIZON=state.horizon/1000;data=simulate();if(resetTime)time=0;else time=clamp(time,0,HORIZON);updateStats();harmonicTable();draw()}
+const presets={baseline:{duty:60,freq:20,bus:12,extraL:0,inertia:1,load:0},slow:{duty:60,freq:2,bus:12,extraL:0,inertia:1,load:0},fast:{duty:60,freq:40,bus:12,extraL:0,inertia:1,load:0},inductor:{duty:60,freq:20,bus:12,extraL:1,inertia:1,load:0},inertia:{duty:60,freq:20,bus:12,extraL:0,inertia:10,load:0}};
+for(const k of Object.keys(bounds)){
+  const range=$(k),num=$(k+'Num');
+  const apply=(raw,source)=>{const x=Number(raw);if(!Number.isFinite(x)||x<bounds[k][0]||x>bounds[k][1]){source.setAttribute('aria-invalid','true');return;}source.removeAttribute('aria-invalid');state[k]=x;range.value=x;num.value=displayFmt[k](x);$('preset').value='baseline';recalc(false)};
+  range.addEventListener('input',()=>apply(range.value,range));num.addEventListener('change',()=>apply(num.value,num));
+  num.addEventListener('blur',()=>{if(num.getAttribute('aria-invalid')==='true'){num.removeAttribute('aria-invalid');num.value=displayFmt[k](state[k]);}})
+}
+$('preset').addEventListener('change',()=>{state={...state,...presets[$('preset').value]};syncControls();recalc(true)});
+$('units').addEventListener('change',()=>{state.units=$('units').value;updateStats();draw()});
+$('playSpeed').addEventListener('change',()=>{playback=Number($('playSpeed').value)});
+$('play').addEventListener('click',()=>{if(playing){stop();return}if(time>=HORIZON)time=0;playing=true;lastTs=0;$('play').textContent='Ⅱ Pause';$('play').setAttribute('aria-pressed','true');raf=requestAnimationFrame(animate)});
+$('restart').addEventListener('click',()=>{stop();time=0;draw()});
+$('reset').addEventListener('click',()=>{state={...defaults};$('preset').value='baseline';syncControls();recalc(true)});
+$('scrub').addEventListener('input',()=>{stop();time=HORIZON*Number($('scrub').value)/1000;draw()});
+$('download').addEventListener('click',()=>{
+  const copy=document.documentElement.cloneNode(true);copy.querySelector('#saved-state').textContent=JSON.stringify(state).replace(/</g,'\\u003c');
+  const html='<!DOCTYPE html>\n'+copy.outerHTML;
+  const url=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
+  const a=document.createElement('a');a.href=url;a.download='DC_Motor_PWM_Studio.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+window.addEventListener('resize',()=>draw());
+// Public test hooks for numerical and visual regression checks, and for teaching extensions.
+window.PWMMotorStudio={motor,simulate,transition,getState:()=>({...state}),getData:()=>data,setTime:t=>{time=clamp(t,0,HORIZON);draw()},getTime:()=>time,recalculate:recalc};
+syncControls();recalc(true);
+})();
+</script>
+</body>
+</html>

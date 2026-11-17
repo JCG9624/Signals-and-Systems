@@ -147,6 +147,15 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .spectrum-dc-note{background:#f4f9fc;color:#526f83;padding:9px 17px 12px;font-size:11px;line-height:1.5}
 @media(max-width:900px){.spectrum-detail{grid-template-columns:1fr 1fr}.spectrum-detail-card:last-child{grid-column:1/-1}}
 @media(max-width:550px){.spectrum-detail{grid-template-columns:1fr}.spectrum-detail-card:last-child{grid-column:auto}.frequency-domain .spectrum-comparison canvas{height:280px}.spectrum-comparison-hint{margin-left:0}}
+/* Three-signal frequency-domain comparison and waveform reconstruction. */
+.freq-compare-note{display:flex;flex-direction:column;gap:5px;padding:7px 10px;background:#edf6fa;border:1px solid #d7eaf2;border-radius:9px;color:var(--navy);font-size:12px}
+.freq-compare-note small{font-size:10.5px;color:var(--muted);line-height:1.45}
+.spectrum-comparison .spectrum-detail{grid-template-columns:repeat(4,minmax(0,1fr))}
+.spectrum-comparison .spectrum-detail-card:last-child{grid-column:auto}
+.speed-reconstruction{margin-top:13px;overflow:hidden}
+.speed-reconstruction canvas{height:230px}
+@media(max-width:1100px){.spectrum-comparison .spectrum-detail{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:550px){.spectrum-comparison .spectrum-detail{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -255,29 +264,35 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   <div class="freq-intro-heading"><div><h2>From PWM harmonics to the motor response</h2><p>Resolve the rectangular input into sinusoids; inspect the RL filter and full motor frequency responses; then reconstruct the periodic output.</p></div><span class="freq-tag">PERIODIC STEADY STATE</span></div>
   <div class="freq-controls">
    <div class="freq-control"><label for="harmonicCount">Harmonics included, N</label><div class="freq-control-range"><input id="harmonicCount" type="range" min="1" max="20" step="1" value="10"/><output id="harmonicCountValue">10</output></div></div>
-   <div class="freq-control"><label for="freqOutput">Output to analyse</label><select id="freqOutput"><option value="speed" selected>Motor speed ω(t)</option><option value="current">Armature current i(t)</option></select></div>
+   <div class="freq-control freq-compare-note"><b>All three signals shown together</b><small>PWM voltage → armature current → motor speed. The same harmonic orders and 0–1 amplitude scale are used throughout.</small></div>
   </div>
   <p class="freq-intro-note" id="freqIntroNote">The mean (DC) value is n = 0. AC harmonics are at n × fPWM. In the graph, each input or output spectrum is divided by its own largest component, including DC.</p>
  </section>
- <section class="card spectrum-card spectrum-comparison" aria-label="Linked input and output harmonic spectrum">
-  <div class="card-header"><div><h2>Input and output harmonics · compare each frequency</h2>
-  <div class="scope-desc">DC at 0 Hz; paired Fourier lines at n × f<sub>PWM</sub> for n ≥ 1</div></div>
+ <section class="card spectrum-card spectrum-comparison" aria-label="Three linked spectra of PWM voltage, motor current and speed">
+  <div class="card-header"><div><h2>From PWM voltage to armature current and motor speed</h2>
+  <div class="scope-desc">Three one-sided spectra with the same 0–1 axis: DC at 0 Hz, harmonics at n × f<sub>PWM</sub></div></div>
   <label class="inspect-harmonic" for="inspectHarmonic">Inspect component
     <select id="inspectHarmonic" aria-label="Choose the DC component or a PWM harmonic to compare"></select>
   </label></div>
-  <div class="spectrum-legend"><span><i class="spectrum-key" style="--c:var(--slate)"></i>Input voltage</span><span><i class="spectrum-key" style="--c:var(--orange)"></i><span id="spectrumOutputLegend">Output current</span></span><span class="spectrum-comparison-hint">Max. spectral component = 1 for each signal</span></div>
-  <canvas id="pwmSpectrumPlot" role="img" aria-label="PWM input and motor output spectra separately normalized to their respective largest components, including the DC component at n equals zero" tabindex="0"></canvas>
-  <div class="spectrum-detail" aria-live="polite"><div class="spectrum-detail-card"><span class="detail-label" id="inspectFreq">Harmonic 1</span><strong id="inspectInput">—</strong><small id="inspectInputType">Input voltage · sinusoidal peak</small></div><div class="spectrum-detail-card"><span class="detail-label" id="inspectOutputLabel">Output component</span><strong id="inspectOutput">—</strong><small id="inspectOutputType">Armature current, peak</small></div><div class="spectrum-detail-card"><span class="detail-label">Motor response at this frequency</span><strong id="inspectGain">—</strong><small id="inspectPhase">Magnitude and phase</small></div></div>
-  <div class="scope-footer"><b>How to read this comparison:</b> the graph includes <b>DC (n = 0)</b> and has a fixed vertical scale from <b>0 to 1</b>. Each signal is divided by <b>its own maximum spectral amplitude, including DC</b>—not by its fundamental. For n ≥ 1, amplitudes are the <b>peaks</b> of the sinusoidal components; at n = 0, the plotted amplitude is the <b>absolute mean</b>. Voltage and current/speed have different units, so equal heights do not imply equal physical amplitudes. Click any component for the actual values.</div>
-  <div class="spectrum-dc-note" id="spectrumDCInfo">DC (n = 0): input — · output —</div>
+  <div class="spectrum-legend"><span><i class="spectrum-key" style="--c:var(--slate)"></i>PWM voltage</span><span><i class="spectrum-key" style="--c:var(--orange)"></i>Armature current</span><span><i class="spectrum-key" style="--c:var(--teal)"></i>Motor speed</span><span class="spectrum-comparison-hint">Common 0–1 axis · each spectrum has its own reference</span></div>
+  <canvas id="pwmSpectrumPlot" role="img" aria-label="PWM voltage, armature current and motor speed spectra on a common 0 to 1 scale, each divided by its own maximum spectral component" tabindex="0"></canvas>
+  <div class="spectrum-detail" aria-live="polite">
+    <div class="spectrum-detail-card"><span class="detail-label" id="inspectFreq">n = 0 · DC</span><strong id="inspectInput">—</strong><small id="inspectInputType">PWM voltage · DC mean</small></div>
+    <div class="spectrum-detail-card"><span class="detail-label">Armature current</span><strong id="inspectCurrent">—</strong><small id="inspectCurrentType">DC mean (A)</small></div>
+    <div class="spectrum-detail-card"><span class="detail-label">Motor speed</span><strong id="inspectSpeed">—</strong><small id="inspectSpeedType">DC mean (rad/s)</small></div>
+    <div class="spectrum-detail-card"><span class="detail-label">Filtering at selected frequency</span><strong id="inspectGain">—</strong><small id="inspectPhase">Response and phase</small></div>
+  </div>
+  <div class="scope-footer"><b>How to read the spectra:</b> all three signals share the <b>same horizontal harmonic orders</b> and the <b>same 0–1 vertical scale</b>. Each signal is divided by its <b>own largest spectral component, including DC</b>, since V, A and rad/s are different units. At n = 0, height is |mean|; for n ≥ 1, height is sinusoidal <b>peak amplitude</b>. A high current harmonic but almost no speed harmonic illustrates mechanical filtering. The physical amplitudes appear above; the AC-to-mean comparisons appear below.</div>
+  <div class="spectrum-dc-note" id="spectrumDCInfo">Steady-state means and ripple-to-mean comparisons</div>
  </section>
  <section class="card bode-card"><div class="card-header"><div><h2>Frequency response · ideal RL approximation versus the coupled motor</h2><div class="scope-desc">Current response to a small sinusoidal terminal-voltage perturbation; markers identify PWM harmonics</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--purple)"></i>RL circuit</span><span><i class="legend-line" style="--c:var(--teal)"></i>Full motor</span><span><i class="legend-line dash" style="--c:var(--orange)"></i>RL cutoff</span></div></div>
  <div class="frequency-grid bode-grid"><div><div class="plot-mini-title">Magnitude · dB re 1 A/V</div><canvas id="bodeMagnitudePlot" role="img" aria-label="Bode magnitude for the RL current response and the full coupled DC motor"></canvas></div><div><div class="plot-mini-title">Phase · degrees</div><canvas id="bodePhasePlot" role="img" aria-label="Bode phase for the RL current response and the full coupled DC motor"></canvas></div></div>
  <div class="scope-footer" id="bodeInfo">H<sub>RL</sub>(s) = 1/(R<sub>tot</sub> + sL<sub>tot</sub>), if shaft speed is effectively fixed. The full motor includes electromechanical feedback through back EMF.</div></section>
  <div class="frequency-grid">
-   <section class="card reconstruction-card"><div class="card-header"><div><h2>Reconstruct the PWM input</h2><div class="scope-desc">Two periods · rectangular PWM versus N Fourier harmonics</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--slate)"></i>Exact PWM</span><span><i class="legend-line dash" style="--c:var(--purple)"></i>Fourier sum</span></div></div><canvas id="pwmFourierPlot" role="img" aria-label="Fourier reconstruction of two periods of PWM voltage"></canvas><div class="scope-footer">The overshoots near switching edges are Gibbs oscillations; increasing N improves the reconstruction away from the discontinuities.</div></section>
-   <section class="card reconstruction-card"><div class="card-header"><div><h2 id="outputFourierTitle">Reconstruct the current</h2><div class="scope-desc" id="outputFourierInfo">Two periods · periodic motor solution versus N harmonics</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--orange)"></i>Exact output</span><span><i class="legend-line dash" style="--c:var(--teal)"></i>Fourier sum</span></div></div><canvas id="outputFourierPlot" role="img" aria-label="Fourier reconstruction of motor output in periodic steady state"></canvas><div class="scope-footer">The output harmonics are calculated using the complete two-pole electromechanical transfer function, not simply the RL approximation.</div></section>
+   <section class="card reconstruction-card"><div class="card-header"><div><h2>Reconstruct PWM voltage</h2><div class="scope-desc">Exact rectangular voltage versus Fourier sum</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--slate)"></i>Exact PWM</span><span><i class="legend-line dash" style="--c:var(--purple)"></i>Fourier sum</span></div></div><canvas id="pwmFourierPlot" role="img" aria-label="Two-period Fourier reconstruction of PWM voltage"></canvas><div class="scope-footer">The discontinuities produce Gibbs overshoots in truncated Fourier sums.</div></section>
+   <section class="card reconstruction-card"><div class="card-header"><div><h2>Reconstruct armature current</h2><div class="scope-desc">Exact periodic current versus Fourier sum</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--orange)"></i>Exact current</span><span><i class="legend-line dash" style="--c:var(--navy)"></i>Fourier sum</span></div></div><canvas id="currentFourierPlot" role="img" aria-label="Two-period Fourier reconstruction of armature current"></canvas><div class="scope-footer">Electrical inductance attenuates the PWM voltage harmonics, but current ripple can remain significant.</div></section>
  </div>
+ <section class="card reconstruction-card speed-reconstruction"><div class="card-header"><div><h2>Reconstruct motor speed</h2><div class="scope-desc">Exact periodic speed versus Fourier sum, across the same two PWM periods</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--teal)"></i>Exact speed</span><span><i class="legend-line dash" style="--c:var(--purple)"></i>Fourier sum</span></div></div><canvas id="speedFourierPlot" role="img" aria-label="Two-period Fourier reconstruction of motor speed"></canvas><div class="scope-footer">Mechanical inertia strongly attenuates switching-frequency speed ripple. The three physical traces have different units; the shared-axis comparison above makes their relative harmonic content easier to compare.</div></section>
 <section class="card teach harmonics" aria-label="Fourier harmonic response"><h2>Fourier view: steady-state harmonics</h2><p>The PWM contains a DC component and harmonics at n f<sub>PWM</sub>. Each harmonic is multiplied by the motor's frequency response. Its voltage amplitude is 2V<sub>dc</sub>|sin(πnD)|/(πn).</p><table><thead><tr><th>n</th><th>Voltage peak</th><th>Current peak</th><th>Speed peak</th></tr></thead><tbody id="harmonicRows"></tbody></table><p class="foot">Peak (not RMS) amplitudes of individual sinusoids in the <strong>periodic steady state</strong>. These are not start-up contributions. Fourier is especially convenient here because each harmonic can be handled independently.</p></section>
  <section class="card teach frequency-explanation"><h2>The mathematical connection</h2>
  <div class="freq-equations"><div><b>Electrical approximation (speed fixed)</b><br>H<sub>RL</sub>(s) = 1/(R<sub>tot</sub> + sL<sub>tot</sub>)<br>f<sub>c</sub> = R<sub>tot</sub>/(2πL<sub>tot</sub>)</div><div><b>Complete voltage-to-current transfer</b><br>H<sub>i</sub>(s) = (Js+b)/[(R<sub>tot</sub>+sL<sub>tot</sub>)(Js+b)+k<sub>e</sub>k<sub>t</sub>]</div></div>
@@ -520,26 +535,28 @@ function responseMotor(p,omega,output='current'){
 }
 function amp(z){return Math.hypot(z.re,z.im)}
 function phase(z){return Math.atan2(z.im,z.re)*180/Math.PI}
-function outputUnit(){return $('freqOutput').value==='speed'?(state.units==='rpm'?'rpm':'rad/s'):'A';}
-function outputScale(){return $('freqOutput').value==='speed'&&state.units==='rpm'?60/(2*Math.PI):1;}
+function speedOutputUnit(){return state.units==='rpm'?'rpm':'rad/s';}
+function speedOutputScale(){return state.units==='rpm'?60/(2*Math.PI):1;}
 function harmonicSeries(){
-  const p=data.p,N=Number($('harmonicCount').value),output=$('freqOutput').value,scale=outputScale();
+  const p=data.p,N=Number($('harmonicCount').value),scale=speedOutputScale();
   const harmonics=[];
   for(let n=1;n<=N;n++){
     const input=pwmHarmonic(p,n),w=2*Math.PI*n*p.f;
-    const response=responseMotor(p,w,output),current=multiplyComplex(input,response);
-    harmonics.push({n,input,output:{re:current.re*scale,im:current.im*scale},response,f:n*p.f});
+    const responseCurrent=responseMotor(p,w,'current'),responseSpeed=responseMotor(p,w,'speed');
+    const current=multiplyComplex(input,responseCurrent),rawSpeed=multiplyComplex(input,responseSpeed);
+    harmonics.push({n,input,current,speed:{re:rawSpeed.re*scale,im:rawSpeed.im*scale},responseCurrent,responseSpeed,f:n*p.f});
   }
-  return {p,N,output,scale,harmonics,outputDC:(output==='speed'?data.wss:data.losses.iAvg)*scale};
+  return {p,N,scale,harmonics,currentDC:data.losses.iAvg,speedDC:data.wss*scale};
 }
 function normalizedSpectrum(q){
-  // Spectral convention: DC = |mean|; each non-DC height = peak amplitude (2|c_n|).
-  // The input and output are in different units, so normalize their spectra independently.
+  // At n=0 use |mean|, and at n>=1 use sinusoidal PEAK (2|complex Fourier coefficient|).
+  // Each of the three signals has an independently determined physical normalisation reference.
   const inputRef=Math.max(1e-20,Math.abs(data.vbar),...q.harmonics.map(h=>amp(h.input)));
-  const outputRef=Math.max(1e-20,Math.abs(q.outputDC),...q.harmonics.map(h=>amp(h.output)));
-  const values=[{n:0,input:Math.abs(data.vbar)/inputRef,output:Math.abs(q.outputDC)/outputRef},
-    ...q.harmonics.map(h=>({n:h.n,input:amp(h.input)/inputRef,output:amp(h.output)/outputRef}))];
-  return {inputRef,outputRef,values};
+  const currentRef=Math.max(1e-20,Math.abs(q.currentDC),...q.harmonics.map(h=>amp(h.current)));
+  const speedRef=Math.max(1e-20,Math.abs(q.speedDC),...q.harmonics.map(h=>amp(h.speed)));
+  const values=[{n:0,input:Math.abs(data.vbar)/inputRef,current:Math.abs(q.currentDC)/currentRef,speed:Math.abs(q.speedDC)/speedRef},
+    ...q.harmonics.map(h=>({n:h.n,input:amp(h.input)/inputRef,current:amp(h.current)/currentRef,speed:amp(h.speed)/speedRef}))];
+  return {inputRef,currentRef,speedRef,values};
 }
 function drawHarmonicComparison(q){
   const {N}=q,sel=Math.min(N,Math.max(0,Number($('inspectHarmonic').value)));
@@ -549,7 +566,6 @@ function drawHarmonicComparison(q){
   const baseline=T+plotH,yy=v=>baseline-Math.max(0,Math.min(1,v))*plotH;
   const xx=n=>L+(n+.5)*plotW/(N+1);
   ctx.font='11px system-ui,Segoe UI,Arial,sans-serif';ctx.lineWidth=1;
-  // Fixed 0..1 scale: the largest displayed input and output component is exactly 1.
   for(let j=0;j<=4;j++){
     const v=j/4,y=yy(v);ctx.strokeStyle=j===4?'#9ebacb':C.grid;
     ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(W-R,y);ctx.stroke();
@@ -557,15 +573,15 @@ function drawHarmonicComparison(q){
   }
   const band=plotW/(N+1);
   ctx.fillStyle='rgba(178,123,19,.115)';ctx.fillRect(xx(sel)-band*.47,T,band*.94,plotH);
-  const offset=Math.min(9,Math.max(2.4,band*.17));
-  const dotRadius=band<18?2.65:3.7;
+  const offset=Math.min(9,Math.max(2.2,band*.21));
+  const dotRadius=band<18?2.35:3.4;
   for(const item of values){
-    for(const [v,col,off] of [[item.input,C.slate,-offset],[item.output,C.orange,offset]]){
+    for(const [v,col,off] of [[item.input,C.slate,-offset],[item.current,C.orange,0],[item.speed,C.teal,offset]]){
       const px=xx(item.n)+off,py=yy(v);
-      ctx.strokeStyle=col;ctx.lineWidth=item.n===sel?3.3:2.4;
+      ctx.strokeStyle=col;ctx.lineWidth=item.n===sel?3.1:2.2;
       ctx.beginPath();ctx.moveTo(px,baseline);ctx.lineTo(px,py);ctx.stroke();
-      ctx.fillStyle=col;ctx.beginPath();ctx.arc(px,py,item.n===sel?dotRadius+.8:dotRadius,0,Math.PI*2);ctx.fill();
-      if(item.n===sel){ctx.lineWidth=1.35;ctx.strokeStyle='#fff';ctx.stroke();}
+      ctx.fillStyle=col;ctx.beginPath();ctx.arc(px,py,item.n===sel?dotRadius+.8:dotRadius,0,2*Math.PI);ctx.fill();
+      if(item.n===sel){ctx.lineWidth=1.2;ctx.strokeStyle='#fff';ctx.stroke();}
     }
     if(N<=12||item.n===0||item.n===1||item.n===sel||item.n%2===0){
       ctx.textAlign='center';ctx.fillStyle=item.n===sel?C.navy:C.text;
@@ -592,38 +608,38 @@ function syncInspectedHarmonic(N){
   sel.value=String(selected);
 }
 function updateInspectedHarmonic(q){
-  const {harmonics,output,outputDC}=q;
+  const {harmonics,currentDC,speedDC}=q;
   const n=Math.min(harmonics.length,Math.max(0,Number($('inspectHarmonic').value)));
-  const {inputRef,outputRef,values}=normalizedSpectrum(q);
-  const fmtSmall=(v)=>Math.abs(v)>=1e-2?fmt(v,3):Math.abs(v)>=1e-5?fmt(v,6):v.toExponential(2);
-  $('spectrumOutputLegend').textContent=output==='speed'?'Output speed':'Output current';
+  const {inputRef,currentRef,speedRef}=normalizedSpectrum(q);
+  const fmtSmall=v=>Math.abs(v)>=1e-2?fmt(v,3):Math.abs(v)>=1e-5?fmt(v,6):v.toExponential(2);
+  const speedUnit=speedOutputUnit();
   if(n===0){
-    $('inspectFreq').textContent='n = 0 · DC / mean (0 Hz)';
-    $('inspectInputType').textContent='Input voltage · signed DC mean';
-    $('inspectOutputLabel').textContent='Output DC component';
+    $('inspectFreq').textContent='n = 0 · DC mean (0 Hz)';
+    $('inspectInputType').textContent='PWM voltage · signed mean';
     $('inspectInput').textContent=fmtSmall(data.vbar)+' V';
-    $('inspectOutput').textContent=fmtSmall(outputDC)+' '+outputUnit();
-    $('inspectOutputType').textContent=(output==='speed'?'Mean motor speed':'Mean armature current')+' · signed DC value';
+    $('inspectCurrent').textContent=fmtSmall(currentDC)+' A';
+    $('inspectCurrentType').textContent='Armature current · signed mean';
+    $('inspectSpeed').textContent=fmtSmall(speedDC)+' '+speedUnit;
+    $('inspectSpeedType').textContent='Motor speed · signed mean';
     $('inspectGain').textContent='DC operating point';
-    $('inspectPhase').textContent='No oscillatory phase at 0 Hz. Load torque also affects the DC output.';
+    $('inspectPhase').textContent='Load torque affects DC speed and current; no sinusoidal phase at zero frequency.';
   }else{
-    const h=harmonics[n-1],f=h.f,ip=amp(h.input),op=amp(h.output),H=amp(h.response)*q.scale,ph=phase(h.response);
+    const h=harmonics[n-1],f=h.f;
     $('inspectFreq').textContent='n = '+n+' · '+(f<1e3?fmt(f,1)+' Hz':fmt(f/1000,2)+' kHz');
-    $('inspectInputType').textContent='Input voltage · sinusoidal peak';
-    $('inspectOutputLabel').textContent='Output harmonic';
-    $('inspectInput').textContent=fmtSmall(ip)+' V';
-    $('inspectOutput').textContent=fmtSmall(op)+' '+outputUnit();
-    $('inspectOutputType').textContent=(output==='speed'?'Motor speed':'Armature current')+' · sinusoidal peak';
-    $('inspectGain').textContent=fmtSmall(H)+' '+(output==='speed'?(state.units==='rpm'?'rpm/V':'(rad/s)/V'):'A/V');
-    $('inspectPhase').textContent='Phase shift = '+fmt(ph,1)+'° · output phasor = H(j2πf) × input phasor';
+    $('inspectInputType').textContent='PWM voltage · sinusoidal peak';
+    $('inspectInput').textContent=fmtSmall(amp(h.input))+' V';
+    $('inspectCurrent').textContent=fmtSmall(amp(h.current))+' A';
+    $('inspectCurrentType').textContent='Armature current · sinusoidal peak';
+    $('inspectSpeed').textContent=fmtSmall(amp(h.speed))+' '+speedUnit;
+    $('inspectSpeedType').textContent='Motor speed · sinusoidal peak';
+    const Hi=amp(h.responseCurrent),Hw=amp(h.responseSpeed)*q.scale;
+    $('inspectGain').textContent='Current '+fmtSmall(Hi)+' A/V · speed '+fmtSmall(Hw)+' '+speedUnit+'/V';
+    $('inspectPhase').textContent='Phase: current '+fmt(phase(h.responseCurrent),1)+'° · speed '+fmt(phase(h.responseSpeed),1)+'°';
   }
-  const dcRatio=values[0].output;
-  const lesson=output==='speed'
-    ? 'For a motor drive, the intended speed is typically a <b>steady (DC) speed</b>; the non-DC components represent unwanted speed ripple.'
-    : dcRatio<.1
-      ? 'With very little opposing load, <b>mean current can be small</b> even while current ripple is appreciable. A small DC current is not necessarily a problem.'
-      : 'The <b>DC current produces mean torque</b>; AC current components produce torque ripple and extra copper heating.';
-  $('spectrumDCInfo').innerHTML='DC at <b>n = 0</b>: input <b>'+fmt(data.vbar,3)+' V</b> · output <b>'+fmt(outputDC,output==='speed'?3:5)+' '+outputUnit()+'</b>. Normalisation references: input <b>'+fmtSmall(inputRef)+' V</b>; output <b>'+fmtSmall(outputRef)+' '+outputUnit()+'</b>. '+lesson;
+  const rms=key=>Math.sqrt(harmonics.reduce((a,h)=>a+amp(h[key])**2,0)/2);
+  const ri=rms('current'),rw=rms('speed');
+  const pct=(ac,dc)=>Math.abs(dc)>1e-8?(100*ac/Math.abs(dc)).toFixed(ac/Math.abs(dc)<.001?4:2)+'%':'undefined (mean ≈ 0)';
+  $('spectrumDCInfo').innerHTML='<b>Shared 0–1 scale, but separate references:</b> voltage '+fmtSmall(inputRef)+' V · current '+fmtSmall(currentRef)+' A · speed '+fmtSmall(speedRef)+' '+speedUnit+'. <b>AC RMS of first '+harmonics.length+' harmonics:</b> current '+fmtSmall(ri)+' A ('+pct(ri,currentDC)+' of |mean|); speed '+fmtSmall(rw)+' '+speedUnit+' ('+pct(rw,speedDC)+' of |mean|). Electrical inductance filters voltage to current; mechanical inertia further filters current ripple to speed ripple. Very small current mean under no load can make the current ripple/mean percentage large.';
 }
 function bodeAxes(id,ymin,ymax){
   const z=ctxSetup(id),{ctx,W,H}=z,l=62,r=14,t=20,b=37,w=W-l-r,h=H-t-b,minF=5,maxF=2e6;
@@ -673,42 +689,43 @@ function drawBode(){
   $('bodeInfo').innerHTML='RL corner frequency <b>f<sub>c</sub> = '+fmt(fc/1000,2)+' kHz</b> (R<sub>tot</sub>/(2πL<sub>tot</sub>)). Purple: H<sub>RL</sub>(s) = 1/(R<sub>tot</sub> + sL<sub>tot</sub>) at effectively fixed speed. Teal: complete coupled current transfer H<sub>i</sub>(s). Dots: the selected PWM harmonics.';
 }
 function sampleSteadyOutput(p,t,output){
-  const phase=((t%(1/p.f))+(1/p.f))%(1/p.f),q=data.losses;
-  const onDuration=Math.min(phase,p.D/p.f);
+  const periodicPhase=((t%(1/p.f))+(1/p.f))%(1/p.f),q=data.losses;
+  const onDuration=Math.min(periodicPhase,p.D/p.f);
   let x=transition(p,onDuration,p.bus)(q.i0,q.w0);
-  if(phase>onDuration)x=transition(p,phase-onDuration,0)(x[0],x[1]);
-  return (output==='speed'?x[1]:x[0])*outputScale();
+  if(periodicPhase>onDuration)x=transition(p,periodicPhase-onDuration,0)(x[0],x[1]);
+  return output==='speed'?x[1]*speedOutputScale():x[0];
 }
 function drawFourierWaveforms(){
-  const q=harmonicSeries(),{p,N,harmonics,output,outputDC}=q,T=1/p.f,ns=450;
-  const xs=[],inputReal=[],inputFourier=[],outputReal=[],outputFourier=[];
+  const q=harmonicSeries(),{p,N,harmonics,currentDC,speedDC}=q,T=1/p.f,ns=450;
+  const xs=[],iv=[],ifourier=[],ic=[],icfourier=[],iw=[],iwfourier=[];
   for(let j=0;j<=ns;j++){
     const t=2*T*j/ns;xs.push(t*1000);
-    const phase=(t/T)%1;inputReal.push(phase<p.D?p.bus:0);
-    let vi=data.vbar,vo=outputDC;
+    const pwmPhase=(t/T)%1;iv.push(pwmPhase<p.D?p.bus:0);
+    let vin=data.vbar,cur=currentDC,speed=speedDC;
     for(const h of harmonics){const w=2*Math.PI*h.n*p.f*t,c=Math.cos(w),si=Math.sin(w);
-      vi+=h.input.re*c-h.input.im*si;
-      vo+=h.output.re*c-h.output.im*si;
+      vin+=h.input.re*c-h.input.im*si;
+      cur+=h.current.re*c-h.current.im*si;
+      speed+=h.speed.re*c-h.speed.im*si;
     }
-    inputFourier.push(vi);outputFourier.push(vo);outputReal.push(sampleSteadyOutput(p,t,output));
+    ifourier.push(vin);icfourier.push(cur);iwfourier.push(speed);
+    ic.push(sampleSteadyOutput(p,t,'current'));
+    iw.push(sampleSteadyOutput(p,t,'speed'));
   }
-  const plot=(id,truth,approx,unit)=>{
+  const plot=(id,truth,approx,unit,truthColor,fourierColor)=>{
     const z=ctxSetup(id),{ctx}=z;
     const low=Math.min(...truth,...approx),high=Math.max(...truth,...approx),padding=Math.max(1e-8,.12*(high-low));
     const ax=axes(z,{x0:0,x1:2*T*1000,y0:low-padding,y1:high+padding,xUnit:'Time (ms)',yUnit:unit});
-    drawCurve(ctx,xs,truth,ax,id==='pwmFourierPlot'?C.slate:C.orange,2.4);
-    drawCurve(ctx,xs,approx,ax,id==='pwmFourierPlot'?C.purple:C.teal,2.2,[7,4]);ctx.restore();
+    drawCurve(ctx,xs,truth,ax,truthColor,2.4);
+    drawCurve(ctx,xs,approx,ax,fourierColor,2.2,[7,4]);ctx.restore();
   };
-  plot('pwmFourierPlot',inputReal,inputFourier,'Voltage (V)');
-  plot('outputFourierPlot',outputReal,outputFourier,outputUnit());
+  plot('pwmFourierPlot',iv,ifourier,'Voltage (V)',C.slate,C.purple);
+  plot('currentFourierPlot',ic,icfourier,'Current (A)',C.orange,C.navy);
+  plot('speedFourierPlot',iw,iwfourier,'Speed ('+speedOutputUnit()+')',C.teal,C.purple);
 }
 function updateFrequencyText(){
-  const q=harmonicSeries(),{p,N,harmonics,output,outputDC}=q;
-  const outName=output==='speed'?'motor speed':'armature current';
+  const q=harmonicSeries(),{p,N}=q;
   $('harmonicCountValue').textContent=String(N);
-  $('outputFourierTitle').textContent='Reconstruct the '+outName;
-  $('outputFourierInfo').textContent='Two periods · exact periodic output versus '+N+' harmonic'+(N===1?'':'s');
-  $('freqIntroNote').textContent='DC (n = 0) is the average value. AC harmonics are at n × '+fmt(p.f/1000,3)+' kHz. Each plotted spectrum is divided by its own maximum spectral amplitude (DC included), giving a common 0–1 vertical scale.';
+  $('freqIntroNote').textContent='Follow all three signals. DC (n = 0) is the mean; AC components occur at n × '+fmt(p.f/1000,3)+' kHz. The three spectra use identical 0–1 axes but independent physical normalisation references, so compare relative harmonic content rather than raw volt/amp/speed magnitudes.';
 }
 function drawFrequency(){
   if($('frequencyDomain').hidden||!data)return;
@@ -729,7 +746,6 @@ $('tabTime').addEventListener('click',()=>activateTab('time'));
 $('tabFrequency').addEventListener('click',()=>activateTab('frequency'));
 for(const id of ['tabTime','tabFrequency'])$(id).addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();const to=id==='tabTime'?'frequency':'time';activateTab(to);$(to==='time'?'tabTime':'tabFrequency').focus()}});
 $('harmonicCount').addEventListener('input',()=>drawFrequency());
-$('freqOutput').addEventListener('change',()=>drawFrequency());
 $('inspectHarmonic').addEventListener('change',()=>drawFrequency());
 $('pwmSpectrumPlot').addEventListener('click',e=>{
   const rect=e.currentTarget.getBoundingClientRect(),N=Number($('harmonicCount').value),left=55,right=16;

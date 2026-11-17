@@ -231,7 +231,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 </section>
 
 <nav class="analysis-tabs" role="tablist" aria-label="Analysis domain">
-  <button type="button" id="tabTime" role="tab" aria-selected="true" aria-controls="timeDomain" tabindex="0"><span class="tab-symbol">◷</span> Time domain<span class="tab-sub">PWM, start-up and losses</span></button>
+  <button type="button" id="tabTime" role="tab" aria-selected="true" aria-controls="timeDomain" tabindex="0"><span class="tab-symbol">◷</span> Time domain<span class="tab-sub">start-up, duty steps and losses</span></button>
   <button type="button" id="tabFrequency" role="tab" aria-selected="false" aria-controls="frequencyDomain" tabindex="-1"><span class="tab-symbol">∿</span> Frequency domain<span class="tab-sub">Fourier harmonics and Bode response</span></button>
 </nav>
 <div class="workspace">
@@ -255,7 +255,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <div class="control-field"><div class="control-head"><label for="inertia">Mechanical inertia multiplier</label><div class="num-wrap"><input id="inertiaNum" type="number" min="1" max="10" step="1" value="1"><span>× J</span></div></div><input id="inertia" type="range" min="1" max="10" step="1" value="1"><div class="range-row"><span>1×</span><span>10×</span></div></div>
     <div class="control-field"><div class="control-head"><label for="load">Opposing load torque, T<sub>L</sub></label><div class="num-wrap"><input id="loadNum" type="number" min="0" max="8" step="0.5" value="0"><span>mN·m</span></div></div><input id="load" type="range" min="0" max="8" step="0.5" value="0"><div class="range-row"><span>No load</span><span>8 mN·m</span></div></div>
 
-    <div class="control-field"><div class="control-head"><label for="horizon">Start-up time horizon</label><div class="num-wrap"><input id="horizonNum" type="number" min="20" max="320" step="10" value="80"><span>ms</span></div></div><input id="horizon" type="range" min="20" max="320" step="10" value="80"><div class="range-row"><span>20 ms</span><span>320 ms</span></div></div>
+    <div class="control-field"><div class="control-head"><label for="horizon">Simulation time horizon</label><div class="num-wrap"><input id="horizonNum" type="number" min="20" max="320" step="10" value="80"><span>ms</span></div></div><input id="horizon" type="range" min="20" max="320" step="10" value="80"><div class="range-row"><span>20 ms</span><span>320 ms</span></div></div>
   </div>
   <div class="stat-strip" aria-live="polite"><span class="chip">Average voltage = <b id="avgV">7.20 V</b></span><span class="chip">τ<sub>e</sub> = L<sub>tot</sub>/R = <b id="tauE">23.1 µs</b></span><span class="chip">τ<sub>m</sub> ≈ <b id="tauM">11.0 ms</b></span><span class="chip">Steady current ripple ≈ <b id="ripple">—</b></span><span class="chip">Steady speed ≈ <b id="steadySpeed">—</b></span></div>
   <div class="view-unit"><label for="units">Speed units</label><select class="preset" id="units"><option value="rad">rad/s</option><option value="rpm">rpm</option></select></div>
@@ -605,7 +605,7 @@ function stepAt(t){
   const x=stepData;
   t=clamp(t,0,HORIZON);
   const idx=Math.min(x.cycles.length-1,Math.floor(t/x.period)),c=x.cycles[idx];
-  const phase=Math.max(0,Math.min(x.period,t-c.t)),p=x.phases[c.D===stepSettings.D1/100&&idx<x.switchCycle?0:idx<x.switchCycle?0:1];
+  const phase=Math.max(0,Math.min(x.period,t-c.t)),p=x.phases[idx<x.switchCycle?0:1];
   // The cycle begins at a switching boundary, with no state reset at the duty step.
   let v=[c.si,c.sw],delta=phase;
   if(delta>0){

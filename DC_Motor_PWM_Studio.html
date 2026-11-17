@@ -156,6 +156,14 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .speed-reconstruction canvas{height:230px}
 @media(max-width:1100px){.spectrum-comparison .spectrum-detail{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:550px){.spectrum-comparison .spectrum-detail{grid-template-columns:1fr}}
+
+/* Switch between voltage-to-current and voltage-to-speed Bode responses. */
+.bode-controls-row{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap;padding:3px 18px 12px}
+.bode-output-label{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:730;color:var(--navy)}
+.bode-output-label select{min-height:35px;max-width:100%;padding:7px 10px;background:#f8fbfd;color:var(--navy);border:1px solid #cfdeea;border-radius:8px;font-size:12px}
+.bode-controls-row .small-legend{gap:12px}
+@media(max-width:550px){.bode-controls-row{align-items:flex-start;flex-direction:column}.bode-output-label{flex-wrap:wrap}}
+
 </style>
 </head>
 <body>
@@ -285,8 +293,25 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   <div class="scope-footer"><b>How to read the spectra:</b> all three signals share the <b>same horizontal harmonic orders</b> and the <b>same 0–1 vertical scale</b>. Each signal is divided by its <b>own largest spectral component, including DC</b>, since V, A and rad/s are different units. At n = 0, height is |mean|; for n ≥ 1, height is sinusoidal <b>peak amplitude</b>. A high current harmonic but almost no speed harmonic illustrates mechanical filtering. The physical amplitudes appear above; the AC-to-mean comparisons appear below.</div>
   <div class="spectrum-dc-note" id="spectrumDCInfo">Steady-state means and ripple-to-mean comparisons</div>
  </section>
- <section class="card bode-card"><div class="card-header"><div><h2>Frequency response · ideal RL approximation versus the coupled motor</h2><div class="scope-desc">Current response to a small sinusoidal terminal-voltage perturbation; markers identify PWM harmonics</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--purple)"></i>RL circuit</span><span><i class="legend-line" style="--c:var(--teal)"></i>Full motor</span><span><i class="legend-line dash" style="--c:var(--orange)"></i>RL cutoff</span></div></div>
- <div class="frequency-grid bode-grid"><div><div class="plot-mini-title">Magnitude · dB re 1 A/V</div><canvas id="bodeMagnitudePlot" role="img" aria-label="Bode magnitude for the RL current response and the full coupled DC motor"></canvas></div><div><div class="plot-mini-title">Phase · degrees</div><canvas id="bodePhasePlot" role="img" aria-label="Bode phase for the RL current response and the full coupled DC motor"></canvas></div></div>
+ 
+<section class="card bode-card">
+  <div class="card-header"><div>
+    <h2>Frequency response · locate the PWM harmonics</h2>
+    <div class="scope-desc" id="bodeDescription">Compare the full voltage-to-current motor response with the RL approximation; dots mark the PWM harmonics</div>
+  </div></div>
+  <div class="bode-controls-row">
+    <label class="bode-output-label" for="bodeOutput">Transfer function
+      <select id="bodeOutput" aria-label="Select voltage-to-current or voltage-to-speed Bode plots">
+        <option value="current" selected>Voltage → current (V → I)</option>
+        <option value="speed">Voltage → speed (V → ω)</option>
+      </select>
+    </label>
+    <div class="small-legend">
+      <span><i class="legend-line dash" style="--c:var(--purple)"></i><span id="bodeApproxLegend">RL approximation</span></span>
+      <span><i class="legend-line" style="--c:var(--teal)"></i>Complete motor</span>
+      <span><i class="legend-line dash" style="--c:var(--orange)"></i><span id="bodeCornerLegend">RL corner</span></span>
+    </div>
+  </div> <div class="frequency-grid bode-grid"><div><div class="plot-mini-title" id="bodeMagnitudeLabel">Magnitude · dB re 1 A/V</div><canvas id="bodeMagnitudePlot" role="img" aria-label="Bode magnitude, voltage to armature current"></canvas></div><div><div class="plot-mini-title">Phase · degrees</div><canvas id="bodePhasePlot" role="img" aria-label="Bode phase, voltage to armature current"></canvas></div></div>
  <div class="scope-footer" id="bodeInfo">H<sub>RL</sub>(s) = 1/(R<sub>tot</sub> + sL<sub>tot</sub>), if shaft speed is effectively fixed. The full motor includes electromechanical feedback through back EMF.</div></section>
  <div class="frequency-grid">
    <section class="card reconstruction-card"><div class="card-header"><div><h2>Reconstruct PWM voltage</h2><div class="scope-desc">Exact rectangular voltage versus Fourier sum</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--slate)"></i>Exact PWM</span><span><i class="legend-line dash" style="--c:var(--purple)"></i>Fourier sum</span></div></div><canvas id="pwmFourierPlot" role="img" aria-label="Two-period Fourier reconstruction of PWM voltage"></canvas><div class="scope-footer">The discontinuities produce Gibbs overshoots in truncated Fourier sums.</div></section>
@@ -656,37 +681,86 @@ function bodeAxes(id,ymin,ymax){
     ctx.fillStyle=C.text;ctx.textAlign='center';ctx.fillText(f>=1e6?'1M':f>=1e3?(f/1e3)+'k':String(f),x,H-b+15);
   }
   ctx.fillText('Frequency (Hz) · logarithmic',l+w/2,H-5);
-  ctx.beginPath();ctx.rect(l,t,w,h);ctx.clip();return {ctx,W,H,xx,yy,l,r,t,b,w,h,minF,maxF};
+  ctx.save();ctx.beginPath();ctx.rect(l,t,w,h);ctx.clip();return {ctx,W,H,xx,yy,l,r,t,b,w,h,minF,maxF};
+}
+
+function speedFirstOrder(p,omega){
+  // Low-frequency reduction of voltage-to-speed dynamics when armature inductance is neglected.
+  const den=p.R*p.b+p.ke*p.kt;
+  const gain=p.kt/den,tau=p.R*p.J/den,z=omega*tau;
+  return {re:gain/(1+z*z),im:-gain*z/(1+z*z)};
 }
 function drawBode(){
-  const p=data.p,series=[];
-  for(let k=0;k<=220;k++){
-    const f=5*Math.pow(2e6/5,k/220),w=2*Math.PI*f;
-    const rl=responseRL(p,w),motor=responseMotor(p,w,'current');
-    series.push({f,mRL:20*Math.log10(amp(rl)),mMotor:20*Math.log10(amp(motor)),phRL:phase(rl),phMotor:phase(motor)});
+  const p=data.p,mode=$('bodeOutput').value==='speed'?'speed':'current';
+  const isSpeed=mode==='speed',scale=isSpeed&&state.units==='rpm'?60/(2*Math.PI):1;
+  const unit=isSpeed?(state.units==='rpm'?'rpm/V':'(rad/s)/V'):'A/V';
+  const den=p.R*p.b+p.ke*p.kt;
+  const corner=isSpeed?den/(2*Math.PI*p.R*p.J):p.R/(2*Math.PI*p.L);
+  const series=[];
+  for(let k=0;k<=280;k++){
+    const f=5*Math.pow(2e6/5,k/280),w=2*Math.PI*f;
+    const approx=isSpeed?speedFirstOrder(p,w):responseRL(p,w);
+    const full=responseMotor(p,w,mode);
+    series.push({
+      f,mApprox:20*Math.log10(Math.max(amp(approx)*scale,1e-300)),
+      mFull:20*Math.log10(Math.max(amp(full)*scale,1e-300)),
+      phApprox:phase(approx),phFull:phase(full)
+    });
   }
-  const minDB=Math.floor((Math.min(...series.map(q=>Math.min(q.mRL,q.mMotor)))-5)/10)*10;
-  const maxDB=Math.ceil((Math.max(...series.map(q=>Math.max(q.mRL,q.mMotor)))+4)/10)*10;
-  const fc=p.R/(2*Math.PI*p.L);
-  const hs=harmonicSeries().harmonics;
-  for(const [id,kind,y0,y1] of [['bodeMagnitudePlot','m',minDB,maxDB],['bodePhasePlot','ph',-105,5]]){
+  const mags=series.flatMap(q=>[q.mApprox,q.mFull]);
+  const phases=series.flatMap(q=>[q.phApprox,q.phFull]);
+  const minDB=Math.floor((Math.min(...mags)-5)/10)*10;
+  const maxDB=Math.ceil((Math.max(...mags)+5)/10)*10;
+  const minPhase=Math.floor((Math.min(...phases)-8)/30)*30;
+  const maxPhase=Math.ceil((Math.max(...phases)+8)/30)*30;
+  const hs=harmonicSeries().harmonics,selected=Number($('inspectHarmonic').value);
+  for(const [id,kind,y0,y1] of [
+    ['bodeMagnitudePlot','m',minDB,maxDB],
+    ['bodePhasePlot','ph',minPhase,maxPhase]
+  ]){
     const a=bodeAxes(id,y0,y1),{ctx,xx,yy}=a;
-    const cx=xx(fc);ctx.strokeStyle=C.orange;ctx.setLineDash([6,4]);ctx.lineWidth=1.35;
-    ctx.beginPath();ctx.moveTo(cx,a.t);ctx.lineTo(cx,a.t+a.h);ctx.stroke();ctx.setLineDash([]);
-    for(const [key,color] of [[kind+'RL',C.purple],[kind+'Motor',C.teal]]){
-      ctx.strokeStyle=color;ctx.lineWidth=2.7;ctx.lineJoin='round';ctx.beginPath();
-      for(let j=0;j<series.length;j++){const q=series[j];if(j===0)ctx.moveTo(xx(q.f),yy(q[key]));else ctx.lineTo(xx(q.f),yy(q[key]));}ctx.stroke();
+    if(corner>=a.minF&&corner<=a.maxF){
+      const cx=xx(corner);ctx.strokeStyle=C.orange;ctx.setLineDash([6,4]);ctx.lineWidth=1.35;
+      ctx.beginPath();ctx.moveTo(cx,a.t);ctx.lineTo(cx,a.t+a.h);ctx.stroke();ctx.setLineDash([]);
     }
-    for(const q of hs){const f=q.f;if(f>a.maxF)continue;
-      const v=responseMotor(p,2*Math.PI*f,'current');
-      const y=kind==='m'?20*Math.log10(amp(v)):phase(v);
-      const chosen=q.n===Number($('inspectHarmonic').value);
-      if(chosen){ctx.fillStyle='rgba(178,123,19,.22)';ctx.beginPath();ctx.arc(xx(f),yy(y),9,0,2*Math.PI);ctx.fill();}
-      ctx.fillStyle=C.teal;ctx.strokeStyle=chosen?'#b27b13':'#fff';ctx.lineWidth=chosen?2.1:1.1;ctx.beginPath();ctx.arc(xx(f),yy(y),chosen?5.2:3.5,0,2*Math.PI);ctx.fill();ctx.stroke();
+    for(const [key,color,dash] of [[kind+'Approx',C.purple,[7,5]],[kind+'Full',C.teal,[]]]){
+      ctx.strokeStyle=color;ctx.lineWidth=2.7;ctx.setLineDash(dash);ctx.lineJoin='round';ctx.beginPath();
+      for(let n=0;n<series.length;n++){
+        const q=series[n];if(n===0)ctx.moveTo(xx(q.f),yy(q[key]));else ctx.lineTo(xx(q.f),yy(q[key]));
+      }
+      ctx.stroke();ctx.setLineDash([]);
+    }
+    for(const q of hs){
+      if(q.f<a.minF||q.f>a.maxF)continue;
+      const full=responseMotor(p,2*Math.PI*q.f,mode);
+      const y=kind==='m'?20*Math.log10(Math.max(amp(full)*scale,1e-300)):phase(full);
+      const chosen=q.n===selected,px=xx(q.f),py=yy(y);
+      if(chosen){
+        ctx.strokeStyle='rgba(178,123,19,.38)';ctx.lineWidth=1.5;ctx.setLineDash([3,5]);
+        ctx.beginPath();ctx.moveTo(px,a.t);ctx.lineTo(px,a.t+a.h);ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle='rgba(178,123,19,.22)';ctx.beginPath();ctx.arc(px,py,10,0,2*Math.PI);ctx.fill();
+      }
+      ctx.fillStyle=C.teal;ctx.strokeStyle=chosen?'#b27b13':'#fff';ctx.lineWidth=chosen?2.1:1.1;
+      ctx.beginPath();ctx.arc(px,py,chosen?5.2:3.5,0,2*Math.PI);ctx.fill();ctx.stroke();
     }
     ctx.restore();
   }
-  $('bodeInfo').innerHTML='RL corner frequency <b>f<sub>c</sub> = '+fmt(fc/1000,2)+' kHz</b> (R<sub>tot</sub>/(2πL<sub>tot</sub>)). Purple: H<sub>RL</sub>(s) = 1/(R<sub>tot</sub> + sL<sub>tot</sub>) at effectively fixed speed. Teal: complete coupled current transfer H<sub>i</sub>(s). Dots: the selected PWM harmonics.';
+  $('bodeDescription').textContent=isSpeed
+    ? 'Motor speed per applied voltage: compare the two-pole model with its one-pole mechanical approximation'
+    : 'Armature current per applied voltage: compare the two-pole motor with the RL approximation (effectively fixed shaft speed)';
+  $('bodeApproxLegend').textContent=isSpeed?'One-pole speed model':'RL current approximation';
+  $('bodeCornerLegend').textContent=isSpeed?'Mechanical corner':'RL corner';
+  $('bodeMagnitudeLabel').textContent='Magnitude · dB re 1 '+unit;
+  $('bodeMagnitudePlot').setAttribute('aria-label','Voltage-to-'+(isSpeed?'speed':'current')+' Bode magnitude, dB relative to 1 '+unit);
+  $('bodePhasePlot').setAttribute('aria-label','Voltage-to-'+(isSpeed?'speed':'current')+' Bode phase in degrees');
+  const selectedF=selected>0?selected*p.f:0;
+  const v=selected>0?responseMotor(p,2*Math.PI*selectedF,mode):null;
+  const selectedText=selected>0
+    ? ' Selected n = <b>'+selected+'</b> at <b>'+fmt(selectedF/1000,3)+' kHz</b>: |H| = <b>'+fmt(amp(v)*scale,5)+' '+unit+'</b>, phase = <b>'+fmt(phase(v),1)+'°</b>.'
+    : ' DC (n = 0) is shown in the spectrum above but not on a logarithmic Bode frequency axis; select n ≥ 1 to highlight its marker.';
+  $('bodeInfo').innerHTML=isSpeed
+    ? '<b>Voltage → speed:</b> two-pole H<sub>ω</sub>(s) = k<sub>t</sub>/Δ(s) versus the low-frequency one-pole approximation K<sub>m</sub>/(1 + sτ<sub>m</sub>), with mechanical corner <b>'+fmt(corner,2)+' Hz</b>. At higher frequencies, the neglected electrical pole causes further attenuation. Magnitudes follow the selected speed units.'+selectedText
+    : '<b>Voltage → current:</b> two-pole H<sub>i</sub>(s) = (Js + b)/Δ(s) versus the fixed-speed RL approximation 1/(R<sub>tot</sub> + sL<sub>tot</sub>), with RL corner <b>'+fmt(corner/1000,2)+' kHz</b>. The complete model includes back-EMF coupling.'+selectedText;
 }
 function sampleSteadyOutput(p,t,output){
   const periodicPhase=((t%(1/p.f))+(1/p.f))%(1/p.f),q=data.losses;
@@ -747,6 +821,7 @@ $('tabFrequency').addEventListener('click',()=>activateTab('frequency'));
 for(const id of ['tabTime','tabFrequency'])$(id).addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();const to=id==='tabTime'?'frequency':'time';activateTab(to);$(to==='time'?'tabTime':'tabFrequency').focus()}});
 $('harmonicCount').addEventListener('input',()=>drawFrequency());
 $('inspectHarmonic').addEventListener('change',()=>drawFrequency());
+$('bodeOutput').addEventListener('change',()=>{if(!$('frequencyDomain').hidden)drawBode();});
 $('pwmSpectrumPlot').addEventListener('click',e=>{
   const rect=e.currentTarget.getBoundingClientRect(),N=Number($('harmonicCount').value),left=55,right=16;
   const order=Math.round((e.clientX-rect.left-left)/(rect.width-left-right)*(N+1)-.5);

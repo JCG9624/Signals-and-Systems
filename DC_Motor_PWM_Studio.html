@@ -64,6 +64,32 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .sidebar-scroll{overflow-y:auto;overflow-x:hidden;min-height:0;padding-right:5px;scrollbar-color:#c0d3df transparent;scrollbar-width:thin}
 .sidebar-scroll>.control-panel{margin:0}
 @media(max-width:730px){.sidebar{max-height:none;overflow:visible}.sidebar-scroll{overflow:visible;padding-right:0}}
+
+/* Emphasise the electromechanical transient and the losses; switching microscopes follow below. */
+.featured{border-color:#bad5df;box-shadow:0 6px 24px #153c5910}
+.featured .card-header{background:#f7fcff;border-bottom:1px solid #e6f1f4}
+.featured-label{display:inline-block;margin-top:4px;color:#0b777d;font-size:10px;font-weight:800;letter-spacing:.1em}
+.plots>.featured{margin-top:0;margin-bottom:13px}
+.plots .featured #speedPlot{height:278px}
+.plots .featured #currentTrendPlot{height:240px}
+.plots .two-scopes{margin-top:13px}
+.loss-scope{margin:0 0 12px;overflow:hidden}
+.loss-scope .card-header{padding-bottom:9px}
+.loss-pill{font-size:11px;font-weight:720;color:#285e74;background:#eef7fa;border-radius:18px;padding:6px 10px;border:1px solid #d9e9ef;white-space:normal}
+.loss-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:7px 18px 13px}
+.loss-summary-item{border:1px solid #e4edf3;border-radius:10px;padding:9px 11px;background:#fbfdff;min-width:0}
+.loss-summary-item .loss-key{font-size:11px;color:#547184;line-height:1.4;min-height:30px}
+.loss-summary-item strong{display:block;font-size:21px;color:#16445f;letter-spacing:-.025em;margin:4px 0;font-variant-numeric:tabular-nums}
+.loss-summary-item:nth-child(2) strong{color:#c46b30}
+.loss-summary-item:nth-child(3) strong{color:#7954a3}
+.loss-summary-item span{font-size:10px;color:#8194a3}
+.loss-bars{padding:3px 18px 16px;display:grid;gap:9px}
+.loss-bar-row{display:grid;grid-template-columns:minmax(150px,1.1fr) minmax(50px,2fr) 86px;gap:9px;align-items:center;font-size:11px;color:#526e81}
+.loss-track{height:13px;border:1px solid #e1eaf0;background:#f2f6fa;border-radius:6px;overflow:hidden}
+.loss-fill{height:100%;min-width:0;transition:width .15s ease}
+.loss-bar-row output{font-size:11px;color:#244b64;font-weight:730;font-variant-numeric:tabular-nums;text-align:right}
+@media(max-width:990px){.loss-summary{grid-template-columns:1fr 1fr 1fr;gap:5px;padding:7px 11px 12px}.loss-summary-item{padding:7px}.loss-summary-item strong{font-size:16px}.loss-bar-row{grid-template-columns:1.2fr 1.5fr 76px;gap:5px}.loss-bars{padding:0 11px 13px}}
+@media(max-width:730px){.plots .featured #speedPlot{height:245px}.plots .featured #currentTrendPlot{height:212px}.loss-summary{grid-template-columns:1fr;gap:6px}.loss-summary-item .loss-key{min-height:0}.loss-bar-row{grid-template-columns:1fr 85px}.loss-bar-row span{grid-column:1}.loss-track{grid-column:1;grid-row:2}.loss-bar-row output{grid-column:2;grid-row:2}.loss-pill{font-size:10px}}
 </style>
 </head>
 <body>
@@ -74,7 +100,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <div class="title-row"><div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2.1"><path d="M3 28h8v-13h9v13h9V15h9v13h7"/><circle cx="24" cy="39" r="5"/><path d="M24 30v4m-9 5h4m10 0h5M24 44v3M6 6h7M6 10h12M32 7h9"/></svg></div><h1>PWM Motor Studio</h1></div>
     <p class="subtitle">Follow a pulse-width-modulated voltage through the motor: rapid switching produces <strong>current ripple</strong>, while electrical dynamics, back EMF and inertia determine the much slower <strong>speed response</strong>.</p>
   </div>
-  <div class="top-formula"><b>L</b><sub>tot</sub> di/dt = v<sub>PWM</sub> − Ri − k<sub>e</sub>ω<br><b>J</b> dω/dt = k<sub>t</sub>i − bω − T<sub>L</sub></div>
+  <div class="top-formula"><b>L</b><sub>tot</sub> di/dt = v<sub>PWM</sub> − (R + R<sub>f</sub>)i − k<sub>e</sub>ω<br><b>J</b> dω/dt = k<sub>t</sub>i − bω − T<sub>L</sub></div>
 </header>
 <section class="card circuit" aria-label="Motor model block diagram">
   <div class="circuit-top"><h2 style="font-size:14px;color:var(--navy);margin:0">From electrical switching to mechanical motion</h2><span id="switchState" class="state-chip">SWITCH ON · 12 V</span></div>
@@ -82,7 +108,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7" fill="#7299b2"/></marker><marker id="arrOrange" markerWidth="8" markerHeight="8" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7" fill="#db8a52"/></marker></defs>
     <rect class="system-block" x="15" y="12" width="180" height="56" rx="10"/><text class="system-text" x="105" y="35" text-anchor="middle">PWM driver</text><text class="system-sub" x="105" y="53" text-anchor="middle">0 ↔ Vdc</text>
     <path id="pwmPath" class="circuit-line" d="M195 40H253" marker-end="url(#arr)"/><text class="system-sub" x="208" y="28">v<tspan baseline-shift="sub" font-size="10">PWM</tspan></text>
-    <rect class="system-block" x="255" y="12" width="235" height="56" rx="10"/><text class="system-text" x="373" y="35" text-anchor="middle">Armature R, L + L<tspan baseline-shift="sub" font-size="10">add</tspan></text><text class="system-sub" x="373" y="53" text-anchor="middle">current i(t)</text>
+    <rect class="system-block" x="255" y="12" width="235" height="56" rx="10"/><text class="system-text" x="373" y="35" text-anchor="middle">Armature R + Rf, L + L<tspan baseline-shift="sub" font-size="10">add</tspan></text><text class="system-sub" x="373" y="53" text-anchor="middle">current i(t)</text>
     <path class="circuit-line" d="M490 40H544" marker-end="url(#arr)"/><text class="system-sub" x="507" y="28">i</text>
     <rect class="system-block" x="547" y="12" width="152" height="56" rx="10"/><text class="system-text" x="623" y="35" text-anchor="middle">Torque</text><text class="system-sub" x="623" y="53" text-anchor="middle">T = k<tspan baseline-shift="sub" font-size="10">t</tspan> i</text>
     <path class="circuit-line" d="M699 40H752" marker-end="url(#arr)"/>
@@ -100,13 +126,14 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 <div class="sidebar-scroll">
 <section class="card control-panel" aria-label="PWM and motor settings">
   <div class="section-line"><h2>Experiment settings</h2><div><label for="preset" class="mini-hint">Try an example &nbsp;</label><select class="preset" id="preset" aria-label="Select a teaching preset">
-    <option value="baseline">20 kHz · natural armature filtering</option><option value="slow">2 kHz · pronounced current ripple</option><option value="fast">40 kHz · higher switching frequency</option><option value="inductor">20 kHz · extra series inductance</option><option value="inertia">20 kHz · tenfold inertia</option>
+    <option value="baseline">20 kHz · natural armature filtering</option><option value="slow">2 kHz · pronounced current ripple</option><option value="fast">40 kHz · higher switching frequency</option><option value="inductor">20 kHz · ideal extra inductance</option><option value="realFilter">20 kHz · practical 1 mH filter</option><option value="inertia">20 kHz · tenfold inertia</option>
   </select></div></div>
   <div class="control-grid">
     <div class="control-field"><div class="control-head"><label for="duty">PWM duty cycle, D</label><div class="num-wrap"><input id="dutyNum" type="number" min="10" max="90" step="1" value="60"><span>%</span></div></div><input id="duty" type="range" min="10" max="90" step="1" value="60"><div class="range-row"><span>10%</span><span>90%</span></div></div>
     <div class="control-field"><div class="control-head"><label for="freq">Switching frequency, f<sub>PWM</sub></label><div class="num-wrap"><input id="freqNum" type="number" min="1" max="40" step="1" value="20"><span>kHz</span></div></div><input id="freq" type="range" min="1" max="40" step="1" value="20"><div class="range-row"><span>1 kHz</span><span>40 kHz</span></div></div>
     <div class="control-field"><div class="control-head"><label for="bus">DC supply voltage</label><div class="num-wrap"><input id="busNum" type="number" min="4" max="12" step="0.5" value="12"><span>V</span></div></div><input id="bus" type="range" min="4" max="12" step="0.5" value="12"><div class="range-row"><span>4 V</span><span>12 V</span></div></div>
     <div class="control-field"><div class="control-head"><label for="extraL">Extra series inductance, L<sub>add</sub></label><div class="num-wrap"><input id="extraLNum" type="number" min="0" max="3" step="0.1" value="0"><span>mH</span></div></div><input id="extraL" type="range" min="0" max="3" step="0.1" value="0"><div class="range-row"><span>0 mH</span><span>3 mH</span></div></div>
+    <div class="control-field"><div class="control-head"><label for="seriesR">Added filter winding resistance, R<sub>f</sub></label><div class="num-wrap"><input id="seriesRNum" type="number" min="0" max="2" step="0.05" value="0"><span>Ω</span></div></div><input id="seriesR" type="range" min="0" max="2" step="0.05" value="0"><div class="range-row"><span>Ideal filter: 0 Ω</span><span>2 Ω</span></div></div>
     <div class="control-field"><div class="control-head"><label for="inertia">Mechanical inertia multiplier</label><div class="num-wrap"><input id="inertiaNum" type="number" min="1" max="10" step="1" value="1"><span>× J</span></div></div><input id="inertia" type="range" min="1" max="10" step="1" value="1"><div class="range-row"><span>1×</span><span>10×</span></div></div>
     <div class="control-field"><div class="control-head"><label for="load">Opposing load torque, T<sub>L</sub></label><div class="num-wrap"><input id="loadNum" type="number" min="0" max="8" step="0.5" value="0"><span>mN·m</span></div></div><input id="load" type="range" min="0" max="8" step="0.5" value="0"><div class="range-row"><span>No load</span><span>8 mN·m</span></div></div>
 
@@ -114,7 +141,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   </div>
   <div class="stat-strip" aria-live="polite"><span class="chip">Average voltage = <b id="avgV">7.20 V</b></span><span class="chip">τ<sub>e</sub> = L<sub>tot</sub>/R = <b id="tauE">23.1 µs</b></span><span class="chip">τ<sub>m</sub> ≈ <b id="tauM">11.0 ms</b></span><span class="chip">Steady current ripple ≈ <b id="ripple">—</b></span><span class="chip">Steady speed ≈ <b id="steadySpeed">—</b></span></div>
   <div class="view-unit"><label for="units">Speed units</label><select class="preset" id="units"><option value="rad">rad/s</option><option value="rpm">rpm</option></select></div>
-  <div class="math-note">Motor: approximate FAULHABER 2224B012SR parameters from Chapter 11 (R = 8.77 Ω, L = 203 µH, k<sub>t</sub> = 0.0146, k<sub>e</sub> = 0.0145, J = 2.7 × 10<sup>−7</sup>, b = 3.8 × 10<sup>−7</sup>). An optional series inductor adds to the armature inductance, reducing current ripple.</div>
+  <div class="math-note">Motor: approximate FAULHABER 2224B012SR parameters from Chapter 11 (R = 8.77 Ω, L = 203 µH, k<sub>t</sub> = 0.0146, k<sub>e</sub> = 0.0145, J = 2.7 × 10<sup>−7</sup>, b = 3.8 × 10<sup>−7</sup>). An optional series inductor adds to armature inductance and reduces current ripple; its winding resistance R<sub>f</sub> adds resistive heat. The ideal inductor itself is lossless.</div>
 </section>
 
 
@@ -124,34 +151,52 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   <div class="readout" style="--accent:var(--teal)"><div class="key">Speed now</div><div class="val" id="wNow">0 rad/s</div></div>
   <div class="readout" style="--accent:var(--purple)"><div class="key">Motor back EMF now</div><div class="val" id="emNow">0.00 V</div></div>
   <div class="readout" style="--accent:var(--green)"><div class="key">Electromagnetic torque now</div><div class="val" id="torqueNow">0.00 mN·m</div></div>
+  <div class="readout" style="--accent:var(--orange)"><div class="key">Instantaneous resistive heating</div><div class="val" id="heatNow">0.00 W</div></div>
 </div>
 </div>
 </aside>
 <div class="plots" aria-label="Linked motor response plots">
+<section class="card speed-scope featured"><div class="card-header"><div><h2>3 · Motor speed and current: the start-up transient</h2><span class="featured-label">PRIMARY RESULT</span><div class="scope-desc">Common time horizon: compare speed build-up with the evolving mean armature current</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--teal)"></i>two-pole motor, PWM</span><span><i class="legend-line dash" style="--c:var(--purple)"></i>one-pole motor, averaged voltage</span></div></div><canvas id="speedPlot" role="img" aria-label="Long-time motor speed compared with the one-pole average-voltage approximation"></canvas><div class="trend-divider"><span>Armature current during start-up (cycle average and switching envelope)</span><span>Shared time axis</span></div><canvas id="currentTrendPlot" role="img" aria-label="Motor armature current versus time, including average and switching envelope"></canvas><div class="scope-footer" id="speedNote">The current rises and then changes as back EMF builds. The fine switching ripple is still visible in Figure 2, while Figure 3 shows its longer-term evolution.</div></section>
+
+
+<section class="card loss-scope" aria-label="PWM ripple and filter winding dissipation">
+  <div class="card-header"><div><h2>Electrical losses · the cost of PWM ripple and real filtering</h2><div class="scope-desc">Exact periodic steady-state of the two-pole motor; compare resistive heating, not transient start-up energy</div></div><span class="loss-pill" id="lossRms">I<sub>rms</sub> —</span></div>
+  <div class="loss-summary">
+    <div class="loss-summary-item"><div class="loss-key">Total resistive heating</div><strong id="lossTotal">—</strong><span>(R + R<sub>f</sub>) I<sub>rms</sub><sup>2</sup></span></div>
+    <div class="loss-summary-item"><div class="loss-key">Extra armature heat from PWM ripple</div><strong id="lossRipple">—</strong><span>R (I<sub>rms</sub><sup>2</sup> − Ī<sup>2</sup>)</span></div>
+    <div class="loss-summary-item"><div class="loss-key">Additional filter winding heat</div><strong id="lossFilter">—</strong><span>R<sub>f</sub> I<sub>rms</sub><sup>2</sup></span></div>
+  </div>
+  <div class="loss-bars" aria-label="Breakdown of resistive losses in periodic steady state">
+    <div class="loss-bar-row"><span>Base armature heating: R Ī²</span><div class="loss-track"><div id="lossBaseBar" class="loss-fill" style="background:#436b8c"></div></div><output id="lossBaseVal">—</output></div>
+    <div class="loss-bar-row"><span>Additional PWM ripple heating</span><div class="loss-track"><div id="lossRippleBar" class="loss-fill" style="background:#e87528"></div></div><output id="lossRippleVal">—</output></div>
+    <div class="loss-bar-row"><span>Added filter winding heating: R<sub>f</sub> I<sub>rms</sub>²</span><div class="loss-track"><div id="lossFilterBar" class="loss-fill" style="background:#8053b4"></div></div><output id="lossFilterVal">—</output></div>
+  </div>
+  <div class="scope-footer"><b>Physical interpretation:</b> the ideal inductor stores and returns energy (average inductor power is zero in periodic steady state). The <b>resistances</b> turn electrical energy into heat. A larger L<sub>add</sub> usually reduces ripple heating; a real inductor may add winding loss through R<sub>f</sub>. Switching-device, magnetic-core and brush losses are not modelled.</div>
+</section>
+
 <div class="two-scopes">
   <section class="card scope"><div class="card-header"><div><h2>1 · PWM source</h2><div class="scope-desc">Switching-time microscope: six PWM periods around the cursor</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--slate)"></i>v<sub>PWM</sub>(t)</span><span><i class="legend-line dash" style="--c:var(--teal)"></i>average voltage</span></div></div><canvas id="voltagePlot" role="img" aria-label="Zoomed PWM voltage waveform with its average voltage"></canvas><div class="scope-footer">The duty cycle controls the <b>average voltage</b>: V̄ = D V<sub>dc</sub>.</div></section>
   <section class="card scope"><div class="card-header"><div><h2>2 · Armature current ripple</h2><div class="scope-desc">Same six periods; current cannot jump instantaneously</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--orange)"></i>i(t)</span><span><i class="legend-line dash" style="--c:var(--navy)"></i>local cycle mean</span></div></div><canvas id="currentPlot" role="img" aria-label="Armature current showing ripple and local cycle mean"></canvas><div class="scope-footer">The armature inductance (plus any extra series inductance) limits <b>di/dt</b>.</div></section>
 </div>
-<section class="card speed-scope"><div class="card-header"><div><h2>3 · Motor speed and current: the start-up transient</h2><div class="scope-desc">Common time horizon: compare speed build-up with the evolving mean armature current</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--teal)"></i>two-pole motor, PWM</span><span><i class="legend-line dash" style="--c:var(--purple)"></i>one-pole motor, averaged voltage</span></div></div><canvas id="speedPlot" role="img" aria-label="Long-time motor speed compared with the one-pole average-voltage approximation"></canvas><div class="trend-divider"><span>Armature current during start-up (cycle average and switching envelope)</span><span>Shared time axis</span></div><canvas id="currentTrendPlot" role="img" aria-label="Motor armature current versus time, including average and switching envelope"></canvas><div class="scope-footer" id="speedNote">The current rises and then changes as back EMF builds. The fine switching ripple is still visible in Figure 2, while Figure 3 shows its longer-term evolution.</div></section>
 </div>
 </div>
 <div class="lower">
- <section class="card teach" aria-label="Mathematical model and interpretation"><h2>What is the model doing?</h2><div class="math-box">(L + L<sub>add</sub>) di/dt = v<sub>PWM</sub>(t) − Ri(t) − k<sub>e</sub>ω(t)<br>J dω/dt = k<sub>t</sub>i(t) − bω(t) − T<sub>L</sub></div><p><strong>Start-up:</strong> the current reacts quickly to the ON/OFF transitions; accumulated torque accelerates the shaft more slowly.</p><p><strong>Back EMF:</strong> as ω increases, k<sub>e</sub>ω opposes the applied armature voltage, reducing the mean current and driving the motor towards a steady speed.</p><p><strong>Model comparison:</strong> the dashed curve uses the one-pole approximation with V̄ = DV<sub>dc</sub>. It is a good approximation to the <em>slow speed response</em>, not to the switching-frequency current ripple.</p><p><strong>Frequency-domain view:</strong> for voltage-to-current and voltage-to-speed analysis, with L<sub>tot</sub> = L + L<sub>add</sub> and Δ(s) = (R + sL<sub>tot</sub>)(Js + b) + k<sub>e</sub>k<sub>t</sub>, the transfer functions are H<sub>i</sub>(s) = (Js + b)/Δ(s) and H<sub>ω</sub>(s) = k<sub>t</sub>/Δ(s).</p><p><strong>Drive assumption:</strong> the source is an ideal, actively driven 0/V<sub>dc</sub> PWM terminal voltage (including a 0 V freewheel state); signed armature current is allowed. A real nonsynchronous diode/freewheel stage or current limit can change the waveform.</p></section>
+ <section class="card teach" aria-label="Mathematical model and interpretation"><h2>What is the model doing?</h2><div class="math-box">(L + L<sub>add</sub>) di/dt = v<sub>PWM</sub>(t) − (R + R<sub>f</sub>)i(t) − k<sub>e</sub>ω(t)<br>J dω/dt = k<sub>t</sub>i(t) − bω(t) − T<sub>L</sub></div><p><strong>Start-up:</strong> the current reacts quickly to the ON/OFF transitions; accumulated torque accelerates the shaft more slowly.</p><p><strong>Back EMF:</strong> as ω increases, k<sub>e</sub>ω opposes the applied armature voltage, reducing the mean current and driving the motor towards a steady speed.</p><p><strong>Model comparison:</strong> the dashed curve uses the one-pole approximation with V̄ = DV<sub>dc</sub>. It is a good approximation to the <em>slow speed response</em>, not to the switching-frequency current ripple.</p><p><strong>Frequency-domain view:</strong> for voltage-to-current and voltage-to-speed analysis, with L<sub>tot</sub> = L + L<sub>add</sub>, R<sub>tot</sub> = R + R<sub>f</sub> and Δ(s) = (R<sub>tot</sub> + sL<sub>tot</sub>)(Js + b) + k<sub>e</sub>k<sub>t</sub>, the transfer functions are H<sub>i</sub>(s) = (Js + b)/Δ(s) and H<sub>ω</sub>(s) = k<sub>t</sub>/Δ(s).</p><p><strong>Resistive filtering losses:</strong> In periodic steady state, P<sub>ripple</sub> = R(I<sub>rms</sub><sup>2</sup> − Ī<sup>2</sup>) = (R/2) ∑<sub>n≥1</sub>|I<sub>n,peak</sub>|<sup>2</sup>. This uses the complete current spectrum, not just the first six displayed harmonics.</p><p><strong>Drive assumption:</strong> the source is an ideal, actively driven 0/V<sub>dc</sub> PWM terminal voltage (including a 0 V freewheel state); signed armature current is allowed. A real nonsynchronous diode/freewheel stage or current limit can change the waveform.</p></section>
  <section class="card teach harmonics" aria-label="Fourier harmonic response"><h2>Fourier view: steady-state harmonics</h2><p>The PWM contains a DC component and harmonics at n f<sub>PWM</sub>. Each harmonic is multiplied by the motor's frequency response. Its voltage amplitude is 2V<sub>dc</sub>|sin(πnD)|/(πn).</p><table><thead><tr><th>n</th><th>Voltage peak</th><th>Current peak</th><th>Speed peak</th></tr></thead><tbody id="harmonicRows"></tbody></table><p class="foot">Peak (not RMS) amplitudes of individual sinusoids in the <strong>periodic steady state</strong>. These are not start-up contributions. Fourier is especially convenient here because each harmonic can be handled independently.</p></section>
 </div>
-<section class="card questions"><h2>Learning outcomes · Investigate</h2><ol><li>Reduce the switching frequency from 20 kHz to 2 kHz. Which variable shows the larger change in ripple: armature current or speed?</li><li>Add 1 mH of series inductance. Why does the current ripple fall even though the average source voltage is unchanged?</li><li>Increase the mechanical inertia. Why does the speed transient become slower without substantially changing the final speed?</li></ol></section>
+<section class="card questions"><h2>Learning outcomes · Investigate</h2><ol><li>Reduce the switching frequency from 20 kHz to 2 kHz. Which variable shows the larger change in ripple: armature current or speed?</li><li>Add 1 mH of ideal series inductance, then introduce 0.5 Ω winding resistance. Compare the ripple heating saved with the extra filter copper heating.</li><li>Increase the mechanical inertia. Why does the speed transient become slower without substantially changing the final speed?</li></ol></section>
 <footer><span>Signals &amp; Systems · Chapter 11 · DC motor and PWM · Interactive HTML / JavaScript</span><span>Prompts provided by Joaquin Carrasco · Code produced by ChatGPT · No external libraries</span></footer>
 </main>
-<script id="saved-state" type="application/json">{"duty":60,"freq":20,"bus":12,"extraL":0,"inertia":1,"load":0,"units":"rad"}</script>
+<script id="saved-state" type="application/json">{"duty":60,"freq":20,"bus":12,"extraL":0,"seriesR":0,"inertia":1,"load":0,"horizon":80,"units":"rad"}</script>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const C={navy:'#113a61',teal:'#0096a1',orange:'#e87528',purple:'#8053b4',slate:'#9aaaba',grid:'#e7eff5',text:'#607d91',ink:'#17324a'};
 const fixed={R:8.77,L:203e-6,kt:.0146,ke:.0145,J:2.7e-7,b:3.8e-7};
-const defaults={duty:60,freq:20,bus:12,extraL:0,inertia:1,load:0,horizon:80,units:'rad'};
+const defaults={duty:60,freq:20,bus:12,extraL:0,seriesR:0,inertia:1,load:0,horizon:80,units:'rad'};
 let state={...defaults};try{const saved=JSON.parse($('saved-state').textContent);for(const k of Object.keys(defaults))if(saved[k]!==undefined)state[k]=saved[k]}catch(e){}
-const bounds={duty:[10,90],freq:[1,40],bus:[4,12],extraL:[0,3],inertia:[1,10],load:[0,8],horizon:[20,320]};
-const displayFmt={duty:v=>String(Math.round(v)),freq:v=>String(Math.round(v)),bus:v=>String(v),extraL:v=>String(Number(v.toFixed(1))),inertia:v=>String(Math.round(v)),load:v=>String(Number(v.toFixed(1))),horizon:v=>String(Math.round(v))};
+const bounds={duty:[10,90],freq:[1,40],bus:[4,12],extraL:[0,3],seriesR:[0,2],inertia:[1,10],load:[0,8],horizon:[20,320]};
+const displayFmt={duty:v=>String(Math.round(v)),freq:v=>String(Math.round(v)),bus:v=>String(v),extraL:v=>String(Number(v.toFixed(1))),seriesR:v=>Number(v.toFixed(2)).toString(),inertia:v=>String(Math.round(v)),load:v=>String(Number(v.toFixed(1))),horizon:v=>String(Math.round(v))};
 const NPER=24; let HORIZON=state.horizon/1000;
 let data=null,playing=false,raf=0,lastTs=0,time=0,playback=1;
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
@@ -159,7 +204,7 @@ function fmt(v,n=2){return Number.isFinite(v)?v.toFixed(n):'—'}
 function formatCurrent(v){return Math.abs(v)<.1?`${fmt(v,3)} A`:`${fmt(v,2)} A`}
 function speedUnit(w){return state.units==='rpm'?w*60/(2*Math.PI):w}
 function speedLabel(v,n=0){return `${fmt(speedUnit(v),n)} ${state.units==='rpm'?'rpm':'rad/s'}`}
-function motor(){return {R:fixed.R,L:fixed.L+state.extraL*1e-3,kt:fixed.kt,ke:fixed.ke,J:fixed.J*state.inertia,b:fixed.b,TL:state.load*1e-3,bus:state.bus,D:state.duty/100,f:state.freq*1000}}
+function motor(){return {R:fixed.R+state.seriesR,Rarm:fixed.R,Rf:state.seriesR,L:fixed.L+state.extraL*1e-3,kt:fixed.kt,ke:fixed.ke,J:fixed.J*state.inertia,b:fixed.b,TL:state.load*1e-3,bus:state.bus,D:state.duty/100,f:state.freq*1000}}
 // Exact matrix exponential for the two-dimensional LTI system on an ON or OFF interval.
 // Splitting a sampling step at a switching edge ensures duty cycles are not rounded to the sample grid.
 function transition(p,dt,u){
@@ -174,6 +219,35 @@ function transition(p,dt,u){
   const den=p.R*p.b+p.ke*p.kt;
   const iw=(p.b*u+p.ke*p.TL)/den,ww=(p.kt*u-p.R*p.TL)/den;
   return (i,w)=>{const di=i-iw,dw=w-ww;return [iw+e11*di+e12*dw,ww+e21*di+e22*dw]};
+}
+// Periodic steady state: solve the exact ON/OFF affine map for its fixed point.
+// Integrate i and i^2 separately over ON and OFF phases, then decompose copper losses.
+function periodicLosses(p){
+  const T=1/p.f,Ton=p.D*T,Toff=T-Ton;
+  const on=transition(p,Ton,p.bus),off=transition(p,Toff,0);
+  const periodMap=(i,w)=>{const a=on(i,w);return off(a[0],a[1]);};
+  const q0=periodMap(0,0),q1=periodMap(1,0),q2=periodMap(0,1);
+  const a11=1-q1[0]+q0[0],a12=-q2[0]+q0[0];
+  const a21=-q1[1]+q0[1],a22=1-q2[1]+q0[1];
+  const det=a11*a22-a12*a21;
+  if(Math.abs(det)<1e-13)throw new Error('Periodic motor map is singular');
+  const i0=(q0[0]*a22-a12*q0[1])/det;
+  const w0=(a11*q0[1]-a21*q0[0])/det;
+  const atOff=on(i0,w0),N=180;
+  let integralI=0,integralI2=0;
+  for(const phase of [{begin:[i0,w0],duration:Ton,voltage:p.bus},{begin:atOff,duration:Toff,voltage:0}]){
+    const dt=phase.duration/N;
+    for(let k=0;k<=N;k++){
+      const x=transition(p,k*dt,phase.voltage)(phase.begin[0],phase.begin[1])[0];
+      const weight=(k===0||k===N)?.5:1;
+      integralI+=dt*weight*x;integralI2+=dt*weight*x*x;
+    }
+  }
+  const iAvg=integralI/T,iRms2=Math.max(0,integralI2/T);
+  const base=p.Rarm*iAvg*iAvg;
+  const ripple=p.Rarm*Math.max(0,iRms2-iAvg*iAvg);
+  const filter=p.Rf*iRms2;
+  return {iAvg,iRms:Math.sqrt(iRms2),base,ripple,filter,total:base+ripple+filter};
 }
 function simulate(){
   const p=motor(),period=1/p.f,dt=period/NPER,steps=Math.ceil(HORIZON/dt);
@@ -209,7 +283,7 @@ function simulate(){
     if(c<edgeI.length){low=Math.min(low,edgeI[c]);high=Math.max(high,edgeI[c]);}
     cycleStats.push({t:(lo+hi)*.5*dt,avg:isum/(hi-lo),low,high});
   }
-  return {p,period,dt,steps,i,w,theta,edgeI,cycleStats,vbar,wss,iss,tauM,tauE,ripple:imax-imin};
+  return {p,period,dt,steps,i,w,theta,edgeI,cycleStats,vbar,wss,iss,tauM,tauE,ripple:imax-imin,losses:periodicLosses(p)};
 }
 function at(t){
   t=clamp(t,0,HORIZON);
@@ -318,16 +392,28 @@ function harmonicTable(){const p=data.p,rows=[];
   }$('harmonicRows').innerHTML=rows.join('');
 }
 function renderInfo(){const s=at(time),p=data.p,volt=pwm(time);$('scrub').value=Math.round(time/HORIZON*1000);$('now').textContent=`${fmt(time*1000,2)} ms`;
-  $('vNow').textContent=`${fmt(volt,2)} V`;$('iNow').textContent=formatCurrent(s.i);$('wNow').textContent=speedLabel(s.w,1);$('emNow').textContent=`${fmt(p.ke*s.w,2)} V`;$('torqueNow').textContent=`${fmt(1000*p.kt*s.i,2)} mN·m`;
+  $('vNow').textContent=`${fmt(volt,2)} V`;$('iNow').textContent=formatCurrent(s.i);$('wNow').textContent=speedLabel(s.w,1);$('emNow').textContent=`${fmt(p.ke*s.w,2)} V`;$('torqueNow').textContent=`${fmt(1000*p.kt*s.i,2)} mN·m`;$('heatNow').textContent=`${fmt((p.Rarm+p.Rf)*s.i*s.i,3)} W`;
   const on=volt>0,sc=$('switchState');sc.textContent=on?`SWITCH ON · ${fmt(volt,1)} V`:'SWITCH OFF · 0 V';sc.classList.toggle('on',on);$('pwmPath').style.stroke=on?'#00a58b':'#9db2c2';$('rotor').setAttribute('transform',`translate(1068 40) rotate(${s.theta*180/Math.PI})`);
 }
 function draw(){if(!data)return;renderInfo();drawVoltage();drawCurrent();drawSpeed();drawCurrentTrend();}
 function stop(){playing=false;cancelAnimationFrame(raf);raf=0;$('play').textContent='▶ Play';$('play').setAttribute('aria-pressed','false');}
 function animate(ts){if(!playing)return;if(!lastTs)lastTs=ts;const dt=Math.min(.10,(ts-lastTs)/1000);lastTs=ts;time=Math.min(HORIZON,time+dt*playback*HORIZON/12);draw();if(time>=HORIZON)stop();else raf=requestAnimationFrame(animate)}
-function updateStats(){$('avgV').textContent=`${fmt(data.vbar,2)} V`;$('tauE').textContent=`${fmt(data.tauE*1e6,1)} µs`;$('tauM').textContent=`${fmt(data.tauM*1000,2)} ms`;$('ripple').textContent=`${fmt(data.ripple,3)} A p–p`;$('steadySpeed').textContent=speedLabel(data.wss,1);}
+function powerFormat(W){if(W===0)return '0 mW';return Math.abs(W)<1?`${fmt(W*1000,2)} mW`:`${fmt(W,3)} W`}
+function updateLosses(){
+  const q=data.losses;
+  $('lossRms').textContent=`Iᵣₘₛ = ${fmt(q.iRms,3)} A · mean = ${fmt(q.iAvg,3)} A`;
+  $('lossTotal').textContent=powerFormat(q.total);
+  $('lossRipple').textContent=powerFormat(q.ripple);
+  $('lossFilter').textContent=powerFormat(q.filter);
+  for(const [name,value] of [['Base',q.base],['Ripple',q.ripple],['Filter',q.filter]]){
+    $("loss"+name+"Bar").style.width=q.total>0?`${100*value/q.total}%`:'0%';
+    $("loss"+name+"Val").textContent=powerFormat(value);
+  }
+}
+function updateStats(){$('avgV').textContent=`${fmt(data.vbar,2)} V`;$('tauE').textContent=`${fmt(data.tauE*1e6,1)} µs`;$('tauM').textContent=`${fmt(data.tauM*1000,2)} ms`;$('ripple').textContent=`${fmt(data.ripple,3)} A p–p`;$('steadySpeed').textContent=speedLabel(data.wss,1);updateLosses();}
 function syncControls(){for(const k of Object.keys(bounds)){const val=displayFmt[k](state[k]);$(k).value=val;$(k+'Num').value=val}$('units').value=state.units;}
 function recalc(resetTime=true){stop();HORIZON=state.horizon/1000;data=simulate();if(resetTime)time=0;else time=clamp(time,0,HORIZON);updateStats();harmonicTable();draw()}
-const presets={baseline:{duty:60,freq:20,bus:12,extraL:0,inertia:1,load:0},slow:{duty:60,freq:2,bus:12,extraL:0,inertia:1,load:0},fast:{duty:60,freq:40,bus:12,extraL:0,inertia:1,load:0},inductor:{duty:60,freq:20,bus:12,extraL:1,inertia:1,load:0},inertia:{duty:60,freq:20,bus:12,extraL:0,inertia:10,load:0}};
+const presets={baseline:{duty:60,freq:20,bus:12,extraL:0,inertia:1,load:0},slow:{duty:60,freq:2,bus:12,extraL:0,inertia:1,load:0},fast:{duty:60,freq:40,bus:12,extraL:0,inertia:1,load:0},inductor:{duty:60,freq:20,bus:12,extraL:1,seriesR:0,inertia:1,load:0},realFilter:{duty:60,freq:20,bus:12,extraL:1,seriesR:.5,inertia:1,load:0},inertia:{duty:60,freq:20,bus:12,extraL:0,inertia:10,load:0}};
 for(const k of Object.keys(bounds)){
   const range=$(k),num=$(k+'Num');
   const apply=(raw,source)=>{const x=Number(raw);if(!Number.isFinite(x)||x<bounds[k][0]||x>bounds[k][1]){source.setAttribute('aria-invalid','true');return;}source.removeAttribute('aria-invalid');state[k]=x;range.value=x;num.value=displayFmt[k](x);$('preset').value='baseline';recalc(false)};
@@ -349,7 +435,7 @@ $('download').addEventListener('click',()=>{
 });
 window.addEventListener('resize',()=>draw());
 // Public test hooks for numerical and visual regression checks, and for teaching extensions.
-window.PWMMotorStudio={motor,simulate,transition,getState:()=>({...state}),getData:()=>data,setTime:t=>{time=clamp(t,0,HORIZON);draw()},getTime:()=>time,recalculate:recalc};
+window.PWMMotorStudio={motor,simulate,transition,periodicLosses,getState:()=>({...state}),getData:()=>data,setTime:t=>{time=clamp(t,0,HORIZON);draw()},getTime:()=>time,recalculate:recalc};
 syncControls();recalc(true);
 })();
 </script>

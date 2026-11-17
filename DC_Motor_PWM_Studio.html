@@ -560,7 +560,7 @@ function drawBode(){
     for(const q of hs){const f=q.f;if(f>a.maxF)continue;
       const v=responseMotor(p,2*Math.PI*f,'current');
       const y=kind==='m'?20*Math.log10(amp(v)):phase(v);
-      ctx.fillStyle=C.teal;ctx.strokeStyle='#fff';ctx.lineWidth=1.1;ctx.beginPath();ctx.arc(xx(f),yy(y),2.7,0,2*Math.PI);ctx.fill();ctx.stroke();
+      ctx.fillStyle=C.teal;ctx.strokeStyle='#fff';ctx.lineWidth=1.1;ctx.beginPath();ctx.arc(xx(f),yy(y),3.5,0,2*Math.PI);ctx.fill();ctx.stroke();
     }
     ctx.restore();
   }

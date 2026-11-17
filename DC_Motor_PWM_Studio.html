@@ -164,6 +164,19 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .bode-controls-row .small-legend{gap:12px}
 @media(max-width:550px){.bode-controls-row{align-items:flex-start;flex-direction:column}.bode-output-label{flex-wrap:wrap}}
 
+
+/* Shared logarithmic frequency limits for both Bode plots. */
+.bode-range-panel{display:flex;gap:9px 13px;align-items:end;flex-wrap:wrap;padding:2px 18px 5px}
+.bode-range-panel label{display:flex;flex-direction:column;gap:5px;color:var(--navy);font-size:11px;font-weight:750;min-width:0}
+.bode-range-panel select,.bode-range-panel input{min-height:35px;padding:7px 9px;border:1px solid #cbdde9;border-radius:8px;background:#f8fbfd;color:var(--navy);font-size:12px;font-variant-numeric:tabular-nums}
+.bode-range-panel select{width:210px;max-width:100%}
+.bode-range-panel input{width:122px}
+.bode-range-panel button{min-height:35px;padding:7px 12px}
+.bode-range-panel input[aria-invalid="true"]{border-color:#b94630;outline-color:#b94630}
+.bode-range-note{padding:1px 18px 11px;font-size:11px;color:#647e8f;line-height:1.45}
+.bode-range-note.invalid{color:#aa4030;font-weight:650}
+@media(max-width:550px){.bode-range-panel label:first-child{width:100%}.bode-range-panel select{width:100%}.bode-range-panel label:not(:first-child){flex:1}.bode-range-panel input{width:100%}}
+
 </style>
 </head>
 <body>
@@ -311,7 +324,27 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       <span><i class="legend-line" style="--c:var(--teal)"></i>Complete motor</span>
       <span><i class="legend-line dash" style="--c:var(--orange)"></i><span id="bodeCornerLegend">RL corner</span></span>
     </div>
-  </div> <div class="frequency-grid bode-grid"><div><div class="plot-mini-title" id="bodeMagnitudeLabel">Magnitude · dB re 1 A/V</div><canvas id="bodeMagnitudePlot" role="img" aria-label="Bode magnitude, voltage to armature current"></canvas></div><div><div class="plot-mini-title">Phase · degrees</div><canvas id="bodePhasePlot" role="img" aria-label="Bode phase, voltage to armature current"></canvas></div></div>
+  </div>
+  <div class="bode-range-panel" role="group" aria-label="Bode frequency axis controls">
+    <label for="bodeRangePreset">Frequency axis
+      <select id="bodeRangePreset" aria-label="Bode frequency range preset">
+        <option value="full" selected>Full range</option>
+        <option value="mechanical">Around mechanical corner</option>
+        <option value="electrical">Around electrical corner</option>
+        <option value="harmonics">PWM harmonics 1 to N</option>
+        <option value="custom">Custom range</option>
+      </select>
+    </label>
+    <label for="bodeFmin">Minimum (Hz)
+      <input id="bodeFmin" type="number" min="0.01" max="100000000" step="any" value="5" inputmode="decimal" aria-label="Bode minimum frequency in Hz">
+    </label>
+    <label for="bodeFmax">Maximum (Hz)
+      <input id="bodeFmax" type="number" min="0.01" max="100000000" step="any" value="2000000" inputmode="decimal" aria-label="Bode maximum frequency in Hz">
+    </label>
+    <button class="btn muted" id="bodeResetRange" type="button" title="Restore default Bode frequency axis">Reset axis</button>
+  </div>
+  <div class="bode-range-note" id="bodeRangeNote" role="status" aria-live="polite">Logarithmic axis shared by magnitude and phase. Choose a preset or enter custom limits in Hz.</div>
+  <div class="frequency-grid bode-grid"><div><div class="plot-mini-title" id="bodeMagnitudeLabel">Magnitude · dB re 1 A/V</div><canvas id="bodeMagnitudePlot" role="img" aria-label="Bode magnitude, voltage to armature current"></canvas></div><div><div class="plot-mini-title">Phase · degrees</div><canvas id="bodePhasePlot" role="img" aria-label="Bode phase, voltage to armature current"></canvas></div></div>
  <div class="scope-footer" id="bodeInfo">H<sub>RL</sub>(s) = 1/(R<sub>tot</sub> + sL<sub>tot</sub>), if shaft speed is effectively fixed. The full motor includes electromechanical feedback through back EMF.</div></section>
  <div class="frequency-grid">
    <section class="card reconstruction-card"><div class="card-header"><div><h2>Reconstruct PWM voltage</h2><div class="scope-desc">Exact rectangular voltage versus Fourier sum</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--slate)"></i>Exact PWM</span><span><i class="legend-line dash" style="--c:var(--purple)"></i>Fourier sum</span></div></div><canvas id="pwmFourierPlot" role="img" aria-label="Two-period Fourier reconstruction of PWM voltage"></canvas><div class="scope-footer">The discontinuities produce Gibbs overshoots in truncated Fourier sums.</div></section>
@@ -666,22 +699,76 @@ function updateInspectedHarmonic(q){
   const pct=(ac,dc)=>Math.abs(dc)>1e-8?(100*ac/Math.abs(dc)).toFixed(ac/Math.abs(dc)<.001?4:2)+'%':'undefined (mean ≈ 0)';
   $('spectrumDCInfo').innerHTML='<b>Shared 0–1 scale, but separate references:</b> voltage '+fmtSmall(inputRef)+' V · current '+fmtSmall(currentRef)+' A · speed '+fmtSmall(speedRef)+' '+speedUnit+'. <b>AC RMS of first '+harmonics.length+' harmonics:</b> current '+fmtSmall(ri)+' A ('+pct(ri,currentDC)+' of |mean|); speed '+fmtSmall(rw)+' '+speedUnit+' ('+pct(rw,speedDC)+' of |mean|). Electrical inductance filters voltage to current; mechanical inertia further filters current ripple to speed ripple. Very small current mean under no load can make the current ripple/mean percentage large.';
 }
+const BODE_F_LOWER=0.01,BODE_F_UPPER=1e8;
+let bodeRange={min:5,max:2e6};
+function bodeLimitsFor(preset){
+  if(preset==='full')return {min:5,max:2e6};
+  const p=data.p;
+  const mech=(p.R*p.b+p.ke*p.kt)/(2*Math.PI*p.R*p.J);
+  const elec=p.R/(2*Math.PI*p.L);
+  let range;
+  if(preset==='mechanical')range={min:mech/30,max:mech*100};
+  else if(preset==='electrical')range={min:elec/30,max:elec*30};
+  else if(preset==='harmonics'){
+    const count=Number($('harmonicCount').value);
+    range={min:p.f/3,max:p.f*Math.max(3,count*1.3)};
+  }else return bodeRange;
+  return {min:Math.max(BODE_F_LOWER,range.min),max:Math.min(BODE_F_UPPER,range.max)};
+}
+function formatBodeFrequency(f){
+  if(f>=1e6)return +(f/1e6).toPrecision(3)+'M';
+  if(f>=1e3)return +(f/1e3).toPrecision(3)+'k';
+  if(f>=1)return +f.toPrecision(3)+'';
+  return +f.toPrecision(3)+'';
+}
+function syncBodeRange(){
+  $('bodeFmin').value=+bodeRange.min.toPrecision(6);
+  $('bodeFmax').value=+bodeRange.max.toPrecision(6);
+  $('bodeFmin').removeAttribute('aria-invalid');
+  $('bodeFmax').removeAttribute('aria-invalid');
+  $('bodeRangeNote').classList.remove('invalid');
+  $('bodeRangeNote').textContent='Log frequency axis: '+formatBodeFrequency(bodeRange.min)+'Hz to '+formatBodeFrequency(bodeRange.max)+'Hz. Both Bode plots use this range; harmonics outside it are hidden.';
+}
+function applyBodeRange(preset){
+  const {min,max}=bodeLimitsFor(preset);
+  bodeRange={min,max};
+  syncBodeRange();
+  if(!$('frequencyDomain').hidden)drawBode();
+}
+function applyBodeRangeSilently(preset){
+  bodeRange=bodeLimitsFor(preset);
+  syncBodeRange();
+}
 function bodeAxes(id,ymin,ymax){
-  const z=ctxSetup(id),{ctx,W,H}=z,l=62,r=14,t=20,b=37,w=W-l-r,h=H-t-b,minF=5,maxF=2e6;
+  const z=ctxSetup(id),{ctx,W,H}=z,l=62,r=14,t=20,b=37,w=W-l-r,h=H-t-b;
+  const {min:minF,max:maxF}=bodeRange;
   const xx=f=>l+(Math.log10(f)-Math.log10(minF))/Math.log10(maxF/minF)*w;
   const yy=v=>t+(ymax-v)/(ymax-ymin)*h;
   ctx.font='10px system-ui,Arial,sans-serif';ctx.lineWidth=1;
   const step=niceStep(ymax-ymin,4);
-  for(let v=Math.ceil(ymin/step)*step;v<=ymax+step*.001;v+=step){const y=yy(v);
-    ctx.strokeStyle=C.grid;ctx.beginPath();ctx.moveTo(l,y);ctx.lineTo(W-r,y);ctx.stroke();
+  for(let v=Math.ceil(ymin/step)*step;v<=ymax+step*.001;v+=step){
+    const y=yy(v);ctx.strokeStyle=C.grid;ctx.beginPath();ctx.moveTo(l,y);ctx.lineTo(W-r,y);ctx.stroke();
     ctx.textAlign='right';ctx.fillStyle=C.text;ctx.fillText(formatTick(v),l-7,y+3);
   }
-  for(const f of [10,100,1e3,1e4,1e5,1e6]){
-    const x=xx(f);ctx.strokeStyle=C.grid;ctx.beginPath();ctx.moveTo(x,t);ctx.lineTo(x,t+h);ctx.stroke();
-    ctx.fillStyle=C.text;ctx.textAlign='center';ctx.fillText(f>=1e6?'1M':f>=1e3?(f/1e3)+'k':String(f),x,H-b+15);
+  // Major decades across wide spans; also show 2 and 5 ticks when zoomed in.
+  const decades=Math.log10(maxF/minF),multiples=decades>3.5?[1]:[1,2,5];
+  const lastLabels=[];
+  for(let exp=Math.floor(Math.log10(minF));exp<=Math.ceil(Math.log10(maxF));exp++){
+    for(const mult of multiples){
+      const f=mult*10**exp;
+      if(f<minF*(1-1e-10)||f>maxF*(1+1e-10))continue;
+      const x=xx(f);if(x<l||x>W-r)continue;
+      ctx.strokeStyle=C.grid;ctx.beginPath();ctx.moveTo(x,t);ctx.lineTo(x,t+h);ctx.stroke();
+      if(lastLabels.length===0||x-lastLabels[lastLabels.length-1]>44){
+        ctx.fillStyle=C.text;ctx.textAlign='center';
+        ctx.fillText(formatBodeFrequency(f),x,H-b+15);lastLabels.push(x);
+      }
+    }
   }
+  ctx.fillStyle=C.text;ctx.textAlign='center';
   ctx.fillText('Frequency (Hz) · logarithmic',l+w/2,H-5);
-  ctx.save();ctx.beginPath();ctx.rect(l,t,w,h);ctx.clip();return {ctx,W,H,xx,yy,l,r,t,b,w,h,minF,maxF};
+  ctx.save();ctx.beginPath();ctx.rect(l,t,w,h);ctx.clip();
+  return {ctx,W,H,xx,yy,l,r,t,b,w,h,minF,maxF};
 }
 
 function speedFirstOrder(p,omega){
@@ -691,6 +778,7 @@ function speedFirstOrder(p,omega){
   return {re:gain/(1+z*z),im:-gain*z/(1+z*z)};
 }
 function drawBode(){
+  if($('bodeRangePreset').value!=='custom')applyBodeRangeSilently($('bodeRangePreset').value);
   const p=data.p,mode=$('bodeOutput').value==='speed'?'speed':'current';
   const isSpeed=mode==='speed',scale=isSpeed&&state.units==='rpm'?60/(2*Math.PI):1;
   const unit=isSpeed?(state.units==='rpm'?'rpm/V':'(rad/s)/V'):'A/V';
@@ -698,7 +786,7 @@ function drawBode(){
   const corner=isSpeed?den/(2*Math.PI*p.R*p.J):p.R/(2*Math.PI*p.L);
   const series=[];
   for(let k=0;k<=280;k++){
-    const f=5*Math.pow(2e6/5,k/280),w=2*Math.PI*f;
+    const f=bodeRange.min*Math.pow(bodeRange.max/bodeRange.min,k/280),w=2*Math.PI*f;
     const approx=isSpeed?speedFirstOrder(p,w):responseRL(p,w);
     const full=responseMotor(p,w,mode);
     series.push({
@@ -822,6 +910,28 @@ for(const id of ['tabTime','tabFrequency'])$(id).addEventListener('keydown',e=>{
 $('harmonicCount').addEventListener('input',()=>drawFrequency());
 $('inspectHarmonic').addEventListener('change',()=>drawFrequency());
 $('bodeOutput').addEventListener('change',()=>{if(!$('frequencyDomain').hidden)drawBode();});
+$('bodeRangePreset').addEventListener('change',()=>{
+  if($('bodeRangePreset').value!=='custom')applyBodeRange($('bodeRangePreset').value);
+});
+for(const key of ['bodeFmin','bodeFmax']){
+  $(key).addEventListener('change',()=>{
+    const lo=Number($('bodeFmin').value),hi=Number($('bodeFmax').value);
+    const valid=Number.isFinite(lo)&&Number.isFinite(hi)&&lo>=BODE_F_LOWER&&hi<=BODE_F_UPPER&&lo<hi&&hi/lo>=1.1;
+    $('bodeFmin').setAttribute('aria-invalid',String(!valid));
+    $('bodeFmax').setAttribute('aria-invalid',String(!valid));
+    if(!valid){
+      $('bodeRangeNote').textContent='Enter positive limits between 0.01 Hz and 100 MHz, with maximum at least 1.1 × minimum.';
+      $('bodeRangeNote').classList.add('invalid');return;
+    }
+    bodeRange={min:lo,max:hi};
+    $('bodeRangePreset').value='custom';
+    syncBodeRange();
+    if(!$('frequencyDomain').hidden)drawBode();
+  });
+}
+$('bodeResetRange').addEventListener('click',()=>{
+  $('bodeRangePreset').value='full';applyBodeRange('full');
+});
 $('pwmSpectrumPlot').addEventListener('click',e=>{
   const rect=e.currentTarget.getBoundingClientRect(),N=Number($('harmonicCount').value),left=55,right=16;
   const order=Math.round((e.clientX-rect.left-left)/(rect.width-left-right)*(N+1)-.5);

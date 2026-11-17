@@ -20,9 +20,41 @@
 @media(max-width:1050px){main{padding:17px}.workspace{grid-template-columns:minmax(310px,.9fr) minmax(0,1.1fr)}.top-actions select{max-width:160px}.chart canvas{height:232px}.plots-head{padding:13px}.plots-head h2{font-size:13px}.view-switch button{padding:5px 6px;font-size:10px}.frequency-bar{gap:6px;padding:10px}.frequency-bar input{width:75px}.frequency-bar .units{display:none}.factor-details{font-size:10px}}
 @media(max-width:800px){.top{align-items:flex-start;flex-wrap:wrap}.top-actions{width:100%}.top-actions select{max-width:none;flex:1}.workspace{grid-template-columns:minmax(0,1fr)}.formula-label{display:none}.formula-card{padding:11px 13px;gap:10px}.gain-control{padding-left:10px}.plane-wrap canvas{height:360px}.factor-list{max-height:150px}.chart canvas{height:245px}.plots-head h2{font-size:15px}.view-switch button{font-size:11px;padding:5px 9px}.frequency-bar{gap:10px;padding:12px 15px}.frequency-bar input{width:90px}.frequency-bar .units{display:block}.notes{gap:16px}}
 @media(max-width:480px){main{padding:14px 10px}.brandmark{width:37px;height:37px;font-size:24px}h1{font-size:25px}.intro{font-size:11px}.top-actions{gap:5px}.top-actions button{font-size:10px;padding:7px 8px}.top-actions select{font-size:10px;width:110px;min-width:0}.top-actions .download{margin:0}.formula{font-size:18px;min-height:43px}.gain-control{font-size:11px;gap:4px}.gain-control input{width:64px;font-size:12px}.plane-wrap canvas{height:310px}.plane-footer{font-size:9px}.mode-sub{font-size:10px}.plane-tools{padding-left:11px;padding-right:11px}.modes button{font-size:11px}.frequency-bar{gap:7px;padding:10px}.frequency-bar input{width:79px}.frequency-bar .units{display:none}.frequency-bar button{font-size:10px}.plot-legend{gap:10px;font-size:10px;padding-left:13px;padding-right:13px}.plot-legend #view-caption{max-width:120px;text-overflow:ellipsis;white-space:nowrap;overflow:hidden}.hover-readout{font-size:10px;padding-left:13px}.notes{grid-template-columns:1fr;gap:12px}.coordinates{gap:6px}.coordinates button{font-size:10px}.bottom{font-size:9px}}
+
+/* Shared navigation back to the Signals & Systems index. */
+.site-return-nav {
+  box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 10px clamp(16px, 3vw, 38px);
+  background: #eaf2f8;
+  border-bottom: 1px solid #d6e3ef;
+  text-align: left;
+}
+.site-return-nav .site-return-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 7px 13px;
+  background: #fff;
+  border: 1px solid #aec8df;
+  border-radius: 8px;
+  color: #16456f;
+  font: 600 13px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-decoration: none;
+}
+.site-return-nav .site-return-link:hover { background: #f4f9fe; border-color: #6c9dc7; }
+.site-return-nav .site-return-link:focus-visible { outline: 3px solid #e8a82c; outline-offset: 3px; }
+
 </style>
 </head>
 <body>
+<nav class="site-return-nav" aria-label="Site navigation">
+  <a class="site-return-link" href="index.html">← Back to index</a>
+</nav>
+
 <main>
   <header class="top">
     <div class="brand"><div class="brandmark" aria-hidden="true">×○</div><div><div class="eyebrow">Signals &amp; Systems</div><h1>Bode Studio</h1><p class="intro">Build a transfer function directly on the complex plane.</p></div></div>

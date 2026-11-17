@@ -14,9 +14,41 @@
 @media(max-width:570px){main{padding:18px 10px}h1{font-size:27px}.intro{font-size:14px}.model{gap:12px}.model .math{font-size:18px}.model .separator{display:none}.display-head{padding:16px 13px 0}.display-head h2{font-size:16px}.status{font-size:10px}.legend{padding:8px 13px 3px;gap:10px;font-size:10px}canvas{height:340px}.chart-wrap{margin:0 3px}.chart-info{padding:0 13px 10px;font-size:11px;gap:7px}.note-line{padding:10px 13px;font-size:12px}.transport{padding:12px 13px}.transport-row{gap:6px}.transport-row button{font-size:12px;padding:8px 9px}.transport-row .time{font-size:12px}.controls{grid-template-columns:1fr;padding:16px}.controls>h2{grid-column:auto}.controls .initial-control{grid-row:auto}.control{padding-top:12px}.equation-panel{padding:17px 13px}.equation-large{font-size:19px}.equation-sub{font-size:16px;gap:12px}.decomp,.two-notes{grid-template-columns:1fr}.decomp .math{font-size:16px}.two-notes{gap:15px}.footer{font-size:10px;align-items:flex-start}.reading{margin:0}.range-ends{font-size:11px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 @media print{body{background:white}main{padding:0;max-width:none}.transport,.controls,.footer button{display:none}.layout{display:block}.two-notes,.equation-panel{break-inside:avoid}.panel{border-color:#aaa}}
+
+/* Shared navigation back to the Signals & Systems index. */
+.site-return-nav {
+  box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 10px clamp(16px, 3vw, 38px);
+  background: #eaf2f8;
+  border-bottom: 1px solid #d6e3ef;
+  text-align: left;
+}
+.site-return-nav .site-return-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 7px 13px;
+  background: #fff;
+  border: 1px solid #aec8df;
+  border-radius: 8px;
+  color: #16456f;
+  font: 600 13px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-decoration: none;
+}
+.site-return-nav .site-return-link:hover { background: #f4f9fe; border-color: #6c9dc7; }
+.site-return-nav .site-return-link:focus-visible { outline: 3px solid #e8a82c; outline-offset: 3px; }
+
 </style>
 </head>
 <body>
+<nav class="site-return-nav" aria-label="Site navigation">
+  <a class="site-return-link" href="index.html">← Back to index</a>
+</nav>
+
 <main>
   <header>
     <div class="eyebrow">Signals &amp; Systems · Initial conditions</div>

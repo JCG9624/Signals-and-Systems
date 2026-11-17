@@ -67,9 +67,41 @@ select{border-radius:8px;border:1px solid #d3e2eb;padding:7px;background:#fff;co
 footer{color:#879aaa;font-size:11px;margin-top:17px}
 @media(max-width:800px){main{padding:16px 12px}header{flex-direction:column;gap:10px}.formula{align-self:flex-start}.control-grid{grid-template-columns:1fr;gap:13px}.stats{margin-top:10px}.chart-top{padding:12px 12px 4px}.legend{padding:2px 12px 8px}.bottom-bar{margin:0 12px;justify-content:flex-start}.readouts{margin:0 12px 15px;grid-template-columns:repeat(2,minmax(0,1fr))}.equations{grid-template-columns:1fr}.chart-title{font-size:14px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* Shared navigation back to the Signals & Systems index. */
+.site-return-nav {
+  box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 10px clamp(16px, 3vw, 38px);
+  background: #eaf2f8;
+  border-bottom: 1px solid #d6e3ef;
+  text-align: left;
+}
+.site-return-nav .site-return-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 7px 13px;
+  background: #fff;
+  border: 1px solid #aec8df;
+  border-radius: 8px;
+  color: #16456f;
+  font: 600 13px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-decoration: none;
+}
+.site-return-nav .site-return-link:hover { background: #f4f9fe; border-color: #6c9dc7; }
+.site-return-nav .site-return-link:focus-visible { outline: 3px solid #e8a82c; outline-offset: 3px; }
+
 </style>
 </head>
 <body>
+<nav class="site-return-nav" aria-label="Site navigation">
+  <a class="site-return-link" href="index.html">← Back to index</a>
+</nav>
+
 <main>
   <header>
     <div>

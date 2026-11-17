@@ -41,9 +41,41 @@ canvas{width:100%;height:245px;display:block}.right canvas{height:215px}#spectru
 .laplace-joke button{position:absolute;right:9px;top:8px;border:0;color:#effaff;background:transparent;
  font-size:22px;line-height:1;min-height:36px;min-width:36px;padding:5px;cursor:pointer}
 @media(prefers-reduced-motion:reduce){.laplace-joke{transition:none;transform:translate(-50%,0)}}
+
+/* Shared navigation back to the Signals & Systems index. */
+.site-return-nav {
+  box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 10px clamp(16px, 3vw, 38px);
+  background: #eaf2f8;
+  border-bottom: 1px solid #d6e3ef;
+  text-align: left;
+}
+.site-return-nav .site-return-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 7px 13px;
+  background: #fff;
+  border: 1px solid #aec8df;
+  border-radius: 8px;
+  color: #16456f;
+  font: 600 13px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-decoration: none;
+}
+.site-return-nav .site-return-link:hover { background: #f4f9fe; border-color: #6c9dc7; }
+.site-return-nav .site-return-link:focus-visible { outline: 3px solid #e8a82c; outline-offset: 3px; }
+
 </style>
 </head>
-<body><main>
+<body>
+<nav class="site-return-nav" aria-label="Site navigation">
+  <a class="site-return-link" href="index.html">← Back to index</a>
+</nav>
+<main>
 <div class="eyebrow">SIGNALS AND SYSTEMS  ·  FROM FOURIER TO LAPLACE</div>
 <h1>Growing sinusoid: convergence and Fourier spectrum</h1>
 <p class="description">Original signal: <strong>x(t) = e<sup>t</sup> sin(t) u(t)</strong>. Vary σ = Re(s) to see when its exponentially weighted version admits an ordinary Fourier transform.</p>

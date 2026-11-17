@@ -177,6 +177,31 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .bode-range-note.invalid{color:#aa4030;font-weight:650}
 @media(max-width:550px){.bode-range-panel label:first-child{width:100%}.bode-range-panel select{width:100%}.bode-range-panel label:not(:first-child){flex:1}.bode-range-panel input{width:100%}}
 
+
+/* Two linked time-domain experiments: constant-duty startup and a duty-step disturbance. */
+.time-experiment-picker{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;padding:12px 16px;margin-bottom:13px}
+.time-experiment-picker label{font-size:12px;color:var(--navy);font-weight:750}
+.time-experiment-picker select{border:1px solid #cbdce8;border-radius:8px;background:#f8fbfd;color:var(--navy);font-size:12px;padding:8px 11px;max-width:100%;min-height:35px}
+.time-experiment-picker .mini-hint{flex:1;min-width:175px;line-height:1.4}
+.step-settings{padding:17px 18px;margin:0 0 13px}
+.step-settings h2{font-size:15px;color:var(--navy);margin:0 0 5px}
+.step-settings p{font-size:12px;color:var(--muted);margin:3px 0 13px}
+.step-config-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.step-config-grid label{font-size:11px;color:var(--navy);font-weight:740;display:block;margin-bottom:5px}
+.step-config-grid input{border:1px solid #ccdeeb;border-radius:8px;padding:8px 10px;width:100%;font-size:13px;color:var(--navy);background:#f8fbfd;min-height:36px}
+.step-results{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:13px}
+.step-result{padding:10px;border-radius:9px;background:#f4f9fc;border:1px solid #e1ebf1}
+.step-result span{display:block;font-size:11px;color:var(--muted)}
+.step-result strong{display:block;color:var(--navy);font-size:15px;font-weight:750;margin-top:4px}
+.step-explanation{color:#597588;font-size:11px;line-height:1.6;margin:11px 0 0}
+.step-scope{margin:0 0 13px;overflow:hidden}
+.step-scope canvas{height:255px}
+.step-scope.step-command canvas{height:187px}
+.step-scope .scope-footer{font-size:11px;line-height:1.55}
+.step-minor{font-size:11px;color:#67869a}
+@media(max-width:810px){.step-config-grid{grid-template-columns:1fr}.step-results{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.step-results{grid-template-columns:1fr}.time-experiment-picker{align-items:flex-start;flex-direction:column}.time-experiment-picker select{width:100%}}
+
 </style>
 </head>
 <body>
@@ -250,6 +275,15 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 </aside>
 <div class="plots" aria-label="Linked motor response plots">
 <div id="timeDomain" role="tabpanel" aria-labelledby="tabTime">
+<div class="card time-experiment-picker">
+  <label for="timeExperiment">Time-domain experiment</label>
+  <select id="timeExperiment" aria-label="Choose a motor time-domain experiment">
+    <option value="startup" selected>Start-up · fixed PWM duty</option>
+    <option value="step">Duty-ratio step · D₁ → D₂</option>
+  </select>
+  <span class="mini-hint" id="timeExperimentHint">Motor starts from rest with a constant PWM duty ratio.</span>
+</div>
+<div id="startupExperiment">
 <section class="card speed-scope featured"><div class="card-header"><div><h2>Motor speed and current: the start-up transient</h2><span class="featured-label">PRIMARY RESULT</span><div class="scope-desc">Common time horizon: compare speed build-up with the evolving mean armature current</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--teal)"></i>two-pole motor, PWM</span><span><i class="legend-line dash" style="--c:var(--purple)"></i>one-pole motor, averaged voltage</span></div></div><canvas id="speedPlot" role="img" aria-label="Long-time motor speed compared with the one-pole average-voltage approximation"></canvas><div class="trend-divider"><span>Armature current during start-up (cycle average and switching envelope)</span><span>Shared time axis</span></div><canvas id="currentTrendPlot" role="img" aria-label="Motor armature current versus time, including average and switching envelope"></canvas><div class="scope-footer" id="speedNote">The current rises and then changes as back EMF builds. The switching-current detail is visible in the lower plots, while this figure shows its longer-term evolution.</div></section>
 
 
@@ -277,6 +311,47 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 <div class="two-scopes">
   <section class="card scope"><div class="card-header"><div><h2>PWM source</h2><div class="scope-desc">Switching-time microscope: up to six PWM periods around the cursor</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--slate)"></i>v<sub>PWM</sub>(t)</span><span><i class="legend-line dash" style="--c:var(--teal)"></i>average voltage</span></div></div><canvas id="voltagePlot" role="img" aria-label="Zoomed PWM voltage waveform with its average voltage"></canvas><div class="scope-footer">The duty cycle controls the <b>average voltage</b>: V̄ = D V<sub>dc</sub>.</div></section>
   <section class="card scope"><div class="card-header"><div><h2>Armature current ripple</h2><div class="scope-desc">Same close-up window; current cannot jump instantaneously</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--orange)"></i>i(t)</span><span><i class="legend-line dash" style="--c:var(--navy)"></i>local cycle mean</span></div></div><canvas id="currentPlot" role="img" aria-label="Armature current showing ripple and local cycle mean"></canvas><div class="scope-footer">The armature inductance (plus any extra series inductance) limits <b>di/dt</b>.</div></section>
+</div>
+</div>
+<div id="dutyStepExperiment" hidden>
+  <section class="card step-settings">
+    <h2>Experiment: change the PWM duty ratio between two levels</h2>
+    <p>Start from the periodic steady state at D₁, then change to D₂ at the chosen time. The PWM switching frequency stays constant, and the motor states remain continuous.</p>
+    <div class="step-config-grid">
+      <div><label for="stepD1">Initial duty ratio, D₁ (%)</label><input id="stepD1" type="number" min="10" max="90" step="1" value="30"></div>
+      <div><label for="stepD2">Final duty ratio, D₂ (%)</label><input id="stepD2" type="number" min="10" max="90" step="1" value="70"></div>
+      <div><label for="stepAtMs">Requested step time (ms)</label><input id="stepAtMs" type="number" min="1" max="319" step="1" value="40"></div>
+    </div>
+    <div class="step-results" aria-live="polite">
+      <div class="step-result"><span>Mean applied PWM voltage</span><strong id="stepVoltages">—</strong></div>
+      <div class="step-result"><span>Steady motor speed, before → after</span><strong id="stepSpeeds">—</strong></div>
+      <div class="step-result"><span>Actual step time</span><strong id="stepActualTime">—</strong></div>
+    </div>
+    <p class="step-explanation">To avoid an artificial partial PWM cycle, the new duty ratio takes effect at the nearest PWM-period boundary. All curves below use the resulting actual change time. The current and speed do not jump at the change: only the PWM duty command changes.</p>
+  </section>
+  <section class="card step-scope step-command">
+    <div class="card-header"><div><h2>Duty command · two constant levels</h2><div class="scope-desc">The average applied voltage follows V̄(t) = D(t) V<sub>dc</sub></div></div></div>
+    <canvas id="stepDutyPlot" role="img" aria-label="Duty ratio versus time, with a single change from the initial to final level"></canvas>
+    <div class="scope-footer">The duty ratio is piecewise constant. Actual PWM voltage still switches between 0 and V<sub>dc</sub> within each PWM period.</div>
+  </section>
+  <section class="card step-scope">
+    <div class="card-header"><div><h2>Motor speed · response to the duty step</h2><div class="scope-desc">Exact switched two-pole model compared with the averaged first-order mechanical approximation</div></div>
+      <div class="small-legend"><span><i class="legend-line" style="--c:var(--teal)"></i>Switched motor</span><span><i class="legend-line dash" style="--c:var(--purple)"></i>One-pole approximation</span></div>
+    </div>
+    <canvas id="stepSpeedPlot" role="img" aria-label="Speed transition when duty ratio changes, including an averaged first-order approximation"></canvas>
+    <div class="scope-footer">The mean speed responds over the mechanical time scale. The dashed curve neglects electrical inductance and the small PWM speed ripple.</div>
+  </section>
+  <section class="card step-scope">
+    <div class="card-header"><div><h2>Armature current · response to the duty step</h2><div class="scope-desc">Mean current and shaded PWM current envelope across the entire time window</div></div>
+      <div class="small-legend"><span><i class="legend-line" style="--c:var(--orange)"></i>Cycle-average current</span><span class="step-minor">Shaded: minimum–maximum within each switching period</span></div>
+    </div>
+    <canvas id="stepCurrentPlot" role="img" aria-label="Armature current cycle average and switching ripple envelope after a duty-ratio change"></canvas>
+    <div class="scope-footer">The current can respond rapidly after the duty change. The shaded band shows the PWM ripple, which need not disappear even after the mean current has settled.</div>
+  </section>
+  <section class="card questions" style="margin-top:0">
+    <h2>Learning outcomes · investigate the step</h2>
+    <ol><li>Change D₁ = 30% to D₂ = 70%. How quickly does the cycle-average current react compared with motor speed?</li><li>Reverse the step (70% → 30%). What changes in the current and speed responses?</li><li>Increase mechanical inertia or add series inductance. Which response changes most, and why?</li></ol>
+  </section>
 </div>
 </div>
 
@@ -484,6 +559,171 @@ function at(t){
   return {i:x[0],w:x[1],theta};
 }
 function pwm(t){const q=t/data.period,fract=q-Math.floor(q);return fract<data.p.D?data.p.bus:0;}
+// This experiment starts at the *periodic* operating point for D1 and then
+// switches to D2 at a PWM-period boundary. The motor state is continuous.
+const stepSettings={D1:30,D2:70,changeMs:40};
+let stepData=null;
+function isDutyStep(){return $('timeExperiment').value==='step';}
+function stepEquilibrium(p,D){
+  const den=p.R*p.b+p.ke*p.kt,v=p.bus*D;
+  return {i:(p.b*v+p.ke*p.TL)/den,w:(p.kt*v-p.R*p.TL)/den};
+}
+function stepSimulation(){
+  const base=motor(),period=1/base.f,nCycles=Math.ceil(HORIZON/period);
+  const d1=stepSettings.D1/100,d2=stepSettings.D2/100;
+  const switchCycle=Math.max(1,Math.min(nCycles-1,Math.round(stepSettings.changeMs/1000/period)));
+  const switchTime=switchCycle*period;
+  const p1={...base,D:d1};
+  const initial=periodicLosses(p1);
+  const mk=(D)=>{
+    const ton=D*period,toff=period-ton;
+    return {D,ton,toff,
+      onHalf:transition(base,ton/2,base.bus),
+      onFull:transition(base,ton,base.bus),
+      offHalf:transition(base,toff/2,0),
+      offFull:transition(base,toff,0)};
+  };
+  const phases=[mk(d1),mk(d2)];
+  let si=initial.i0,sw=initial.w0,angle=0;
+  const cycles=[];
+  for(let c=0;c<nCycles;c++){
+    const t=c*period,which=c<switchCycle?0:1,p=phases[which];
+    const x0=[si,sw],xMidOn=p.onHalf(si,sw),xOff=p.onFull(si,sw);
+    const xMidOff=p.offHalf(xOff[0],xOff[1]),xEnd=p.offFull(xOff[0],xOff[1]);
+    const iMean=(p.ton*(x0[0]+4*xMidOn[0]+xOff[0])/6+p.toff*(xOff[0]+4*xMidOff[0]+xEnd[0])/6)/period;
+    const wMean=(p.ton*(x0[1]+4*xMidOn[1]+xOff[1])/6+p.toff*(xOff[1]+4*xMidOff[1]+xEnd[1])/6)/period;
+    const low=Math.min(x0[0],xMidOn[0],xOff[0],xMidOff[0],xEnd[0]);
+    const high=Math.max(x0[0],xMidOn[0],xOff[0],xMidOff[0],xEnd[0]);
+    cycles.push({t,D:p.D,si,sw,angle,iMean,wMean,low,high,endI:xEnd[0],endW:xEnd[1]});
+    si=xEnd[0];sw=xEnd[1];angle+=wMean*period;
+  }
+  const e1=stepEquilibrium(base,d1),e2=stepEquilibrium(base,d2);
+  const den=base.R*base.b+base.ke*base.kt;
+  return {base,period,switchTime,switchCycle,cycles,phases,e1,e2,tauM:base.J*base.R/den};
+}
+function stepAt(t){
+  const x=stepData;
+  t=clamp(t,0,HORIZON);
+  const idx=Math.min(x.cycles.length-1,Math.floor(t/x.period)),c=x.cycles[idx];
+  const phase=Math.max(0,Math.min(x.period,t-c.t)),p=x.phases[c.D===stepSettings.D1/100&&idx<x.switchCycle?0:idx<x.switchCycle?0:1];
+  // The cycle begins at a switching boundary, with no state reset at the duty step.
+  let v=[c.si,c.sw],delta=phase;
+  if(delta>0){
+    const onDuration=Math.min(delta,p.ton);
+    v=transition(x.base,onDuration,x.base.bus)(v[0],v[1]);
+    if(delta>onDuration)v=transition(x.base,delta-onDuration,0)(v[0],v[1]);
+  }
+  const theta=c.angle+(c.sw+v[1])*.5*phase;
+  const voltage=phase<p.ton?x.base.bus:0;
+  return {i:v[0],w:v[1],theta,D:p.D,voltage};
+}
+function drawStepSwitchMarker(ctx,ax){
+  const xx=ax.xx(stepData.switchTime*1000);
+  ctx.strokeStyle='#c68f2d';ctx.lineWidth=1.7;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(xx,ax.t);ctx.lineTo(xx,ax.t+ax.bh);ctx.stroke();ctx.setLineDash([]);
+}
+function drawStepDuty(){
+  const z=ctxSetup('stepDutyPlot'),{ctx}=z;
+  const ax=axes(z,{x0:0,x1:HORIZON*1000,y0:0,y1:100,xUnit:'Time (ms)',yUnit:'PWM duty (%)'});
+  const step=stepData.switchTime*1000;
+  const xs=[0,step,step,HORIZON*1000],ys=[stepSettings.D1,stepSettings.D1,stepSettings.D2,stepSettings.D2];
+  drawCurve(ctx,xs,ys,ax,C.navy,3.0);
+  drawStepSwitchMarker(ctx,ax);drawCursor(ctx,ax,time*1000);
+  marker(ctx,ax,time*1000,100*stepAt(time).D,C.navy);ctx.restore();
+}
+function drawStepSpeed(){
+  const z=ctxSetup('stepSpeedPlot'),{ctx}=z;
+  const scale=state.units==='rpm'?60/(2*Math.PI):1;
+  const xs=[],ys=[],approx=[];
+  for(let n=0;n<=680;n++){
+    const t=HORIZON*n/680;
+    xs.push(t*1000);ys.push(stepAt(t).w*scale);
+    const smooth=t<stepData.switchTime?stepData.e1.w:
+      stepData.e2.w+(stepData.e1.w-stepData.e2.w)*Math.exp(-(t-stepData.switchTime)/stepData.tauM);
+    approx.push(smooth*scale);
+  }
+  let min=Math.min(...ys,...approx),max=Math.max(...ys,...approx);
+  const pad=Math.max((max-min)*.13,Math.max(1,Math.abs(max))*0.013);
+  const ax=axes(z,{x0:0,x1:HORIZON*1000,y0:min-pad,y1:max+pad,xUnit:'Time (ms)',yUnit:state.units==='rpm'?'Speed (rpm)':'Speed (rad/s)'});
+  drawCurve(ctx,xs,approx,ax,C.purple,2.3,[7,5]);
+  drawCurve(ctx,xs,ys,ax,C.teal,2.9);
+  drawStepSwitchMarker(ctx,ax);drawCursor(ctx,ax,time*1000);
+  marker(ctx,ax,time*1000,stepAt(time).w*scale,C.teal);ctx.restore();
+}
+function drawStepCurrent(){
+  const z=ctxSetup('stepCurrentPlot'),{ctx}=z;
+  const cycles=stepData.cycles,stride=Math.max(1,Math.ceil(cycles.length/950));
+  const samples=[{t:0,avg:cycles[0].iMean,lo:cycles[0].low,hi:cycles[0].high}];
+  let min=0,max=0;
+  for(let k=0;k<cycles.length;k+=stride){
+    const chunk=cycles.slice(k,k+stride);
+    const lo=Math.min(...chunk.map(a=>a.low)),hi=Math.max(...chunk.map(a=>a.high));
+    const avg=chunk.reduce((z,a)=>z+a.iMean,0)/chunk.length;
+    const tt=Math.min(HORIZON,(chunk[0].t+chunk[chunk.length-1].t+stepData.period)/2);
+    samples.push({t:tt,avg,lo,hi});
+    min=Math.min(min,lo);max=Math.max(max,hi);
+  }
+  const cs=cycles[Math.min(cycles.length-1,Math.floor(stepData.switchTime/stepData.period))];
+  samples.push({t:stepData.switchTime,avg:cs.iMean,lo:cs.low,hi:cs.high});
+  samples.push({t:HORIZON,avg:cycles[cycles.length-1].iMean,lo:cycles[cycles.length-1].low,hi:cycles[cycles.length-1].high});
+  samples.sort((a,b)=>a.t-b.t);
+  const pad=Math.max(.025,(max-min)*.12);
+  const ax=axes(z,{x0:0,x1:HORIZON*1000,y0:min-pad,y1:max+pad,xUnit:'Time (ms)',yUnit:'Current (A)'});
+  ctx.fillStyle='rgba(232,117,40,.13)';ctx.beginPath();
+  samples.forEach((a,j)=>{const px=ax.xx(a.t*1000),py=ax.yy(a.hi);if(j===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);});
+  for(let j=samples.length-1;j>=0;j--){const a=samples[j];ctx.lineTo(ax.xx(a.t*1000),ax.yy(a.lo));}
+  ctx.closePath();ctx.fill();
+  drawCurve(ctx,samples.map(a=>a.t*1000),samples.map(a=>a.avg),ax,C.orange,2.7);
+  drawStepSwitchMarker(ctx,ax);drawCursor(ctx,ax,time*1000);
+  const c=cycles[Math.min(cycles.length-1,Math.floor(time/stepData.period))];
+  marker(ctx,ax,time*1000,c.iMean,C.orange);ctx.restore();
+}
+function syncStepControls(){
+  $('stepD1').value=String(stepSettings.D1);
+  $('stepD2').value=String(stepSettings.D2);
+  $('stepAtMs').value=String(stepSettings.changeMs);
+  $('stepAtMs').max=String(Math.max(2,state.horizon-1));
+}
+function updateStepLabels(){
+  if(!stepData)return;
+  const unit=state.units==='rpm'?'rpm':'rad/s',scale=state.units==='rpm'?60/(2*Math.PI):1;
+  $('stepVoltages').textContent=fmt(stepSettings.D1*stepData.base.bus/100,2)+' → '+fmt(stepSettings.D2*stepData.base.bus/100,2)+' V';
+  $('stepSpeeds').textContent=fmt(stepData.e1.w*scale,1)+' → '+fmt(stepData.e2.w*scale,1)+' '+unit;
+  $('stepActualTime').textContent=fmt(stepData.switchTime*1000,3)+' ms';
+  $('timeExperimentHint').textContent='Motor is initially at periodic steady state; the duty command then changes from D₁ to D₂.';
+}
+function drawStepExperiment(){
+  if(!stepData)return;
+  drawStepDuty();drawStepSpeed();drawStepCurrent();
+}
+function renderStepInfo(){
+  const s=stepAt(time),p=stepData.base;
+  $('scrub').value=Math.round(time/HORIZON*1000);$('now').textContent=fmt(time*1000,2)+' ms';
+  $('vNow').textContent=fmt(s.voltage,2)+' V';$('iNow').textContent=formatCurrent(s.i);
+  $('wNow').textContent=speedLabel(s.w,1);$('emNow').textContent=fmt(p.ke*s.w,2)+' V';
+  $('torqueNow').textContent=fmt(1000*p.kt*s.i,2)+' mN·m';
+  $('heatNow').textContent=fmt(p.R*s.i*s.i,3)+' W';
+  const sc=$('switchState'),on=s.voltage>0;
+  sc.textContent=on?'SWITCH ON · '+fmt(s.voltage,1)+' V':'SWITCH OFF · 0 V';
+  sc.classList.toggle('on',on);
+  $('pwmPath').style.stroke=on?'#00a58b':'#9db2c2';
+  $('rotor').setAttribute('transform','translate(1068 40) rotate('+s.theta*180/Math.PI+')');
+}
+function selectTimeExperiment(){
+  stop();
+  const step=isDutyStep();
+  $('startupExperiment').hidden=step;
+  $('dutyStepExperiment').hidden=!step;
+  $('timeExperimentHint').textContent=step?'Motor is initially at periodic steady state; duty changes from D₁ to D₂.':'Motor starts from rest with a constant PWM duty ratio.';
+  $('timeExtras').hidden=step||!$('frequencyDomain').hidden;
+  $('timeQuestions').hidden=step||!$('frequencyDomain').hidden;
+  const dutyField=document.querySelector('label[for="duty"]').closest('.control-field');
+  dutyField.hidden=step;
+  if(step){syncStepControls();stepData=stepSimulation();updateStepLabels();}
+  else{stepData=null;updateLosses();}
+  time=0;draw();
+}
+
 function niceStep(range,target=5){const raw=Math.max(1e-10,range/target),pow=10**Math.floor(Math.log10(raw));for(const m of [1,2,2.5,5,10])if(m*pow>=raw)return m*pow;return 10*pow}
 function formatTick(x){if(Math.abs(x)>=100)return `${Math.round(x)}`;if(Math.abs(x)>=10)return `${fmt(x,1)}`;if(Math.abs(x)>=1)return `${fmt(x,2)}`;return `${fmt(x,3)}`}
 function ctxSetup(id){const c=$(id),rect=c.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);const W=Math.max(300,rect.width),H=Math.max(180,rect.height);c.width=Math.round(W*dpr);c.height=Math.round(H*dpr);const ctx=c.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);return {ctx,W,H}}
@@ -901,9 +1141,22 @@ function activateTab(which){
   $('tabTime').tabIndex=freq?-1:0;$('tabFrequency').tabIndex=freq?0:-1;
   $('timeDomain').hidden=freq;$('frequencyDomain').hidden=!freq;
   document.querySelector('.sidebar>.player').hidden=freq;
-  $('timeExtras').hidden=freq;$('timeQuestions').hidden=freq;
-  if(freq){stop();drawFrequency();}else{draw();drawLossFrequency();}
+  $('timeExtras').hidden=freq||isDutyStep();$('timeQuestions').hidden=freq||isDutyStep();
+  if(freq){stop();drawFrequency();}else{draw();if(!isDutyStep())drawLossFrequency();}
 }
+
+$('timeExperiment').addEventListener('change',selectTimeExperiment);
+for(const [id,key] of [['stepD1','D1'],['stepD2','D2'],['stepAtMs','changeMs']]){
+  $(id).addEventListener('change',()=>{
+    const val=Number($(id).value);
+    const lo=key==='changeMs'?1:10,hi=key==='changeMs'?Math.max(1,state.horizon-1):90;
+    if(!Number.isFinite(val)||val<lo||val>hi){$(id).setAttribute('aria-invalid','true');return;}
+    $(id).removeAttribute('aria-invalid');
+    stepSettings[key]=val;
+    syncStepControls();stepData=stepSimulation();updateStepLabels();stop();time=0;draw();
+  });
+}
+
 $('tabTime').addEventListener('click',()=>activateTab('time'));
 $('tabFrequency').addEventListener('click',()=>activateTab('frequency'));
 for(const id of ['tabTime','tabFrequency'])$(id).addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();const to=id==='tabTime'?'frequency':'time';activateTab(to);$(to==='time'?'tabTime':'tabFrequency').focus()}});
@@ -947,7 +1200,7 @@ function renderInfo(){const s=at(time),p=data.p,volt=pwm(time);$('scrub').value=
   $('vNow').textContent=`${fmt(volt,2)} V`;$('iNow').textContent=formatCurrent(s.i);$('wNow').textContent=speedLabel(s.w,1);$('emNow').textContent=`${fmt(p.ke*s.w,2)} V`;$('torqueNow').textContent=`${fmt(1000*p.kt*s.i,2)} mN·m`;$('heatNow').textContent=`${fmt((p.Rarm+p.Rf)*s.i*s.i,3)} W`;
   const on=volt>0,sc=$('switchState');sc.textContent=on?`SWITCH ON · ${fmt(volt,1)} V`:'SWITCH OFF · 0 V';sc.classList.toggle('on',on);$('pwmPath').style.stroke=on?'#00a58b':'#9db2c2';$('rotor').setAttribute('transform',`translate(1068 40) rotate(${s.theta*180/Math.PI})`);
 }
-function draw(){if(!data)return;renderInfo();if($('timeDomain').hidden)return;drawVoltage();drawCurrent();drawSpeed();drawCurrentTrend();}
+function draw(){if(!data)return;if(isDutyStep()&&stepData)renderStepInfo();else renderInfo();if($('timeDomain').hidden)return;if(isDutyStep()){drawStepExperiment();return;}drawVoltage();drawCurrent();drawSpeed();drawCurrentTrend();}
 function stop(){playing=false;cancelAnimationFrame(raf);raf=0;$('play').textContent='▶ Play';$('play').setAttribute('aria-pressed','false');}
 function animate(ts){if(!playing)return;if(!lastTs)lastTs=ts;const dt=Math.min(.10,(ts-lastTs)/1000);lastTs=ts;time=Math.min(HORIZON,time+dt*playback*HORIZON/12);draw();if(time>=HORIZON)stop();else raf=requestAnimationFrame(animate)}
 function powerFormat(W){if(W===0)return '0 mW';return Math.abs(W)<1?`${fmt(W*1000,2)} mW`:`${fmt(W,3)} W`}
@@ -1006,9 +1259,9 @@ function updateLosses(){
   $('freqLossNote').textContent=`At ${displayFmt.freq(fkhz)} kHz: ripple-related copper heating ${powerFormat((data.p.Rarm+data.p.Rf)*Math.max(0,q.iRms*q.iRms-q.iAvg*q.iAvg))}; assumed switching loss ${powerFormat(sw)}. The curve is illustrative, not a measured motor driver.`;
   drawLossFrequency();
 }
-function updateStats(){$('avgV').textContent=`${fmt(data.vbar,2)} V`;$('tauE').textContent=`${fmt(data.tauE*1e6,1)} µs`;$('tauM').textContent=`${fmt(data.tauM*1000,2)} ms`;$('ripple').textContent=`${fmt(data.ripple,3)} A p–p`;$('steadySpeed').textContent=speedLabel(data.wss,1);updateLosses();}
+function updateStats(){$('avgV').textContent=`${fmt(data.vbar,2)} V`;$('tauE').textContent=`${fmt(data.tauE*1e6,1)} µs`;$('tauM').textContent=`${fmt(data.tauM*1000,2)} ms`;$('ripple').textContent=`${fmt(data.ripple,3)} A p–p`;$('steadySpeed').textContent=speedLabel(data.wss,1);if(!isDutyStep())updateLosses();}
 function syncControls(){for(const k of Object.keys(bounds)){const val=displayFmt[k](state[k]);$(k).value=k==='freq'?freqToSlider(state.freq):val;$(k+'Num').value=val}$('units').value=state.units;}
-function recalc(resetTime=true){stop();HORIZON=state.horizon/1000;data=simulate();if(resetTime)time=0;else time=clamp(time,0,HORIZON);updateStats();harmonicTable();if($('frequencyDomain').hidden)draw();else drawFrequency()}
+function recalc(resetTime=true){stop();HORIZON=state.horizon/1000;data=simulate();if(isDutyStep()){stepSettings.changeMs=Math.min(stepSettings.changeMs,Math.max(1,state.horizon-1));syncStepControls();stepData=stepSimulation();updateStepLabels();}if(resetTime)time=0;else time=clamp(time,0,HORIZON);updateStats();harmonicTable();if($('frequencyDomain').hidden)draw();else drawFrequency()}
 const presets={baseline:{duty:60,freq:20,bus:12,extraL:0,inertia:1,load:0},sub:{duty:60,freq:.2,bus:12,extraL:0,inertia:1,load:0},slow:{duty:60,freq:2,bus:12,extraL:0,inertia:1,load:0},mid:{duty:60,freq:35,bus:12,extraL:0,inertia:1,load:0},fast:{duty:60,freq:50,bus:12,extraL:0,inertia:1,load:0},extreme:{duty:60,freq:100,bus:12,extraL:0,inertia:1,load:0},inductor:{duty:60,freq:20,bus:12,extraL:1,seriesR:0,inertia:1,load:0},realFilter:{duty:60,freq:20,bus:12,extraL:1,seriesR:.5,inertia:1,load:0},inertia:{duty:60,freq:20,bus:12,extraL:0,inertia:10,load:0}};
 for(const k of Object.keys(bounds)){
   const range=$(k),num=$(k+'Num');
@@ -1029,9 +1282,9 @@ $('download').addEventListener('click',()=>{
   const url=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
   const a=document.createElement('a');a.href=url;a.download='DC_Motor_PWM_Studio.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 });
-window.addEventListener('resize',()=>{if($('frequencyDomain').hidden){draw();drawLossFrequency()}else drawFrequency()});
+window.addEventListener('resize',()=>{if($('frequencyDomain').hidden){draw();if(!isDutyStep())drawLossFrequency()}else drawFrequency()});
 // Public test hooks for numerical and visual regression checks, and for teaching extensions.
-window.PWMMotorStudio={motor,simulate,transition,periodicLosses,pwmHarmonic,responseRL,responseMotor,harmonicSeries,activateTab,switchLoss,sliderToFreq,freqToSlider,getState:()=>({...state}),getData:()=>data,setTime:t=>{time=clamp(t,0,HORIZON);draw()},getTime:()=>time,recalculate:recalc};
+window.PWMMotorStudio={motor,simulate,transition,periodicLosses,pwmHarmonic,responseRL,responseMotor,harmonicSeries,activateTab,switchLoss,sliderToFreq,freqToSlider,stepSimulation,stepAt,getStepData:()=>stepData,getStepSettings:()=>({...stepSettings}),getState:()=>({...state}),getData:()=>data,setTime:t=>{time=clamp(t,0,HORIZON);draw()},getTime:()=>time,recalculate:recalc};
 syncControls();recalc(true);
 })();
 </script>

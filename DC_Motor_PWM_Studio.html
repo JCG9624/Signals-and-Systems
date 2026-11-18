@@ -220,6 +220,17 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .switching-mode-bar select{min-height:36px;padding:8px 12px;border-radius:8px;border:1px solid #c6dbe7;background:#fff;color:var(--navy);font-size:12px;font-weight:700;max-width:100%}
 .switching-mode-bar .mode-guide{font-size:11px;line-height:1.5;color:#58758a;flex:1;min-width:240px}
 @media(max-width:580px){.switching-mode-bar{align-items:stretch;flex-direction:column;gap:7px}.switching-mode-bar .mode-guide{min-width:0}}
+
+.pwm-mode-comparison{overflow:hidden}
+.pwm-compare-table-scroll{overflow-x:auto;padding:3px 15px 10px}
+.pwm-compare-table{width:100%;border-collapse:collapse;font-size:12px;min-width:440px;font-variant-numeric:tabular-nums}
+.pwm-compare-table th{padding:11px 9px;text-align:right;border-bottom:2px solid var(--line);color:var(--navy);font-size:11px}
+.pwm-compare-table th:first-child,.pwm-compare-table td:first-child{text-align:left}
+.pwm-compare-table td{border-bottom:1px solid #eaf0f5;padding:9px;vertical-align:top;color:#456376;text-align:right}
+.pwm-compare-table td:first-child{font-weight:650;color:var(--navy)}
+.pwm-compare-table tr:last-child td{border-bottom:0}
+.pwm-compare-table .selected-switching td:not(:first-child){font-weight:760}
+.pwm-mode-comparison .scope-footer{font-size:11px;line-height:1.55}
 </style>
 </head>
 <body>
@@ -453,6 +464,21 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <p><strong>Switching-frequency choice:</strong> high f<sub>PWM</sub> reduces current ripple, but a real driver usually switches less efficiently as frequency increases. Low switching frequencies can produce audible vibration (not simulated). The proposed 20–50 kHz band is a design discussion, not a conclusion from the motor's LTI model.</p>
   </section>
 
+<section class="card pwm-mode-comparison" aria-label="Unipolar and bipolar switching comparison at the same mean voltage">
+  <div class="card-header"><div><h2>Compare unipolar and bipolar switching</h2>
+    <div class="scope-desc">Same supply, average motor voltage, switching frequency, load and motor parameters · periodic steady state</div></div>
+  </div>
+  <div class="pwm-compare-table-scroll">
+    <table class="pwm-compare-table">
+      <thead><tr><th>Quantity</th><th>Unipolar · 0/+Vdc</th><th>Bipolar · −Vdc/+Vdc</th></tr></thead>
+      <tbody id="modeComparisonRows">
+        <tr><td>Positive-voltage dwell</td><td>—</td><td>—</td></tr>
+        <tr><td>Peak-to-peak current ripple</td><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="scope-footer">The different ripple amplitudes follow from the different voltage switching levels. Both modes use <strong>the same mean input voltage</strong>. The switching-loss row is equal by modelling assumption; realistic driver-device loss depends on the H-bridge topology and switching implementation.</div>
+</section>
 <section class="card loss-scope" aria-label="PWM ripple and filter winding dissipation">
   <div class="card-header"><div><h2>Electrical losses · ripple heating versus switching losses</h2><div class="scope-desc">Resistive loss from periodic steady state; switching estimate assumes constant energy per edge</div></div><span class="loss-pill" id="lossRms">I<sub>rms</sub> —</span></div>
   <div class="loss-summary">
@@ -1312,8 +1338,31 @@ function drawLossFrequency(){
   ctx.restore();
 }
 
+function updateModeComparison(){
+  const p=data.p;
+  const modes=['unipolar','bipolar'];
+  const rows=modes.map(mode=>{
+    const q={...p,mode},loss=periodicLosses(q);
+    return {mode,q,loss,sw:switchLoss(q.f)};
+  });
+  const properties=[
+    ['PWM voltage levels',a=>a.mode==='bipolar'?'−'+fmt(a.q.bus,1)+' / +'+fmt(a.q.bus,1)+' V':'0 / +'+fmt(a.q.bus,1)+' V'],
+    ['Positive-state dwell',a=>fmt(100*positiveDuty(a.q),1)+'%'],
+    ['Mean terminal voltage',a=>fmt(meanVoltage(a.q),2)+' V'],
+    ['Peak-to-peak current ripple',a=>fmt(a.loss.ripplePp,3)+' A'],
+    ['Current RMS',a=>fmt(a.loss.iRms,3)+' A'],
+    ['Extra armature copper loss from ripple',a=>powerFormat(a.loss.ripple)],
+    ['Total resistive winding heating',a=>powerFormat(a.loss.total)],
+    ['Illustrative switching dissipation',a=>powerFormat(a.sw)]
+  ];
+  const esc=v=>String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  $('modeComparisonRows').innerHTML=properties.map(([label,format])=>
+    '<tr><td>'+esc(label)+'</td>'+rows.map(a=>'<td'+(a.mode===state.mode?' class="selected-switching"':'')+'>'+esc(format(a))+'</td>').join('')+'</tr>'
+  ).join('');
+}
 function updateLosses(){
   const q=data.losses;
+  updateModeComparison();
   $('lossRms').textContent=`Iᵣₘₛ = ${fmt(q.iRms,3)} A · mean = ${fmt(q.iAvg,3)} A`;
   $('lossTotal').textContent=powerFormat(q.total);
   $('lossRipple').textContent=powerFormat(q.ripple);

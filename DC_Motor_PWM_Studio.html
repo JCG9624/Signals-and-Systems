@@ -312,10 +312,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <option value="unipolar" selected>Unipolar · 0 / +Vdc</option>
     <option value="bipolar">Bipolar · −Vdc / +Vdc</option>
   </select>
-  <span class="mode-guide" id="switchModeGuide">Unipolar: +Vdc for 60% of each cycle, 0 V otherwise.</span>
+  <span class="mode-guide" id="switchModeGuide">Unipolar: +Vdc for 50% of each cycle, 0 V otherwise.</span>
 </div>
 <div class="control-grid">
-    <div class="control-field"><div class="control-head"><label for="duty">Average-voltage command, D</label><div class="num-wrap"><input id="dutyNum" type="number" min="10" max="90" step="1" value="60"><span>%</span></div></div><input id="duty" type="range" min="10" max="90" step="1" value="60"><div class="range-row"><span>10%</span><span>90%</span></div></div>
+    <div class="control-field"><div class="control-head"><label for="duty">Average-voltage command, D</label><div class="num-wrap"><input id="dutyNum" type="number" min="10" max="90" step="1" value="50"><span>%</span></div></div><input id="duty" type="range" min="10" max="90" step="1" value="50"><div class="range-row"><span>10%</span><span>90%</span></div></div>
     <div class="control-field"><div class="control-head"><label for="freq">Switching frequency, f<sub>PWM</sub></label><div class="num-wrap"><input id="freqNum" type="number" min="0.2" max="100" step="any" value="20"><span>kHz</span></div></div><input id="freq" type="range" min="0" max="1000" step="1" value="741" aria-label="Logarithmic switching frequency from 0.2 kHz to 100 kHz"><div class="range-row"><span>0.2 kHz</span><span>log scale · 20–50 kHz suggested</span><span>100 kHz</span></div><div id="freqGuidance" class="freq-guidance" aria-live="polite" hidden></div></div>
     <div class="control-field" id="edgeEnergyControl" hidden><div class="control-head"><label for="edgeEnergy">Illustrative switching energy per edge</label><div class="num-wrap"><input id="edgeEnergyNum" type="number" min="0" max="5" step="0.25" value="2"><span>µJ</span></div></div><input id="edgeEnergy" type="range" min="0" max="5" step="0.25" value="2"><div class="range-row"><span>0: ideal driver</span><span>5 µJ: greater loss</span></div><p class="math-note">Teaching assumption: two edges per period, P<sub>sw</sub> = 2 f<sub>PWM</sub> E<sub>edge</sub>; not a measured driver specification.</p></div>
     <div class="control-field"><div class="control-head"><label for="bus">DC supply voltage</label><div class="num-wrap"><input id="busNum" type="number" min="4" max="12" step="0.5" value="12"><span>V</span></div></div><input id="bus" type="range" min="4" max="12" step="0.5" value="12"><div class="range-row"><span>4 V</span><span>12 V</span></div></div>
@@ -326,7 +326,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 
     <div class="control-field"><div class="control-head"><label for="horizon">Simulation time horizon</label><div class="num-wrap"><input id="horizonNum" type="number" min="20" max="320" step="10" value="80"><span>ms</span></div></div><input id="horizon" type="range" min="20" max="320" step="10" value="80"><div class="range-row"><span>20 ms</span><span>320 ms</span></div></div>
   </div>
-  <div class="stat-strip" aria-live="polite"><span class="chip">Average voltage = <b id="avgV">7.20 V</b></span><span class="chip">τ<sub>e</sub> = L<sub>tot</sub>/R = <b id="tauE">23.1 µs</b></span><span class="chip">τ<sub>m</sub> ≈ <b id="tauM">11.0 ms</b></span><span class="chip">Steady current ripple ≈ <b id="ripple">—</b></span><span class="chip">Steady speed ≈ <b id="steadySpeed">—</b></span></div>
+  <div class="stat-strip" aria-live="polite"><span class="chip">Average voltage = <b id="avgV">6.00 V</b></span><span class="chip">τ<sub>e</sub> = L<sub>tot</sub>/R = <b id="tauE">23.1 µs</b></span><span class="chip">τ<sub>m</sub> ≈ <b id="tauM">11.0 ms</b></span><span class="chip">Steady current ripple ≈ <b id="ripple">—</b></span><span class="chip">Steady speed ≈ <b id="steadySpeed">—</b></span></div>
   <div class="view-unit"><label for="units">Speed units</label><select class="preset" id="units"><option value="rad">rad/s</option><option value="rpm">rpm</option></select></div>
   <div class="math-note">Motor: approximate FAULHABER 2224B012SR parameters from Chapter 11 (R = 8.77 Ω, L = 203 µH, k<sub>t</sub> = 0.0146, k<sub>e</sub> = 0.0145, J = 2.7 × 10<sup>−7</sup>, b = 3.8 × 10<sup>−7</sup>). An optional series inductor adds to armature inductance and reduces current ripple; its winding resistance R<sub>f</sub> adds resistive heat. The ideal inductor itself is lossless.</div>
 </section>
@@ -505,7 +505,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       <div><h2>Electrical losses · ripple heating and PWM switching trade-offs</h2><p>Explore where electrical power is dissipated and how the PWM switching frequency affects the trade-off.</p></div>
       <span class="losses-tag">PERIODIC STEADY STATE</span>
     </div>
-    <p><strong>Operating point:</strong> these are periodic steady-state losses at fixed duty <b>D = <span id="lossDutyValue">60%</span></b>, set using the shared PWM duty control. They do <strong>not</strong> describe the transient losses during the duty-step experiment.</p>
+    <p><strong>Operating point:</strong> these are periodic steady-state losses at fixed duty <b>D = <span id="lossDutyValue">50%</span></b>, set using the shared PWM duty control. They do <strong>not</strong> describe the transient losses during the duty-step experiment.</p>
     <p><strong>Resistive filtering losses:</strong> In periodic steady state, P<sub>ripple</sub> = R(I<sub>rms</sub><sup>2</sup> − Ī<sup>2</sup>) = (R/2) ∑<sub>n≥1</sub>|I<sub>n,peak</sub>|<sup>2</sup>. This uses the complete current spectrum, not just the finite set of displayed harmonics.</p>
     <p id="lossModeNote"><strong>Switching mode:</strong> both modes use the same mean voltage. The bipolar drive tends to produce greater current ripple and ripple-related copper heating; this teaching model assumes the same switching energy per transition in both modes and does not model semiconductor topology or energy recovery.</p>
     <p><strong>Switching-frequency choice:</strong> high f<sub>PWM</sub> reduces current ripple, but a real driver usually switches less efficiently as frequency increases. Low switching frequencies can produce audible vibration (not simulated). The proposed 20–50 kHz band is a design discussion, not a conclusion from the motor's LTI model.</p>
@@ -560,13 +560,13 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   <div class="footer-acknowledgements"><strong>Acknowledgements</strong><span>Dr Ognjen Marjanovic and Dr Liam Marsh</span></div>
 </footer>
 </main>
-<script id="saved-state" type="application/json">{"mode":"unipolar","duty":60,"freq":20,"bus":12,"extraL":0,"seriesR":0,"inertia":1,"load":0,"horizon":80,"units":"rad"}</script>
+<script id="saved-state" type="application/json">{"mode":"unipolar","duty":50,"freq":20,"bus":12,"extraL":0,"seriesR":0,"inertia":1,"load":0,"horizon":80,"units":"rad"}</script>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const C={navy:'#113a61',teal:'#0096a1',orange:'#e87528',purple:'#8053b4',slate:'#9aaaba',grid:'#e7eff5',text:'#607d91',ink:'#17324a'};
 const fixed={R:8.77,L:203e-6,kt:.0146,ke:.0145,J:2.7e-7,b:3.8e-7};
-const defaults={mode:"unipolar",duty:60,freq:20,edgeEnergy:2,bus:12,extraL:0,seriesR:0,inertia:1,load:0,horizon:80,units:'rad'};
+const defaults={mode:"unipolar",duty:50,freq:20,edgeEnergy:2,bus:12,extraL:0,seriesR:0,inertia:1,load:0,horizon:80,units:'rad'};
 let state={...defaults};try{const saved=JSON.parse($('saved-state').textContent);for(const k of Object.keys(defaults))if(saved[k]!==undefined)state[k]=saved[k]}catch(e){}
 const bounds={duty:[10,90],freq:[0.2,100],edgeEnergy:[0,5],bus:[4,12],extraL:[0,3],seriesR:[0,2],inertia:[1,10],load:[0,8],horizon:[20,320]};
 const displayFmt={duty:v=>String(Math.round(v)),freq:v=>String(Number(v.toFixed(2))),edgeEnergy:v=>String(Number(v.toFixed(2))),bus:v=>String(v),extraL:v=>String(Number(v.toFixed(1))),seriesR:v=>Number(v.toFixed(2)).toString(),inertia:v=>String(Math.round(v)),load:v=>String(Number(v.toFixed(1))),horizon:v=>String(Math.round(v))};
@@ -1439,7 +1439,7 @@ function updateStats(){const p=data.p,plus=(100*positiveDuty(p)).toFixed(1);
   $('avgV').textContent=`${fmt(data.vbar,2)} V`;$('tauE').textContent=`${fmt(data.tauE*1e6,1)} µs`;$('tauM').textContent=`${fmt(data.tauM*1000,2)} ms`;$('ripple').textContent=`${fmt(data.ripple,3)} A p–p`;$('steadySpeed').textContent=speedLabel(data.wss,1);updateLosses();}
 function syncControls(){$('switchMode').value=state.mode;for(const k of Object.keys(bounds)){const val=displayFmt[k](state[k]);$(k).value=k==='freq'?freqToSlider(state.freq):val;$(k+'Num').value=val}$('units').value=state.units;}
 function recalc(resetTime=true){HORIZON=state.horizon/1000;$('inspectTimeNum').max=String(state.horizon);data=simulate();if(isDutyStep()){stepSettings.changeMs=Math.min(stepSettings.changeMs,Math.max(1,state.horizon-1));syncStepControls();stepData=stepSimulation();updateStepLabels();}if(resetTime)time=0;else time=clamp(time,0,HORIZON);updateStats();harmonicTable();if(activeView()==='time')draw();else if(activeView()==='frequency')drawFrequency()}
-const presets={baseline:{duty:60,freq:20,bus:12,extraL:0,inertia:1,load:0},sub:{duty:60,freq:.2,bus:12,extraL:0,inertia:1,load:0},slow:{duty:60,freq:2,bus:12,extraL:0,inertia:1,load:0},mid:{duty:60,freq:35,bus:12,extraL:0,inertia:1,load:0},fast:{duty:60,freq:50,bus:12,extraL:0,inertia:1,load:0},extreme:{duty:60,freq:100,bus:12,extraL:0,inertia:1,load:0},inductor:{duty:60,freq:20,bus:12,extraL:1,seriesR:0,inertia:1,load:0},realFilter:{duty:60,freq:20,bus:12,extraL:1,seriesR:.5,inertia:1,load:0},inertia:{duty:60,freq:20,bus:12,extraL:0,inertia:10,load:0}};
+const presets={baseline:{duty:50,freq:20,bus:12,extraL:0,inertia:1,load:0},sub:{duty:50,freq:.2,bus:12,extraL:0,inertia:1,load:0},slow:{duty:50,freq:2,bus:12,extraL:0,inertia:1,load:0},mid:{duty:50,freq:35,bus:12,extraL:0,inertia:1,load:0},fast:{duty:50,freq:50,bus:12,extraL:0,inertia:1,load:0},extreme:{duty:50,freq:100,bus:12,extraL:0,inertia:1,load:0},inductor:{duty:50,freq:20,bus:12,extraL:1,seriesR:0,inertia:1,load:0},realFilter:{duty:50,freq:20,bus:12,extraL:1,seriesR:.5,inertia:1,load:0},inertia:{duty:50,freq:20,bus:12,extraL:0,inertia:10,load:0}};
 for(const k of Object.keys(bounds)){
   const range=$(k),num=$(k+'Num');
   const apply=(raw,source)=>{const x=Number(raw);if(!Number.isFinite(x)||x<bounds[k][0]||x>bounds[k][1]){source.setAttribute('aria-invalid','true');return;}source.removeAttribute('aria-invalid');state[k]=x;range.value=k==='freq'?freqToSlider(x):x;num.value=displayFmt[k](x);$('preset').value='baseline';recalc(false)};

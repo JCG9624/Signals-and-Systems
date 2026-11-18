@@ -253,12 +253,21 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 @media(max-width:1150px){#timeDomain .readouts{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:730px){.sidebar-tools{margin-bottom:10px}#timeDomain .readouts{grid-template-columns:repeat(3,minmax(0,1fr))}#timeDomain .readout .val{font-size:16px}}
 @media(max-width:580px){#timeDomain .readouts{grid-template-columns:repeat(2,minmax(0,1fr))}.inspection-controls>input[type=range]{flex-basis:100%;order:4}.time-number-label{margin-left:auto}}
+
+.back-to-index{display:inline-flex;align-items:center;gap:6px;margin:0 0 13px;padding:5px 0;color:#245d85;font-weight:740;font-size:12px;text-decoration:none}
+.back-to-index:hover{text-decoration:underline;color:var(--navy)}
+.back-to-index:focus-visible{outline:3px solid #a1d8db;outline-offset:3px;border-radius:3px}
+.studio-footer{display:flex;flex-direction:column;gap:11px;margin-top:22px;padding:18px 4px 5px;border-top:1px solid var(--line);font-size:11px;line-height:1.55}
+.footer-attribution{display:flex;flex-wrap:wrap;gap:7px 22px;color:#8195a5}
+.footer-acknowledgements{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 13px;color:#56748b}
+.footer-acknowledgements strong{font-weight:760;color:var(--navy)}
 </style>
 </head>
 <body>
 <main>
 <header>
   <div>
+    <a class="back-to-index" href="index.html" aria-label="Back to Signals and Systems demonstrations index">← Back to index</a>
     <div class="eyebrow">Signals &amp; Systems · Chapter 11 · Electromechanical systems</div>
     <div class="title-row"><div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2.1"><path d="M3 28h8v-13h9v13h9V15h9v13h7"/><circle cx="24" cy="39" r="5"/><path d="M24 30v4m-9 5h4m10 0h5M24 44v3M6 6h7M6 10h12M32 7h9"/></svg></div><h1>PWM Motor Studio</h1></div>
     <p class="subtitle">Follow a pulse-width-modulated voltage through the motor: rapid switching produces <strong>current ripple</strong>, while electrical dynamics, back EMF and inertia determine the much slower <strong>speed response</strong>.</p>
@@ -546,7 +555,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
  <section class="card teach" aria-label="Mathematical model and interpretation"><h2>What is the model doing?</h2><div class="math-box">(L + L<sub>add</sub>) di/dt = v<sub>PWM</sub>(t) − (R + R<sub>f</sub>)i(t) − k<sub>e</sub>ω(t)<br>J dω/dt = k<sub>t</sub>i(t) − bω(t) − T<sub>L</sub></div><p><strong>Start-up:</strong> the current reacts quickly to the ON/OFF transitions; accumulated torque accelerates the shaft more slowly.</p><p><strong>Back EMF:</strong> as ω increases, k<sub>e</sub>ω opposes the applied armature voltage, reducing the mean current and driving the motor towards a steady speed.</p><p><strong>Model comparison:</strong> the dashed curve uses the one-pole approximation with V̄ = DV<sub>dc</sub>. It is a good approximation to the <em>slow speed response</em>, not to the switching-frequency current ripple.</p><p><strong>Frequency-domain view:</strong> for voltage-to-current and voltage-to-speed analysis, with L<sub>tot</sub> = L + L<sub>add</sub>, R<sub>tot</sub> = R + R<sub>f</sub> and Δ(s) = (R<sub>tot</sub> + sL<sub>tot</sub>)(Js + b) + k<sub>e</sub>k<sub>t</sub>, the transfer functions are H<sub>i</sub>(s) = (Js + b)/Δ(s) and H<sub>ω</sub>(s) = k<sub>t</sub>/Δ(s).</p><p><strong>Drive assumption:</strong> the source is an ideal prescribed motor-terminal voltage: 0/+V<sub>dc</sub> (unipolar) or −V<sub>dc</sub>/+V<sub>dc</sub> (bipolar). Signed armature current is allowed. The H-bridge semiconductors, freewheel and regenerative power paths, switching dead time, current limits and thermal shutdown are not simulated.</p></section>
 </div>
 <section class="card questions" id="timeQuestions"><h2>Learning outcomes · Investigate the time response</h2><ol><li>Compare the electrical and mechanical time constants. Why does armature current react faster than motor speed?</li><li>Compare the instantaneous PWM voltage and the current ripple in unipolar and bipolar modes at the same average voltage. Why are their mean motor speeds similar?</li><li>Choose the duty-ratio step experiment and vary inertia or inductance. Which transient changes most, and why?</li></ol></section>
-<footer><span>Signals &amp; Systems · Chapter 11 · DC motor and PWM · Interactive HTML / JavaScript</span><span>Prompts provided by Joaquin Carrasco · Code produced by ChatGPT · No external libraries</span><span>Acknowledgements: Dr Ognjen Marjanovic and Dr Liam Marsh</span></footer>
+<footer class="studio-footer">
+  <div class="footer-attribution"><span>Signals &amp; Systems · Chapter 11 · DC motor and PWM · Interactive HTML / JavaScript</span><span>Prompts provided by Joaquin Carrasco · Code produced by ChatGPT · No external libraries</span></div>
+  <div class="footer-acknowledgements"><strong>Acknowledgements</strong><span>Dr Ognjen Marjanovic and Dr Liam Marsh</span></div>
+</footer>
 </main>
 <script id="saved-state" type="application/json">{"mode":"unipolar","duty":60,"freq":20,"bus":12,"extraL":0,"seriesR":0,"inertia":1,"load":0,"horizon":80,"units":"rad"}</script>
 <script>

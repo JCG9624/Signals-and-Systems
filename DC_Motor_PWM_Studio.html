@@ -202,6 +202,18 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 @media(max-width:810px){.step-config-grid{grid-template-columns:1fr}.step-results{grid-template-columns:1fr 1fr}}
 @media(max-width:480px){.step-results{grid-template-columns:1fr}.time-experiment-picker{align-items:flex-start;flex-direction:column}.time-experiment-picker select{width:100%}}
 
+
+/* Three independent analysis tabs, with electrical losses in periodic steady state. */
+.losses-domain{display:flex;flex-direction:column;gap:13px;min-width:0}
+.losses-domain .loss-scope{margin:0}
+.losses-intro{padding:15px 18px;color:var(--muted);font-size:12px;line-height:1.6}
+.losses-intro p{margin:7px 0 0}
+.losses-intro h2{color:var(--navy);font-size:16px;margin:0 0 5px}
+.losses-intro strong,.losses-intro b{color:var(--navy)}
+.losses-intro-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}
+.losses-tag{font-size:10px;font-weight:760;letter-spacing:.05em;color:#327a71;background:#edf7f5;border:1px solid #cbe2df;border-radius:7px;padding:5px 8px;white-space:nowrap}
+.losses-domain .questions{margin:0}
+@media(max-width:730px){.analysis-tabs{gap:4px}.analysis-tabs button{font-size:12px;line-height:1.2;padding:9px 5px 8px}.tab-symbol{font-size:15px;margin-right:3px}.tab-sub{font-size:9px;line-height:1.25;margin-left:0}.losses-intro-head{flex-direction:column;gap:5px}}
 </style>
 </head>
 <body>
@@ -230,9 +242,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   </svg>
 </section>
 
-<nav class="analysis-tabs" role="tablist" aria-label="Analysis domain">
-  <button type="button" id="tabTime" role="tab" aria-selected="true" aria-controls="timeDomain" tabindex="0"><span class="tab-symbol">◷</span> Time domain<span class="tab-sub">start-up, duty steps and losses</span></button>
-  <button type="button" id="tabFrequency" role="tab" aria-selected="false" aria-controls="frequencyDomain" tabindex="-1"><span class="tab-symbol">∿</span> Frequency domain<span class="tab-sub">Fourier harmonics and Bode response</span></button>
+<nav class="analysis-tabs" role="tablist" aria-label="Explore motor performance">
+  <button type="button" id="tabTime" role="tab" aria-selected="true" aria-controls="timeDomain" tabindex="0"><span class="tab-symbol">◷</span> Time response<span class="tab-sub">Start-up and duty changes</span></button>
+  <button type="button" id="tabFrequency" role="tab" aria-selected="false" aria-controls="frequencyDomain" tabindex="-1"><span class="tab-symbol">∿</span> Frequency response<span class="tab-sub">Harmonics and Bode plots</span></button>
+  <button type="button" id="tabLosses" role="tab" aria-selected="false" aria-controls="lossesDomain" tabindex="-1"><span class="tab-symbol">⚡</span> Electrical losses<span class="tab-sub">Heating and trade-offs</span></button>
 </nav>
 <div class="workspace">
 <aside class="sidebar" aria-label="Parameters and animation controls">
@@ -247,8 +260,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   </select></div></div>
   <div class="control-grid">
     <div class="control-field"><div class="control-head"><label for="duty">PWM duty cycle, D</label><div class="num-wrap"><input id="dutyNum" type="number" min="10" max="90" step="1" value="60"><span>%</span></div></div><input id="duty" type="range" min="10" max="90" step="1" value="60"><div class="range-row"><span>10%</span><span>90%</span></div></div>
-    <div class="control-field"><div class="control-head"><label for="freq">Switching frequency, f<sub>PWM</sub></label><div class="num-wrap"><input id="freqNum" type="number" min="0.2" max="100" step="any" value="20"><span>kHz</span></div></div><input id="freq" type="range" min="0" max="1000" step="1" value="741" aria-label="Logarithmic switching frequency from 0.2 kHz to 100 kHz"><div class="range-row"><span>0.2 kHz</span><span>log scale · 20–50 kHz suggested</span><span>100 kHz</span></div><div id="freqGuidance" class="freq-guidance" aria-live="polite"></div></div>
-    <div class="control-field"><div class="control-head"><label for="edgeEnergy">Illustrative switching energy per edge</label><div class="num-wrap"><input id="edgeEnergyNum" type="number" min="0" max="5" step="0.25" value="2"><span>µJ</span></div></div><input id="edgeEnergy" type="range" min="0" max="5" step="0.25" value="2"><div class="range-row"><span>0: ideal driver</span><span>5 µJ: greater loss</span></div><p class="math-note">Teaching assumption: two edges per period, P<sub>sw</sub> = 2 f<sub>PWM</sub> E<sub>edge</sub>; not a measured driver specification.</p></div>
+    <div class="control-field"><div class="control-head"><label for="freq">Switching frequency, f<sub>PWM</sub></label><div class="num-wrap"><input id="freqNum" type="number" min="0.2" max="100" step="any" value="20"><span>kHz</span></div></div><input id="freq" type="range" min="0" max="1000" step="1" value="741" aria-label="Logarithmic switching frequency from 0.2 kHz to 100 kHz"><div class="range-row"><span>0.2 kHz</span><span>log scale · 20–50 kHz suggested</span><span>100 kHz</span></div><div id="freqGuidance" class="freq-guidance" aria-live="polite" hidden></div></div>
+    <div class="control-field" id="edgeEnergyControl" hidden><div class="control-head"><label for="edgeEnergy">Illustrative switching energy per edge</label><div class="num-wrap"><input id="edgeEnergyNum" type="number" min="0" max="5" step="0.25" value="2"><span>µJ</span></div></div><input id="edgeEnergy" type="range" min="0" max="5" step="0.25" value="2"><div class="range-row"><span>0: ideal driver</span><span>5 µJ: greater loss</span></div><p class="math-note">Teaching assumption: two edges per period, P<sub>sw</sub> = 2 f<sub>PWM</sub> E<sub>edge</sub>; not a measured driver specification.</p></div>
     <div class="control-field"><div class="control-head"><label for="bus">DC supply voltage</label><div class="num-wrap"><input id="busNum" type="number" min="4" max="12" step="0.5" value="12"><span>V</span></div></div><input id="bus" type="range" min="4" max="12" step="0.5" value="12"><div class="range-row"><span>4 V</span><span>12 V</span></div></div>
     <div class="control-field"><div class="control-head"><label for="extraL">Extra series inductance, L<sub>add</sub></label><div class="num-wrap"><input id="extraLNum" type="number" min="0" max="3" step="0.1" value="0"><span>mH</span></div></div><input id="extraL" type="range" min="0" max="3" step="0.1" value="0"><div class="range-row"><span>0 mH</span><span>3 mH</span></div></div>
     <div class="control-field"><div class="control-head"><label for="seriesR">Added filter winding resistance, R<sub>f</sub></label><div class="num-wrap"><input id="seriesRNum" type="number" min="0" max="2" step="0.05" value="0"><span>Ω</span></div></div><input id="seriesR" type="range" min="0" max="2" step="0.05" value="0"><div class="range-row"><span>Ideal filter: 0 Ω</span><span>2 Ω</span></div></div>
@@ -287,26 +300,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 <section class="card speed-scope featured"><div class="card-header"><div><h2>Motor speed and current: the start-up transient</h2><span class="featured-label">PRIMARY RESULT</span><div class="scope-desc">Common time horizon: compare speed build-up with the evolving mean armature current</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--teal)"></i>two-pole motor, PWM</span><span><i class="legend-line dash" style="--c:var(--purple)"></i>one-pole motor, averaged voltage</span></div></div><canvas id="speedPlot" role="img" aria-label="Long-time motor speed compared with the one-pole average-voltage approximation"></canvas><div class="trend-divider"><span>Armature current during start-up (cycle average and switching envelope)</span><span>Shared time axis</span></div><canvas id="currentTrendPlot" role="img" aria-label="Motor armature current versus time, including average and switching envelope"></canvas><div class="scope-footer" id="speedNote">The current rises and then changes as back EMF builds. The switching-current detail is visible in the lower plots, while this figure shows its longer-term evolution.</div></section>
 
 
-<section class="card loss-scope" aria-label="PWM ripple and filter winding dissipation">
-  <div class="card-header"><div><h2>Electrical losses · ripple heating versus switching losses</h2><div class="scope-desc">Resistive loss from periodic steady state; switching estimate assumes constant energy per edge</div></div><span class="loss-pill" id="lossRms">I<sub>rms</sub> —</span></div>
-  <div class="loss-summary">
-    <div class="loss-summary-item"><div class="loss-key">Total resistive heating</div><strong id="lossTotal">—</strong><span>(R + R<sub>f</sub>) I<sub>rms</sub><sup>2</sup></span></div>
-    <div class="loss-summary-item"><div class="loss-key">Extra armature heat from PWM ripple</div><strong id="lossRipple">—</strong><span>R (I<sub>rms</sub><sup>2</sup> − Ī<sup>2</sup>)</span></div>
-    <div class="loss-summary-item"><div class="loss-key">Additional filter winding heat</div><strong id="lossFilter">—</strong><span>R<sub>f</sub> I<sub>rms</sub><sup>2</sup></span></div>
-  </div>
-  <div class="switching-summary"><div><span class="loss-key">Illustrative driver switching dissipation</span><strong id="lossSwitch">—</strong><small>P<sub>sw</sub> = 2 f<sub>PWM</sub> E<sub>edge</sub></small></div><div><span class="loss-key">Resistive + estimated switching power</span><strong id="lossCombined">—</strong><small>Not a full motor/driver efficiency calculation</small></div></div>
-  <div class="loss-bars" aria-label="Breakdown of resistive losses plus illustrative switching losses">
-    <div class="loss-bar-row"><span>Base armature heating: R Ī²</span><div class="loss-track"><div id="lossBaseBar" class="loss-fill" style="background:#436b8c"></div></div><output id="lossBaseVal">—</output></div>
-    <div class="loss-bar-row"><span>Additional PWM ripple heating</span><div class="loss-track"><div id="lossRippleBar" class="loss-fill" style="background:#e87528"></div></div><output id="lossRippleVal">—</output></div>
-    <div class="loss-bar-row"><span>Added filter winding heating: R<sub>f</sub> I<sub>rms</sub>²</span><div class="loss-track"><div id="lossFilterBar" class="loss-fill" style="background:#8053b4"></div></div><output id="lossFilterVal">—</output></div>
-    <div class="loss-bar-row"><span>Illustrative switching dissipation</span><div class="loss-track"><div id="lossSwitchBar" class="loss-fill" style="background:#16877c"></div></div><output id="lossSwitchVal">—</output></div>
-  </div>
-  <div class="loss-plot-title"><b>Switching-frequency trade-off</b><span>20–50 kHz shaded: suggested discussion band, not a universal optimum</span></div>
-  <div class="trade-legend"><span><i style="--c:#e87528"></i>Ripple-related copper heat</span><span><i style="--c:#16877c"></i>Estimated switching heat</span><span><i style="--c:#113a61"></i>Sum of both</span></div>
-  <canvas id="lossFrequencyPlot" class="loss-frequency-plot" role="img" aria-label="Frequency versus predicted ripple copper losses, illustrative device switching losses and their sum on a logarithmic frequency axis"></canvas>
-  <p class="loss-caption" id="freqLossNote">Change the switching frequency and the assumed switching energy to examine the trade-off.</p>
-  <div class="scope-footer"><b>Physical interpretation:</b> the ideal inductor stores and returns energy (average inductor power is zero in periodic steady state). The <b>resistances</b> turn electrical energy into heat. A larger L<sub>add</sub> usually reduces ripple heating; a real inductor may add winding loss through R<sub>f</sub>. <b>Illustrative switching-device dissipation is added separately</b> using an adjustable energy-per-edge assumption; actual switching loss depends on the driver, its voltage, current and transition times. Magnetic-core, brush, acoustic and other mechanical losses are not calculated. At lower frequencies, PWM harmonics may excite audible vibration; sound is not simulated.</div>
-</section>
 
 <div class="two-scopes">
   <section class="card scope"><div class="card-header"><div><h2>PWM source</h2><div class="scope-desc">Switching-time microscope: up to six PWM periods around the cursor</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--slate)"></i>v<sub>PWM</sub>(t)</span><span><i class="legend-line dash" style="--c:var(--teal)"></i>average voltage</span></div></div><canvas id="voltagePlot" role="img" aria-label="Zoomed PWM voltage waveform with its average voltage"></canvas><div class="scope-footer">The duty cycle controls the <b>average voltage</b>: V̄ = D V<sub>dc</sub>.</div></section>
@@ -433,12 +426,47 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
  <p><b>DC versus harmonics:</b> the opposing load torque influences the DC operating point, while fixed load torque contributes no AC harmonic. The input-to-output frequency response therefore describes deviations around the operating point.</p>
  </section>
 </div>
+
+<div id="lossesDomain" class="losses-domain" role="tabpanel" aria-labelledby="tabLosses" hidden>
+  <section class="card losses-intro">
+    <div class="losses-intro-head">
+      <div><h2>Electrical losses · ripple heating and PWM switching trade-offs</h2><p>Explore where electrical power is dissipated and how the PWM switching frequency affects the trade-off.</p></div>
+      <span class="losses-tag">PERIODIC STEADY STATE</span>
+    </div>
+    <p><strong>Operating point:</strong> these are periodic steady-state losses at fixed duty <b>D = <span id="lossDutyValue">60%</span></b>, set using the shared PWM duty control. They do <strong>not</strong> describe the transient losses during the duty-step experiment.</p>
+    <p><strong>Resistive filtering losses:</strong> In periodic steady state, P<sub>ripple</sub> = R(I<sub>rms</sub><sup>2</sup> − Ī<sup>2</sup>) = (R/2) ∑<sub>n≥1</sub>|I<sub>n,peak</sub>|<sup>2</sup>. This uses the complete current spectrum, not just the first six displayed harmonics.</p>
+    <p><strong>Switching-frequency choice:</strong> high f<sub>PWM</sub> reduces current ripple, but a real driver usually switches less efficiently as frequency increases. Low switching frequencies can produce audible vibration (not simulated). The proposed 20–50 kHz band is a design discussion, not a conclusion from the motor's LTI model.</p>
+  </section>
+
+<section class="card loss-scope" aria-label="PWM ripple and filter winding dissipation">
+  <div class="card-header"><div><h2>Electrical losses · ripple heating versus switching losses</h2><div class="scope-desc">Resistive loss from periodic steady state; switching estimate assumes constant energy per edge</div></div><span class="loss-pill" id="lossRms">I<sub>rms</sub> —</span></div>
+  <div class="loss-summary">
+    <div class="loss-summary-item"><div class="loss-key">Total resistive heating</div><strong id="lossTotal">—</strong><span>(R + R<sub>f</sub>) I<sub>rms</sub><sup>2</sup></span></div>
+    <div class="loss-summary-item"><div class="loss-key">Extra armature heat from PWM ripple</div><strong id="lossRipple">—</strong><span>R (I<sub>rms</sub><sup>2</sup> − Ī<sup>2</sup>)</span></div>
+    <div class="loss-summary-item"><div class="loss-key">Additional filter winding heat</div><strong id="lossFilter">—</strong><span>R<sub>f</sub> I<sub>rms</sub><sup>2</sup></span></div>
+  </div>
+  <div class="switching-summary"><div><span class="loss-key">Illustrative driver switching dissipation</span><strong id="lossSwitch">—</strong><small>P<sub>sw</sub> = 2 f<sub>PWM</sub> E<sub>edge</sub></small></div><div><span class="loss-key">Resistive + estimated switching power</span><strong id="lossCombined">—</strong><small>Not a full motor/driver efficiency calculation</small></div></div>
+  <div class="loss-bars" aria-label="Breakdown of resistive losses plus illustrative switching losses">
+    <div class="loss-bar-row"><span>Base armature heating: R Ī²</span><div class="loss-track"><div id="lossBaseBar" class="loss-fill" style="background:#436b8c"></div></div><output id="lossBaseVal">—</output></div>
+    <div class="loss-bar-row"><span>Additional PWM ripple heating</span><div class="loss-track"><div id="lossRippleBar" class="loss-fill" style="background:#e87528"></div></div><output id="lossRippleVal">—</output></div>
+    <div class="loss-bar-row"><span>Added filter winding heating: R<sub>f</sub> I<sub>rms</sub>²</span><div class="loss-track"><div id="lossFilterBar" class="loss-fill" style="background:#8053b4"></div></div><output id="lossFilterVal">—</output></div>
+    <div class="loss-bar-row"><span>Illustrative switching dissipation</span><div class="loss-track"><div id="lossSwitchBar" class="loss-fill" style="background:#16877c"></div></div><output id="lossSwitchVal">—</output></div>
+  </div>
+  <div class="loss-plot-title"><b>Switching-frequency trade-off</b><span>20–50 kHz shaded: suggested discussion band, not a universal optimum</span></div>
+  <div class="trade-legend"><span><i style="--c:#e87528"></i>Ripple-related copper heat</span><span><i style="--c:#16877c"></i>Estimated switching heat</span><span><i style="--c:#113a61"></i>Sum of both</span></div>
+  <canvas id="lossFrequencyPlot" class="loss-frequency-plot" role="img" aria-label="Frequency versus predicted ripple copper losses, illustrative device switching losses and their sum on a logarithmic frequency axis"></canvas>
+  <p class="loss-caption" id="freqLossNote">Change the switching frequency and the assumed switching energy to examine the trade-off.</p>
+  <div class="scope-footer"><b>Physical interpretation:</b> the ideal inductor stores and returns energy (average inductor power is zero in periodic steady state). The <b>resistances</b> turn electrical energy into heat. A larger L<sub>add</sub> usually reduces ripple heating; a real inductor may add winding loss through R<sub>f</sub>. <b>Illustrative switching-device dissipation is added separately</b> using an adjustable energy-per-edge assumption; actual switching loss depends on the driver, its voltage, current and transition times. Magnetic-core, brush, acoustic and other mechanical losses are not calculated. At lower frequencies, PWM harmonics may excite audible vibration; sound is not simulated.</div>
+</section>
+<section class="card questions" id="lossQuestions"><h2>Learning outcomes · Investigate electrical losses</h2><ol><li>Compare 0.2, 2, 20, 50 and 100 kHz. Where does ripple heating fall? When might switching become audible?</li><li>Add 1 mH of ideal series inductance, then introduce 0.5 Ω winding resistance. Compare the ripple heating saved with the extra filter copper heating.</li><li>At 100 kHz, compare E<sub>edge</sub> = 0 and 2 µJ. Why does the illustrated switching loss increase, and why is the shaded 20–50 kHz band not a universal optimum?</li></ol></section>
+</div>
+
 </div>
 </div>
 <div class="lower time-extras" id="timeExtras">
- <section class="card teach" aria-label="Mathematical model and interpretation"><h2>What is the model doing?</h2><div class="math-box">(L + L<sub>add</sub>) di/dt = v<sub>PWM</sub>(t) − (R + R<sub>f</sub>)i(t) − k<sub>e</sub>ω(t)<br>J dω/dt = k<sub>t</sub>i(t) − bω(t) − T<sub>L</sub></div><p><strong>Start-up:</strong> the current reacts quickly to the ON/OFF transitions; accumulated torque accelerates the shaft more slowly.</p><p><strong>Back EMF:</strong> as ω increases, k<sub>e</sub>ω opposes the applied armature voltage, reducing the mean current and driving the motor towards a steady speed.</p><p><strong>Model comparison:</strong> the dashed curve uses the one-pole approximation with V̄ = DV<sub>dc</sub>. It is a good approximation to the <em>slow speed response</em>, not to the switching-frequency current ripple.</p><p><strong>Frequency-domain view:</strong> for voltage-to-current and voltage-to-speed analysis, with L<sub>tot</sub> = L + L<sub>add</sub>, R<sub>tot</sub> = R + R<sub>f</sub> and Δ(s) = (R<sub>tot</sub> + sL<sub>tot</sub>)(Js + b) + k<sub>e</sub>k<sub>t</sub>, the transfer functions are H<sub>i</sub>(s) = (Js + b)/Δ(s) and H<sub>ω</sub>(s) = k<sub>t</sub>/Δ(s).</p><p><strong>Resistive filtering losses:</strong> In periodic steady state, P<sub>ripple</sub> = R(I<sub>rms</sub><sup>2</sup> − Ī<sup>2</sup>) = (R/2) ∑<sub>n≥1</sub>|I<sub>n,peak</sub>|<sup>2</sup>. This uses the complete current spectrum, not just the first six displayed harmonics.</p><p><strong>Switching-frequency choice:</strong> high f<sub>PWM</sub> reduces current ripple, but a real driver usually switches less efficiently as frequency increases. Low switching frequencies can produce audible vibration (not simulated). The proposed 20–50 kHz band is a design discussion, not a conclusion from the motor's LTI model.</p><p><strong>Drive assumption:</strong> the source is an ideal, actively driven 0/V<sub>dc</sub> PWM terminal voltage (including a 0 V freewheel state); signed armature current is allowed. A real nonsynchronous diode/freewheel stage or current limit can change the waveform.</p></section>
+ <section class="card teach" aria-label="Mathematical model and interpretation"><h2>What is the model doing?</h2><div class="math-box">(L + L<sub>add</sub>) di/dt = v<sub>PWM</sub>(t) − (R + R<sub>f</sub>)i(t) − k<sub>e</sub>ω(t)<br>J dω/dt = k<sub>t</sub>i(t) − bω(t) − T<sub>L</sub></div><p><strong>Start-up:</strong> the current reacts quickly to the ON/OFF transitions; accumulated torque accelerates the shaft more slowly.</p><p><strong>Back EMF:</strong> as ω increases, k<sub>e</sub>ω opposes the applied armature voltage, reducing the mean current and driving the motor towards a steady speed.</p><p><strong>Model comparison:</strong> the dashed curve uses the one-pole approximation with V̄ = DV<sub>dc</sub>. It is a good approximation to the <em>slow speed response</em>, not to the switching-frequency current ripple.</p><p><strong>Frequency-domain view:</strong> for voltage-to-current and voltage-to-speed analysis, with L<sub>tot</sub> = L + L<sub>add</sub>, R<sub>tot</sub> = R + R<sub>f</sub> and Δ(s) = (R<sub>tot</sub> + sL<sub>tot</sub>)(Js + b) + k<sub>e</sub>k<sub>t</sub>, the transfer functions are H<sub>i</sub>(s) = (Js + b)/Δ(s) and H<sub>ω</sub>(s) = k<sub>t</sub>/Δ(s).</p><p><strong>Drive assumption:</strong> the source is an ideal, actively driven 0/V<sub>dc</sub> PWM terminal voltage (including a 0 V freewheel state); signed armature current is allowed. A real nonsynchronous diode/freewheel stage or current limit can change the waveform.</p></section>
 </div>
-<section class="card questions" id="timeQuestions"><h2>Learning outcomes · Investigate</h2><ol><li>Compare 0.2, 2, 20, 50 and 100 kHz. Where does ripple heating fall? When might switching become audible?</li><li>Add 1 mH of ideal series inductance, then introduce 0.5 Ω winding resistance. Compare the ripple heating saved with the extra filter copper heating.</li><li>At 100 kHz, compare E<sub>edge</sub> = 0 and 2 µJ. Why does the illustrated switching loss increase, and why is the shaded 20–50 kHz band not a universal optimum?</li></ol></section>
+<section class="card questions" id="timeQuestions"><h2>Learning outcomes · Investigate the time response</h2><ol><li>Compare the electrical and mechanical time constants. Why does armature current react faster than motor speed?</li><li>Vary PWM frequency at fixed duty. What happens to current ripple and to the slower motor-speed response?</li><li>Choose the duty-ratio step experiment and vary inertia or inductance. Which transient changes most, and why?</li></ol></section>
 <footer><span>Signals &amp; Systems · Chapter 11 · DC motor and PWM · Interactive HTML / JavaScript</span><span>Prompts provided by Joaquin Carrasco · Code produced by ChatGPT · No external libraries</span></footer>
 </main>
 <script id="saved-state" type="application/json">{"duty":60,"freq":20,"bus":12,"extraL":0,"seriesR":0,"inertia":1,"load":0,"horizon":80,"units":"rad"}</script>
@@ -715,10 +743,10 @@ function selectTimeExperiment(){
   $('startupExperiment').hidden=step;
   $('dutyStepExperiment').hidden=!step;
   $('timeExperimentHint').textContent=step?'Motor is initially at periodic steady state; duty changes from D₁ to D₂.':'Motor starts from rest with a constant PWM duty ratio.';
-  $('timeExtras').hidden=step||!$('frequencyDomain').hidden;
-  $('timeQuestions').hidden=step||!$('frequencyDomain').hidden;
+  $('timeExtras').hidden=step||$('timeDomain').hidden;
+  $('timeQuestions').hidden=step||$('timeDomain').hidden;
   const dutyField=document.querySelector('label[for="duty"]').closest('.control-field');
-  dutyField.hidden=step;
+  dutyField.hidden=step&&!$('timeDomain').hidden;
   if(step){syncStepControls();stepData=stepSimulation();updateStepLabels();}
   else{stepData=null;updateLosses();}
   time=0;draw();
@@ -1135,14 +1163,23 @@ function drawFrequency(){
   syncInspectedHarmonic(q.N);drawHarmonicComparison(q);updateInspectedHarmonic(q);
   drawBode();drawFourierWaveforms();harmonicTable();
 }
+function activeView(){return $('timeDomain').hidden?($('frequencyDomain').hidden?'losses':'frequency'):'time';}
 function activateTab(which){
-  const freq=which==='frequency';
-  $('tabTime').setAttribute('aria-selected',String(!freq));$('tabFrequency').setAttribute('aria-selected',String(freq));
-  $('tabTime').tabIndex=freq?-1:0;$('tabFrequency').tabIndex=freq?0:-1;
-  $('timeDomain').hidden=freq;$('frequencyDomain').hidden=!freq;
-  document.querySelector('.sidebar>.player').hidden=freq;
-  $('timeExtras').hidden=freq||isDutyStep();$('timeQuestions').hidden=freq||isDutyStep();
-  if(freq){stop();drawFrequency();}else{draw();if(!isDutyStep())drawLossFrequency();}
+  const view=['time','frequency','losses'].includes(which)?which:'time';
+  stop();
+  for(const [name,tab,panel] of [['time','tabTime','timeDomain'],['frequency','tabFrequency','frequencyDomain'],['losses','tabLosses','lossesDomain']]){
+    const selected=name===view;
+    $(tab).setAttribute('aria-selected',String(selected));$(tab).tabIndex=selected?0:-1;
+    $(panel).hidden=!selected;
+  }
+  document.querySelector('.sidebar>.player').hidden=view!=='time';
+  document.querySelector('.readouts').hidden=view!=='time';
+  $('timeExtras').hidden=view!=='time'||isDutyStep();
+  $('timeQuestions').hidden=view!=='time'||isDutyStep();
+  document.querySelector('label[for="duty"]').closest('.control-field').hidden=view==='time'&&isDutyStep();
+  $('edgeEnergyControl').hidden=view!=='losses';
+  $('freqGuidance').hidden=view!=='losses';
+  if(view==='frequency')drawFrequency();else if(view==='losses')updateLosses();else draw();
 }
 
 $('timeExperiment').addEventListener('change',selectTimeExperiment);
@@ -1157,9 +1194,16 @@ for(const [id,key] of [['stepD1','D1'],['stepD2','D2'],['stepAtMs','changeMs']])
   });
 }
 
-$('tabTime').addEventListener('click',()=>activateTab('time'));
-$('tabFrequency').addEventListener('click',()=>activateTab('frequency'));
-for(const id of ['tabTime','tabFrequency'])$(id).addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();const to=id==='tabTime'?'frequency':'time';activateTab(to);$(to==='time'?'tabTime':'tabFrequency').focus()}});
+for(const [id,view] of [['tabTime','time'],['tabFrequency','frequency'],['tabLosses','losses']]){
+  $(id).addEventListener('click',()=>activateTab(view));
+  $(id).addEventListener('keydown',e=>{
+    if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+    e.preventDefault();
+    const views=['time','frequency','losses'],index=views.indexOf(view);
+    const next=e.key==='Home'?0:e.key==='End'?2:(index+(e.key==='ArrowRight'?1:-1)+3)%3;
+    activateTab(views[next]);$( ['tabTime','tabFrequency','tabLosses'][next] ).focus();
+  });
+}
 $('harmonicCount').addEventListener('input',()=>drawFrequency());
 $('inspectHarmonic').addEventListener('change',()=>drawFrequency());
 $('bodeOutput').addEventListener('change',()=>{if(!$('frequencyDomain').hidden)drawBode();});
@@ -1257,11 +1301,12 @@ function updateLosses(){
   const fkhz=state.freq;
   $('freqGuidance').textContent=fkhz<20?'Below 20 kHz: higher current ripple; switching may excite audible vibrations.':fkhz<=50?'20–50 kHz: the suggested design discussion range; hardware-specific losses decide the best setting.':'Above 50 kHz: current ripple is smaller, but the illustrative driver switching losses grow with frequency.';
   $('freqLossNote').textContent=`At ${displayFmt.freq(fkhz)} kHz: ripple-related copper heating ${powerFormat((data.p.Rarm+data.p.Rf)*Math.max(0,q.iRms*q.iRms-q.iAvg*q.iAvg))}; assumed switching loss ${powerFormat(sw)}. The curve is illustrative, not a measured motor driver.`;
-  drawLossFrequency();
+  $('lossDutyValue').textContent=fmt(state.duty,0)+'%';
+  if(!$('lossesDomain').hidden)drawLossFrequency();
 }
-function updateStats(){$('avgV').textContent=`${fmt(data.vbar,2)} V`;$('tauE').textContent=`${fmt(data.tauE*1e6,1)} µs`;$('tauM').textContent=`${fmt(data.tauM*1000,2)} ms`;$('ripple').textContent=`${fmt(data.ripple,3)} A p–p`;$('steadySpeed').textContent=speedLabel(data.wss,1);if(!isDutyStep())updateLosses();}
+function updateStats(){$('avgV').textContent=`${fmt(data.vbar,2)} V`;$('tauE').textContent=`${fmt(data.tauE*1e6,1)} µs`;$('tauM').textContent=`${fmt(data.tauM*1000,2)} ms`;$('ripple').textContent=`${fmt(data.ripple,3)} A p–p`;$('steadySpeed').textContent=speedLabel(data.wss,1);updateLosses();}
 function syncControls(){for(const k of Object.keys(bounds)){const val=displayFmt[k](state[k]);$(k).value=k==='freq'?freqToSlider(state.freq):val;$(k+'Num').value=val}$('units').value=state.units;}
-function recalc(resetTime=true){stop();HORIZON=state.horizon/1000;data=simulate();if(isDutyStep()){stepSettings.changeMs=Math.min(stepSettings.changeMs,Math.max(1,state.horizon-1));syncStepControls();stepData=stepSimulation();updateStepLabels();}if(resetTime)time=0;else time=clamp(time,0,HORIZON);updateStats();harmonicTable();if($('frequencyDomain').hidden)draw();else drawFrequency()}
+function recalc(resetTime=true){stop();HORIZON=state.horizon/1000;data=simulate();if(isDutyStep()){stepSettings.changeMs=Math.min(stepSettings.changeMs,Math.max(1,state.horizon-1));syncStepControls();stepData=stepSimulation();updateStepLabels();}if(resetTime)time=0;else time=clamp(time,0,HORIZON);updateStats();harmonicTable();if(activeView()==='time')draw();else if(activeView()==='frequency')drawFrequency();else updateLosses()}
 const presets={baseline:{duty:60,freq:20,bus:12,extraL:0,inertia:1,load:0},sub:{duty:60,freq:.2,bus:12,extraL:0,inertia:1,load:0},slow:{duty:60,freq:2,bus:12,extraL:0,inertia:1,load:0},mid:{duty:60,freq:35,bus:12,extraL:0,inertia:1,load:0},fast:{duty:60,freq:50,bus:12,extraL:0,inertia:1,load:0},extreme:{duty:60,freq:100,bus:12,extraL:0,inertia:1,load:0},inductor:{duty:60,freq:20,bus:12,extraL:1,seriesR:0,inertia:1,load:0},realFilter:{duty:60,freq:20,bus:12,extraL:1,seriesR:.5,inertia:1,load:0},inertia:{duty:60,freq:20,bus:12,extraL:0,inertia:10,load:0}};
 for(const k of Object.keys(bounds)){
   const range=$(k),num=$(k+'Num');
@@ -1270,9 +1315,9 @@ for(const k of Object.keys(bounds)){
   num.addEventListener('blur',()=>{if(num.getAttribute('aria-invalid')==='true'){num.removeAttribute('aria-invalid');num.value=displayFmt[k](state[k]);}})
 }
 $('preset').addEventListener('change',()=>{state={...state,...presets[$('preset').value]};syncControls();recalc(true)});
-$('units').addEventListener('change',()=>{state.units=$('units').value;updateStats();if($('frequencyDomain').hidden)draw();else drawFrequency()});
+$('units').addEventListener('change',()=>{state.units=$('units').value;updateStats();if(activeView()==='time')draw();else if(activeView()==='frequency')drawFrequency();else updateLosses()});
 $('playSpeed').addEventListener('change',()=>{playback=Number($('playSpeed').value)});
-$('play').addEventListener('click',()=>{if(!$('frequencyDomain').hidden)activateTab('time');if(playing){stop();return}if(time>=HORIZON)time=0;playing=true;lastTs=0;$('play').textContent='Ⅱ Pause';$('play').setAttribute('aria-pressed','true');raf=requestAnimationFrame(animate)});
+$('play').addEventListener('click',()=>{if(activeView()!=='time')activateTab('time');if(playing){stop();return}if(time>=HORIZON)time=0;playing=true;lastTs=0;$('play').textContent='Ⅱ Pause';$('play').setAttribute('aria-pressed','true');raf=requestAnimationFrame(animate)});
 $('restart').addEventListener('click',()=>{stop();time=0;draw()});
 $('reset').addEventListener('click',()=>{state={...defaults};$('preset').value='baseline';syncControls();recalc(true)});
 $('scrub').addEventListener('input',()=>{stop();time=HORIZON*Number($('scrub').value)/1000;draw()});
@@ -1282,9 +1327,9 @@ $('download').addEventListener('click',()=>{
   const url=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
   const a=document.createElement('a');a.href=url;a.download='DC_Motor_PWM_Studio.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 });
-window.addEventListener('resize',()=>{if($('frequencyDomain').hidden){draw();if(!isDutyStep())drawLossFrequency()}else drawFrequency()});
+window.addEventListener('resize',()=>{if(activeView()==='time')draw();else if(activeView()==='frequency')drawFrequency();else drawLossFrequency()});
 // Public test hooks for numerical and visual regression checks, and for teaching extensions.
-window.PWMMotorStudio={motor,simulate,transition,periodicLosses,pwmHarmonic,responseRL,responseMotor,harmonicSeries,activateTab,switchLoss,sliderToFreq,freqToSlider,stepSimulation,stepAt,getStepData:()=>stepData,getStepSettings:()=>({...stepSettings}),getState:()=>({...state}),getData:()=>data,setTime:t=>{time=clamp(t,0,HORIZON);draw()},getTime:()=>time,recalculate:recalc};
+window.PWMMotorStudio={activeView,motor,simulate,transition,periodicLosses,pwmHarmonic,responseRL,responseMotor,harmonicSeries,activateTab,switchLoss,sliderToFreq,freqToSlider,stepSimulation,stepAt,getStepData:()=>stepData,getStepSettings:()=>({...stepSettings}),getState:()=>({...state}),getData:()=>data,setTime:t=>{time=clamp(t,0,HORIZON);draw()},getTime:()=>time,recalculate:recalc};
 syncControls();recalc(true);
 })();
 </script>

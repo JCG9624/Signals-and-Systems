@@ -214,6 +214,12 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .losses-tag{font-size:10px;font-weight:760;letter-spacing:.05em;color:#327a71;background:#edf7f5;border:1px solid #cbe2df;border-radius:7px;padding:5px 8px;white-space:nowrap}
 .losses-domain .questions{margin:0}
 @media(max-width:730px){.analysis-tabs{gap:4px}.analysis-tabs button{font-size:12px;line-height:1.2;padding:9px 5px 8px}.tab-symbol{font-size:15px;margin-right:3px}.tab-sub{font-size:9px;line-height:1.25;margin-left:0}.losses-intro-head{flex-direction:column;gap:5px}}
+
+.switching-mode-bar{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;margin:0 0 16px;padding:12px 14px;border:1px solid #d8e7f0;border-radius:10px;background:#f4f9fc}
+.switching-mode-bar label{font-size:12px;font-weight:760;color:var(--navy)}
+.switching-mode-bar select{min-height:36px;padding:8px 12px;border-radius:8px;border:1px solid #c6dbe7;background:#fff;color:var(--navy);font-size:12px;font-weight:700;max-width:100%}
+.switching-mode-bar .mode-guide{font-size:11px;line-height:1.5;color:#58758a;flex:1;min-width:240px}
+@media(max-width:580px){.switching-mode-bar{align-items:stretch;flex-direction:column;gap:7px}.switching-mode-bar .mode-guide{min-width:0}}
 </style>
 </head>
 <body>
@@ -230,7 +236,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   <div class="circuit-top"><h2 style="font-size:14px;color:var(--navy);margin:0">From electrical switching to mechanical motion</h2><span id="switchState" class="state-chip">SWITCH ON · 12 V</span></div>
   <svg viewBox="0 0 1160 119" role="img" aria-label="PWM source, armature resistance and inductance, current-to-torque conversion, mechanical shaft, and back-EMF coupling">
     <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7" fill="#7299b2"/></marker><marker id="arrOrange" markerWidth="8" markerHeight="8" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7" fill="#db8a52"/></marker></defs>
-    <rect class="system-block" x="15" y="12" width="180" height="56" rx="10"/><text class="system-text" x="105" y="35" text-anchor="middle">PWM driver</text><text class="system-sub" x="105" y="53" text-anchor="middle">0 ↔ Vdc</text>
+    <rect class="system-block" x="15" y="12" width="180" height="56" rx="10"/><text class="system-text" x="105" y="35" text-anchor="middle">PWM driver</text><text class="system-sub" x="105" y="53" text-anchor="middle" id="driveModeLabel">0 ↔ +Vdc</text>
     <path id="pwmPath" class="circuit-line" d="M195 40H253" marker-end="url(#arr)"/><text class="system-sub" x="208" y="28">v<tspan baseline-shift="sub" font-size="10">PWM</tspan></text>
     <rect class="system-block" x="255" y="12" width="235" height="56" rx="10"/><text class="system-text" x="373" y="35" text-anchor="middle">Armature R + Rf, L + L<tspan baseline-shift="sub" font-size="10">add</tspan></text><text class="system-sub" x="373" y="53" text-anchor="middle">current i(t)</text>
     <path class="circuit-line" d="M490 40H544" marker-end="url(#arr)"/><text class="system-sub" x="507" y="28">i</text>
@@ -258,8 +264,16 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   <div class="section-line"><h2>Experiment settings</h2><div><label for="preset" class="mini-hint">Try an example &nbsp;</label><select class="preset" id="preset" aria-label="Select a teaching preset">
     <option value="baseline">20 kHz · natural armature filtering</option><option value="sub">0.2 kHz · low-frequency ripple</option><option value="slow">2 kHz · pronounced current ripple</option><option value="mid">35 kHz · suggested range</option><option value="fast">50 kHz · upper design band</option><option value="extreme">100 kHz · high switching losses</option><option value="inductor">20 kHz · ideal extra inductance</option><option value="realFilter">20 kHz · practical 1 mH filter</option><option value="inertia">20 kHz · tenfold inertia</option>
   </select></div></div>
-  <div class="control-grid">
-    <div class="control-field"><div class="control-head"><label for="duty">PWM duty cycle, D</label><div class="num-wrap"><input id="dutyNum" type="number" min="10" max="90" step="1" value="60"><span>%</span></div></div><input id="duty" type="range" min="10" max="90" step="1" value="60"><div class="range-row"><span>10%</span><span>90%</span></div></div>
+  <div class="switching-mode-bar">
+  <label for="switchMode">PWM switching mode</label>
+  <select id="switchMode" aria-label="Select PWM voltage switching mode">
+    <option value="unipolar" selected>Unipolar · 0 / +Vdc</option>
+    <option value="bipolar">Bipolar · −Vdc / +Vdc</option>
+  </select>
+  <span class="mode-guide" id="switchModeGuide">Unipolar: +Vdc for 60% of each cycle, 0 V otherwise.</span>
+</div>
+<div class="control-grid">
+    <div class="control-field"><div class="control-head"><label for="duty">Average-voltage command, D</label><div class="num-wrap"><input id="dutyNum" type="number" min="10" max="90" step="1" value="60"><span>%</span></div></div><input id="duty" type="range" min="10" max="90" step="1" value="60"><div class="range-row"><span>10%</span><span>90%</span></div></div>
     <div class="control-field"><div class="control-head"><label for="freq">Switching frequency, f<sub>PWM</sub></label><div class="num-wrap"><input id="freqNum" type="number" min="0.2" max="100" step="any" value="20"><span>kHz</span></div></div><input id="freq" type="range" min="0" max="1000" step="1" value="741" aria-label="Logarithmic switching frequency from 0.2 kHz to 100 kHz"><div class="range-row"><span>0.2 kHz</span><span>log scale · 20–50 kHz suggested</span><span>100 kHz</span></div><div id="freqGuidance" class="freq-guidance" aria-live="polite" hidden></div></div>
     <div class="control-field" id="edgeEnergyControl" hidden><div class="control-head"><label for="edgeEnergy">Illustrative switching energy per edge</label><div class="num-wrap"><input id="edgeEnergyNum" type="number" min="0" max="5" step="0.25" value="2"><span>µJ</span></div></div><input id="edgeEnergy" type="range" min="0" max="5" step="0.25" value="2"><div class="range-row"><span>0: ideal driver</span><span>5 µJ: greater loss</span></div><p class="math-note">Teaching assumption: two edges per period, P<sub>sw</sub> = 2 f<sub>PWM</sub> E<sub>edge</sub>; not a measured driver specification.</p></div>
     <div class="control-field"><div class="control-head"><label for="bus">DC supply voltage</label><div class="num-wrap"><input id="busNum" type="number" min="4" max="12" step="0.5" value="12"><span>V</span></div></div><input id="bus" type="range" min="4" max="12" step="0.5" value="12"><div class="range-row"><span>4 V</span><span>12 V</span></div></div>
@@ -469,13 +483,13 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 <section class="card questions" id="timeQuestions"><h2>Learning outcomes · Investigate the time response</h2><ol><li>Compare the electrical and mechanical time constants. Why does armature current react faster than motor speed?</li><li>Vary PWM frequency at fixed duty. What happens to current ripple and to the slower motor-speed response?</li><li>Choose the duty-ratio step experiment and vary inertia or inductance. Which transient changes most, and why?</li></ol></section>
 <footer><span>Signals &amp; Systems · Chapter 11 · DC motor and PWM · Interactive HTML / JavaScript</span><span>Prompts provided by Joaquin Carrasco · Code produced by ChatGPT · No external libraries</span><span>Acknowledgements: Dr Ognjen Marjanovic and Dr Liam Marsh</span></footer>
 </main>
-<script id="saved-state" type="application/json">{"duty":60,"freq":20,"bus":12,"extraL":0,"seriesR":0,"inertia":1,"load":0,"horizon":80,"units":"rad"}</script>
+<script id="saved-state" type="application/json">{"mode":"unipolar","duty":60,"freq":20,"bus":12,"extraL":0,"seriesR":0,"inertia":1,"load":0,"horizon":80,"units":"rad"}</script>
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const C={navy:'#113a61',teal:'#0096a1',orange:'#e87528',purple:'#8053b4',slate:'#9aaaba',grid:'#e7eff5',text:'#607d91',ink:'#17324a'};
 const fixed={R:8.77,L:203e-6,kt:.0146,ke:.0145,J:2.7e-7,b:3.8e-7};
-const defaults={duty:60,freq:20,edgeEnergy:2,bus:12,extraL:0,seriesR:0,inertia:1,load:0,horizon:80,units:'rad'};
+const defaults={mode:"unipolar",duty:60,freq:20,edgeEnergy:2,bus:12,extraL:0,seriesR:0,inertia:1,load:0,horizon:80,units:'rad'};
 let state={...defaults};try{const saved=JSON.parse($('saved-state').textContent);for(const k of Object.keys(defaults))if(saved[k]!==undefined)state[k]=saved[k]}catch(e){}
 const bounds={duty:[10,90],freq:[0.2,100],edgeEnergy:[0,5],bus:[4,12],extraL:[0,3],seriesR:[0,2],inertia:[1,10],load:[0,8],horizon:[20,320]};
 const displayFmt={duty:v=>String(Math.round(v)),freq:v=>String(Number(v.toFixed(2))),edgeEnergy:v=>String(Number(v.toFixed(2))),bus:v=>String(v),extraL:v=>String(Number(v.toFixed(1))),seriesR:v=>Number(v.toFixed(2)).toString(),inertia:v=>String(Math.round(v)),load:v=>String(Number(v.toFixed(1))),horizon:v=>String(Math.round(v))};
@@ -489,7 +503,13 @@ function speedLabel(v,n=0){return `${fmt(speedUnit(v),n)} ${state.units==='rpm'?
 function switchLoss(fHz){return 2*fHz*state.edgeEnergy*1e-6;}
 function freqToSlider(f){return Math.round(1000*Math.log(f/.2)/Math.log(500));}
 function sliderToFreq(position){return .2*Math.pow(500,position/1000);}
-function motor(){return {R:fixed.R+state.seriesR,Rarm:fixed.R,Rf:state.seriesR,L:fixed.L+state.extraL*1e-3,kt:fixed.kt,ke:fixed.ke,J:fixed.J*state.inertia,b:fixed.b,TL:state.load*1e-3,bus:state.bus,D:state.duty/100,f:state.freq*1000}}
+function positiveDuty(p){return p.mode==='bipolar'?(1+p.D)/2:p.D;}
+function highVoltage(p){return p.bus;}
+function lowVoltage(p){return p.mode==='bipolar'?-p.bus:0;}
+function meanVoltage(p){return p.D*p.bus;}
+function pwmAtPhase(p,phase){return phase<positiveDuty(p)?highVoltage(p):lowVoltage(p);}
+function switchingModeLabel(p){return p.mode==='bipolar'?'Bipolar (+Vdc/−Vdc)':'Unipolar (+Vdc/0)';}
+function motor(){return {mode:state.mode,R:fixed.R+state.seriesR,Rarm:fixed.R,Rf:state.seriesR,L:fixed.L+state.extraL*1e-3,kt:fixed.kt,ke:fixed.ke,J:fixed.J*state.inertia,b:fixed.b,TL:state.load*1e-3,bus:state.bus,D:state.duty/100,f:state.freq*1000}}
 // Exact matrix exponential for the two-dimensional LTI system on an ON or OFF interval.
 // Splitting a sampling step at a switching edge ensures duty cycles are not rounded to the sample grid.
 function transition(p,dt,u){
@@ -508,8 +528,8 @@ function transition(p,dt,u){
 // Periodic steady state: solve the exact ON/OFF affine map for its fixed point.
 // Integrate i and i^2 separately over ON and OFF phases, then decompose copper losses.
 function periodicLosses(p){
-  const T=1/p.f,Ton=p.D*T,Toff=T-Ton;
-  const on=transition(p,Ton,p.bus),off=transition(p,Toff,0);
+  const T=1/p.f,Ton=positiveDuty(p)*T,Toff=T-Ton;
+  const on=transition(p,Ton,highVoltage(p)),off=transition(p,Toff,lowVoltage(p));
   const periodMap=(i,w)=>{const a=on(i,w);return off(a[0],a[1]);};
   const q0=periodMap(0,0),q1=periodMap(1,0),q2=periodMap(0,1);
   const a11=1-q1[0]+q0[0],a12=-q2[0]+q0[0];
@@ -520,7 +540,7 @@ function periodicLosses(p){
   const w0=(a11*q0[1]-a21*q0[0])/det;
   const atOff=on(i0,w0),N=180;
   let integralI=0,integralI2=0,lowI=Infinity,highI=-Infinity;
-  for(const phase of [{begin:[i0,w0],duration:Ton,voltage:p.bus},{begin:atOff,duration:Toff,voltage:0}]){
+  for(const phase of [{begin:[i0,w0],duration:Ton,voltage:highVoltage(p)},{begin:atOff,duration:Toff,voltage:lowVoltage(p)}]){
     const dt=phase.duration/N;
     for(let k=0;k<=N;k++){
       const x=transition(p,k*dt,phase.voltage)(phase.begin[0],phase.begin[1])[0];
@@ -538,11 +558,12 @@ function periodicLosses(p){
 function simulate(){
   const p=motor(),period=1/p.f,dt=period/NPER,steps=Math.ceil(HORIZON/dt);
   const i=new Float64Array(steps+1),w=new Float64Array(steps+1),theta=new Float64Array(steps+1),edgeI=new Float64Array(Math.ceil(steps/NPER)+1);
-  const fullOn=transition(p,dt,p.bus),fullOff=transition(p,dt,0),toOff=transition(p,p.D*period,p.bus),switchSample=p.D*NPER;
+  const plus=positiveDuty(p);
+  const fullOn=transition(p,dt,highVoltage(p)),fullOff=transition(p,dt,lowVoltage(p)),toOff=transition(p,plus*period,highVoltage(p)),switchSample=plus*NPER;
   const crossIdx=Math.floor(switchSample);
   const hasSplit=Math.abs(switchSample-Math.round(switchSample))>1e-10;
   const onPart=hasSplit?transition(p,dt*(switchSample-crossIdx),p.bus):null;
-  const offPart=hasSplit?transition(p,dt*(1-switchSample+crossIdx),0):null;
+  const offPart=hasSplit?transition(p,dt*(1-switchSample+crossIdx),lowVoltage(p)):null;
   let si=0,sw=0,th=0;
   for(let k=0;k<steps;k++){
     const phase=k%NPER;
@@ -554,7 +575,7 @@ function simulate(){
     i[k+1]=si;w[k+1]=sw;theta[k+1]=th;
   }
   const den=p.R*p.b+p.ke*p.kt;
-  const vbar=p.bus*p.D;
+  const vbar=meanVoltage(p);
   const wss=(p.kt*vbar-p.R*p.TL)/den,iss=(p.b*vbar+p.ke*p.TL)/den;
   const tauM=p.J*p.R/den;
   const tauE=p.L/p.R;
@@ -580,13 +601,13 @@ function at(t){
   const t0=cycle*data.period,phase=clamp(t-t0,0,data.period),ix=cycle*NPER;
   let x=[data.i[ix],data.w[ix]];
   if(phase>0){
-    const onDuration=Math.min(phase,data.p.D*data.period);
-    x=transition(data.p,onDuration,data.p.bus)(x[0],x[1]);
-    if(phase>onDuration)x=transition(data.p,phase-onDuration,0)(x[0],x[1]);
+    const onDuration=Math.min(phase,positiveDuty(data.p)*data.period);
+    x=transition(data.p,onDuration,highVoltage(data.p))(x[0],x[1]);
+    if(phase>onDuration)x=transition(data.p,phase-onDuration,lowVoltage(data.p))(x[0],x[1]);
   }
   return {i:x[0],w:x[1],theta};
 }
-function pwm(t){const q=t/data.period,fract=q-Math.floor(q);return fract<data.p.D?data.p.bus:0;}
+function pwm(t){const q=t/data.period,fract=q-Math.floor(q);return pwmAtPhase(data.p,fract);}
 // This experiment starts at the *periodic* operating point for D1 and then
 // switches to D2 at a PWM-period boundary. The motor state is continuous.
 const stepSettings={D1:30,D2:70,changeMs:40};
@@ -604,12 +625,12 @@ function stepSimulation(){
   const p1={...base,D:d1};
   const initial=periodicLosses(p1);
   const mk=(D)=>{
-    const ton=D*period,toff=period-ton;
+    const ton=positiveDuty({...base,D})*period,toff=period-ton;
     return {D,ton,toff,
-      onHalf:transition(base,ton/2,base.bus),
-      onFull:transition(base,ton,base.bus),
-      offHalf:transition(base,toff/2,0),
-      offFull:transition(base,toff,0)};
+      onHalf:transition(base,ton/2,highVoltage(base)),
+      onFull:transition(base,ton,highVoltage(base)),
+      offHalf:transition(base,toff/2,lowVoltage(base)),
+      offFull:transition(base,toff,lowVoltage(base))};
   };
   const phases=[mk(d1),mk(d2)];
   let si=initial.i0,sw=initial.w0,angle=0;
@@ -638,11 +659,11 @@ function stepAt(t){
   let v=[c.si,c.sw],delta=phase;
   if(delta>0){
     const onDuration=Math.min(delta,p.ton);
-    v=transition(x.base,onDuration,x.base.bus)(v[0],v[1]);
-    if(delta>onDuration)v=transition(x.base,delta-onDuration,0)(v[0],v[1]);
+    v=transition(x.base,onDuration,highVoltage(x.base))(v[0],v[1]);
+    if(delta>onDuration)v=transition(x.base,delta-onDuration,lowVoltage(x.base))(v[0],v[1]);
   }
   const theta=c.angle+(c.sw+v[1])*.5*phase;
-  const voltage=phase<p.ton?x.base.bus:0;
+  const voltage=phase<p.ton?highVoltage(x.base):lowVoltage(x.base);
   return {i:v[0],w:v[1],theta,D:p.D,voltage};
 }
 function drawStepSwitchMarker(ctx,ax){
@@ -772,12 +793,13 @@ function marker(ctx,ax,x,y,color){ctx.strokeStyle='#fff';ctx.fillStyle=color;ctx
 function drawCursor(ctx,ax,x){ctx.strokeStyle='#6f8fa3';ctx.lineWidth=1.4;ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(ax.xx(x),ax.t);ctx.lineTo(ax.xx(x),ax.t+ax.bh);ctx.stroke();ctx.setLineDash([])}
 function zoomWindow(){const width=Math.min(6*data.period,HORIZON),start=clamp(time-width/2,0,Math.max(0,HORIZON-width));return [start,start+width]}
 function drawVoltage(){const z=ctxSetup('voltagePlot'),{ctx}=z,[t0,t1]=zoomWindow(),x0=t0*1000,x1=t1*1000;
-  const ax=axes(z,{x0,x1,y0:-data.p.bus*.07,y1:data.p.bus*1.18,xUnit:'Time (ms)',yUnit:'Voltage (V)'});
+  const ax=axes(z,{x0,x1,y0:(lowVoltage(data.p)<0?-data.p.bus*1.18:-data.p.bus*.07),y1:data.p.bus*1.18,xUnit:'Time (ms)',yUnit:'Voltage (V)'});
   const avg=data.vbar;ctx.strokeStyle=C.teal;ctx.lineWidth=2;ctx.setLineDash([7,5]);ctx.beginPath();ctx.moveTo(ax.xx(x0),ax.yy(avg));ctx.lineTo(ax.xx(x1),ax.yy(avg));ctx.stroke();ctx.setLineDash([]);
   ctx.strokeStyle=C.slate;ctx.lineWidth=2.8;ctx.lineJoin='miter';ctx.beginPath();let first=true;
   const firstPeriod=Math.max(0,Math.floor(t0/data.period)-1),lastPeriod=Math.ceil(t1/data.period)+1;
   for(let k=firstPeriod;k<=lastPeriod;k++){
-    const pts=[[k*data.period,data.p.bus],[(k+data.p.D)*data.period,data.p.bus],[(k+data.p.D)*data.period,0],[(k+1)*data.period,0]];
+    const plus=positiveDuty(data.p),lo=lowVoltage(data.p);
+    const pts=[[k*data.period,data.p.bus],[(k+plus)*data.period,data.p.bus],[(k+plus)*data.period,lo],[(k+1)*data.period,lo]];
     for(const [t,v] of pts){const sx=ax.xx(t*1000),sy=ax.yy(v);if(first){ctx.moveTo(sx,sy);first=false}else ctx.lineTo(sx,sy)}
   }ctx.stroke();drawCursor(ctx,ax,time*1000);marker(ctx,ax,time*1000,pwm(time),C.slate);ctx.restore();
 }
@@ -789,7 +811,7 @@ function drawCurrent(){const z=ctxSetup('currentPlot'),{ctx}=z,[t0,t1]=zoomWindo
   }
   // Include the exact switching peaks even if the 24-point sample grid misses the duty boundary.
   for(let cycle=Math.max(0,Math.floor(t0/data.period)-1);cycle<=Math.ceil(t1/data.period);cycle++){
-    const edgeTime=(cycle+data.p.D)*data.period;
+    const edgeTime=(cycle+positiveDuty(data.p))*data.period;
     if(edgeTime<t0||edgeTime>t1||cycle*NPER>=data.steps)continue;
     const v=data.edgeI[cycle];xs.push(edgeTime*1000);ys.push(v);
     const lo=cycle*NPER,hi=Math.min(data.steps,(cycle+1)*NPER);let mean=0;
@@ -837,7 +859,7 @@ function drawCurrentTrend(){
 }
 function harmonicTable(){const p=data.p,rows=[];
   for(let n=1;n<=Number($('harmonicCount').value);n++){const Om=n*2*Math.PI*p.f;
-    const V=2*p.bus*Math.abs(Math.sin(Math.PI*n*p.D))/(Math.PI*n);
+    const V=amp(pwmHarmonic(p,n));
     const re=p.R*p.b+p.ke*p.kt-p.L*p.J*Om**2,im=(p.R*p.J+p.L*p.b)*Om;
     const denom=Math.hypot(re,im),I=V*Math.hypot(p.b,p.J*Om)/denom,W=V*p.kt/denom;
     rows.push(`<tr><td>${n}</td><td>${fmt(V,3)} V</td><td>${fmt(I*1000,1)} mA</td><td>${fmt(W,3)} rad/s</td></tr>`);
@@ -845,10 +867,10 @@ function harmonicTable(){const p=data.p,rows=[];
 }
 
 // Fourier phasors use the real-part convention Re{U_n exp(j n Ω t)}. n>=1.
-// PWM(t)= Vdc on [0,DT), 0 on [DT,T); U_n= 2*C_n.
+// Two-level switching: +Vdc over the positive-state dwell, 0 or -Vdc otherwise; U_n = 2*C_n.
 function pwmHarmonic(p,n){
-  const theta=2*Math.PI*n*p.D;
-  return {re:p.bus*Math.sin(theta)/(Math.PI*n),im:-p.bus*(1-Math.cos(theta))/(Math.PI*n)};
+  const theta=2*Math.PI*n*positiveDuty(p),span=highVoltage(p)-lowVoltage(p);
+  return {re:span*Math.sin(theta)/(Math.PI*n),im:-span*(1-Math.cos(theta))/(Math.PI*n)};
 }
 function multiplyComplex(a,b){return {re:a.re*b.re-a.im*b.im,im:a.re*b.im+a.im*b.re};}
 function responseRL(p,omega){const r=p.R,lw=p.L*omega,den=r*r+lw*lw;return {re:r/den,im:-lw/den};}
@@ -1120,8 +1142,8 @@ function drawBode(){
 }
 function sampleSteadyOutput(p,t,output){
   const periodicPhase=((t%(1/p.f))+(1/p.f))%(1/p.f),q=data.losses;
-  const onDuration=Math.min(periodicPhase,p.D/p.f);
-  let x=transition(p,onDuration,p.bus)(q.i0,q.w0);
+  const onDuration=Math.min(periodicPhase,positiveDuty(p)/p.f);
+  let x=transition(p,onDuration,highVoltage(p))(q.i0,q.w0);
   if(periodicPhase>onDuration)x=transition(p,periodicPhase-onDuration,0)(x[0],x[1]);
   return output==='speed'?x[1]*speedOutputScale():x[0];
 }
@@ -1130,7 +1152,7 @@ function drawFourierWaveforms(){
   const xs=[],iv=[],ifourier=[],ic=[],icfourier=[],iw=[],iwfourier=[];
   for(let j=0;j<=ns;j++){
     const t=2*T*j/ns;xs.push(t*1000);
-    const pwmPhase=(t/T)%1;iv.push(pwmPhase<p.D?p.bus:0);
+    const pwmPhase=(t/T)%1;iv.push(pwmAtPhase(p,pwmPhase));
     let vin=data.vbar,cur=currentDC,speed=speedDC;
     for(const h of harmonics){const w=2*Math.PI*h.n*p.f*t,c=Math.cos(w),si=Math.sin(w);
       vin+=h.input.re*c-h.input.im*si;
@@ -1305,7 +1327,7 @@ function updateLosses(){
   if(!$('lossesDomain').hidden)drawLossFrequency();
 }
 function updateStats(){$('avgV').textContent=`${fmt(data.vbar,2)} V`;$('tauE').textContent=`${fmt(data.tauE*1e6,1)} µs`;$('tauM').textContent=`${fmt(data.tauM*1000,2)} ms`;$('ripple').textContent=`${fmt(data.ripple,3)} A p–p`;$('steadySpeed').textContent=speedLabel(data.wss,1);updateLosses();}
-function syncControls(){for(const k of Object.keys(bounds)){const val=displayFmt[k](state[k]);$(k).value=k==='freq'?freqToSlider(state.freq):val;$(k+'Num').value=val}$('units').value=state.units;}
+function syncControls(){$('switchMode').value=state.mode;for(const k of Object.keys(bounds)){const val=displayFmt[k](state[k]);$(k).value=k==='freq'?freqToSlider(state.freq):val;$(k+'Num').value=val}$('units').value=state.units;}
 function recalc(resetTime=true){stop();HORIZON=state.horizon/1000;data=simulate();if(isDutyStep()){stepSettings.changeMs=Math.min(stepSettings.changeMs,Math.max(1,state.horizon-1));syncStepControls();stepData=stepSimulation();updateStepLabels();}if(resetTime)time=0;else time=clamp(time,0,HORIZON);updateStats();harmonicTable();if(activeView()==='time')draw();else if(activeView()==='frequency')drawFrequency()}
 const presets={baseline:{duty:60,freq:20,bus:12,extraL:0,inertia:1,load:0},sub:{duty:60,freq:.2,bus:12,extraL:0,inertia:1,load:0},slow:{duty:60,freq:2,bus:12,extraL:0,inertia:1,load:0},mid:{duty:60,freq:35,bus:12,extraL:0,inertia:1,load:0},fast:{duty:60,freq:50,bus:12,extraL:0,inertia:1,load:0},extreme:{duty:60,freq:100,bus:12,extraL:0,inertia:1,load:0},inductor:{duty:60,freq:20,bus:12,extraL:1,seriesR:0,inertia:1,load:0},realFilter:{duty:60,freq:20,bus:12,extraL:1,seriesR:.5,inertia:1,load:0},inertia:{duty:60,freq:20,bus:12,extraL:0,inertia:10,load:0}};
 for(const k of Object.keys(bounds)){
@@ -1315,6 +1337,7 @@ for(const k of Object.keys(bounds)){
   num.addEventListener('blur',()=>{if(num.getAttribute('aria-invalid')==='true'){num.removeAttribute('aria-invalid');num.value=displayFmt[k](state[k]);}})
 }
 $('preset').addEventListener('change',()=>{state={...state,...presets[$('preset').value]};syncControls();recalc(true)});
+$('switchMode').addEventListener('change',()=>{state.mode=$('switchMode').value;recalc(false);});
 $('units').addEventListener('change',()=>{state.units=$('units').value;updateStats();if(activeView()==='time')draw();else if(activeView()==='frequency')drawFrequency()});
 $('playSpeed').addEventListener('change',()=>{playback=Number($('playSpeed').value)});
 $('play').addEventListener('click',()=>{if(activeView()!=='time')activateTab('time');if(playing){stop();return}if(time>=HORIZON)time=0;playing=true;lastTs=0;$('play').textContent='Ⅱ Pause';$('play').setAttribute('aria-pressed','true');raf=requestAnimationFrame(animate)});
@@ -1329,7 +1352,7 @@ $('download').addEventListener('click',()=>{
 });
 window.addEventListener('resize',()=>{if(activeView()==='time')draw();else if(activeView()==='frequency')drawFrequency();else drawLossFrequency()});
 // Public test hooks for numerical and visual regression checks, and for teaching extensions.
-window.PWMMotorStudio={activeView,motor,simulate,transition,periodicLosses,pwmHarmonic,responseRL,responseMotor,harmonicSeries,activateTab,switchLoss,sliderToFreq,freqToSlider,stepSimulation,stepAt,getStepData:()=>stepData,getStepSettings:()=>({...stepSettings}),getState:()=>({...state}),getData:()=>data,setTime:t=>{time=clamp(t,0,HORIZON);draw()},getTime:()=>time,recalculate:recalc};
+window.PWMMotorStudio={activeView,positiveDuty,highVoltage,lowVoltage,meanVoltage,pwmAtPhase,motor,simulate,transition,periodicLosses,pwmHarmonic,responseRL,responseMotor,harmonicSeries,activateTab,switchLoss,sliderToFreq,freqToSlider,stepSimulation,stepAt,getStepData:()=>stepData,getStepSettings:()=>({...stepSettings}),getState:()=>({...state}),getData:()=>data,setTime:t=>{time=clamp(t,0,HORIZON);draw()},getTime:()=>time,recalculate:recalc};
 syncControls();recalc(true);
 })();
 </script>

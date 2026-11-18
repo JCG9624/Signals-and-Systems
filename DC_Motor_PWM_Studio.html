@@ -861,11 +861,13 @@ function niceStep(range,target=5){const raw=Math.max(1e-10,range/target),pow=10*
 function formatTick(x){if(Math.abs(x)>=100)return `${Math.round(x)}`;if(Math.abs(x)>=10)return `${fmt(x,1)}`;if(Math.abs(x)>=1)return `${fmt(x,2)}`;return `${fmt(x,3)}`}
 function ctxSetup(id){const c=$(id),rect=c.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);const W=Math.max(300,rect.width),H=Math.max(180,rect.height);c.width=Math.round(W*dpr);c.height=Math.round(H*dpr);const ctx=c.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);return {ctx,W,H}}
 function axes(z,opts){const {ctx,W,H}=z,l=64,r=18,t=15,b=38,bw=W-l-r,bh=H-t-b;
-  const {x0,x1,y0,y1,xUnit,yUnit}=opts;
+  const {x0,x1,y0,y1,xUnit,yUnit,yTickDecimals}=opts;
   const xx=x=>l+(x-x0)/(x1-x0)*bw,yy=y=>t+(y1-y)/(y1-y0)*bh;
   ctx.font='11px system-ui,Segoe UI,Arial,sans-serif';ctx.strokeStyle=C.grid;ctx.lineWidth=1;
   const ys=niceStep(y1-y0,5);const first=Math.ceil(y0/ys)*ys;
-  for(let y=first;y<=y1+ys*1e-5;y+=ys){const py=yy(y);ctx.beginPath();ctx.moveTo(l,py);ctx.lineTo(W-r,py);ctx.stroke();ctx.fillStyle=C.text;ctx.textAlign='right';ctx.fillText(formatTick(y),l-9,py+4)}
+  // Speed reconstruction uses at least one decimal; finer ticks retain enough digits to stay distinct.
+  const decimals=yTickDecimals===undefined?null:Math.min(7,Math.max(yTickDecimals,Math.ceil(-Math.log10(ys))));
+  for(let y=first;y<=y1+ys*1e-5;y+=ys){const py=yy(y);ctx.beginPath();ctx.moveTo(l,py);ctx.lineTo(W-r,py);ctx.stroke();ctx.fillStyle=C.text;ctx.textAlign='right';ctx.fillText(decimals===null?formatTick(y):y.toFixed(decimals),l-9,py+4)}
   const xs=niceStep(x1-x0,6);const xfirst=Math.ceil(x0/xs)*xs;
   for(let x=xfirst;x<=x1+xs*1e-5;x+=xs){const px=xx(x);ctx.beginPath();ctx.moveTo(px,t);ctx.lineTo(px,H-b);ctx.stroke();ctx.fillStyle=C.text;ctx.textAlign='center';ctx.fillText(formatTick(x),px,H-b+17)}
   ctx.fillStyle=C.text;ctx.textAlign='center';ctx.font='11px system-ui,Segoe UI,Arial,sans-serif';ctx.fillText(xUnit,(l+W-r)/2,H-6);
@@ -1252,7 +1254,7 @@ function drawFourierWaveforms(){
   const plot=(id,truth,approx,unit,truthColor,fourierColor)=>{
     const z=ctxSetup(id),{ctx}=z;
     const low=Math.min(...truth,...approx),high=Math.max(...truth,...approx),padding=Math.max(1e-8,.12*(high-low));
-    const ax=axes(z,{x0:0,x1:2*T*1000,y0:low-padding,y1:high+padding,xUnit:'Time (ms)',yUnit:unit});
+    const ax=axes(z,{x0:0,x1:2*T*1000,y0:low-padding,y1:high+padding,xUnit:'Time (ms)',yUnit:unit,yTickDecimals:id==='speedFourierPlot'?1:undefined});
     drawCurve(ctx,xs,truth,ax,truthColor,2.4);
     drawCurve(ctx,xs,approx,ax,fourierColor,2.2,[7,4]);ctx.restore();
   };

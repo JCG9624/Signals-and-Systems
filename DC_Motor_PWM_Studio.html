@@ -336,7 +336,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   </select>
   <span class="mini-hint" id="timeExperimentHint">Motor starts from rest with a constant PWM duty ratio.</span>
 </div>
-<section class="card time-inspection" aria-label="Inspect motor response at a chosen time">
+
+<div id="startupExperiment">
+<section id="startupFirstFigure" class="card speed-scope featured"><div class="card-header"><div><h2>Motor speed and current: the start-up transient</h2><span class="featured-label">PRIMARY RESULT</span><div class="scope-desc">Common time horizon: compare speed build-up with the evolving mean armature current</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--teal)"></i>two-pole motor, PWM</span><span><i class="legend-line dash" style="--c:var(--purple)"></i>one-pole motor, averaged voltage</span></div></div><canvas id="speedPlot" role="img" aria-label="Long-time motor speed compared with the one-pole average-voltage approximation"></canvas><div class="trend-divider"><span>Armature current during start-up (cycle average and switching envelope)</span><span>Shared time axis</span></div><canvas id="currentTrendPlot" role="img" aria-label="Motor armature current versus time, including average and switching envelope"></canvas><div class="scope-footer" id="speedNote">The current rises and then changes as back EMF builds. The switching-current detail is visible in the lower plots, while this figure shows its longer-term evolution.</div></section>
+<section id="timeInspection" class="card time-inspection" aria-label="Inspect motor response at a chosen time">
   <div class="inspection-heading">
     <div><h2>Inspect a moment in time</h2>
       <p>Choose a time to update the cursors in the plots and examine the instantaneous motor quantities.</p></div>
@@ -358,8 +361,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   <div class="readout" style="--accent:var(--orange)"><div class="key">Resistive heating</div><div class="val" id="heatNow">0.00 W</div></div>
 </div>
 </section>
-<div id="startupExperiment">
-<section class="card speed-scope featured"><div class="card-header"><div><h2>Motor speed and current: the start-up transient</h2><span class="featured-label">PRIMARY RESULT</span><div class="scope-desc">Common time horizon: compare speed build-up with the evolving mean armature current</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--teal)"></i>two-pole motor, PWM</span><span><i class="legend-line dash" style="--c:var(--purple)"></i>one-pole motor, averaged voltage</span></div></div><canvas id="speedPlot" role="img" aria-label="Long-time motor speed compared with the one-pole average-voltage approximation"></canvas><div class="trend-divider"><span>Armature current during start-up (cycle average and switching envelope)</span><span>Shared time axis</span></div><canvas id="currentTrendPlot" role="img" aria-label="Motor armature current versus time, including average and switching envelope"></canvas><div class="scope-footer" id="speedNote">The current rises and then changes as back EMF builds. The switching-current detail is visible in the lower plots, while this figure shows its longer-term evolution.</div></section>
 
 
 
@@ -384,7 +385,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     </div>
     <p class="step-explanation" id="stepModeNote">To avoid an artificial partial PWM cycle, the new duty ratio takes effect at the nearest PWM-period boundary. All curves below use the resulting actual change time. The current and speed do not jump at the change: only the PWM duty command changes.</p>
   </section>
-  <section class="card step-scope step-command">
+  <section id="stepFirstFigure" class="card step-scope step-command">
     <div class="card-header"><div><h2>Duty command · two constant levels</h2><div class="scope-desc">The average applied voltage follows V̄(t) = D(t) V<sub>dc</sub></div></div></div>
     <canvas id="stepDutyPlot" role="img" aria-label="Duty ratio versus time, with a single change from the initial to final level"></canvas>
     <div class="scope-footer">The mean-voltage command is piecewise constant. The instantaneous PWM voltage switches between 0 and +V<sub>dc</sub> in unipolar mode, or −V<sub>dc</sub> and +V<sub>dc</sub> in bipolar mode.</div>
@@ -828,8 +829,10 @@ function renderStepInfo(){
   $('rotor').setAttribute('transform','translate(1068 40) rotate('+s.theta*180/Math.PI+')');
 }
 function selectTimeExperiment(){
-  
   const step=isDutyStep();
+  // Keep the same inspector immediately below the first figure of either experiment.
+  if(step)$('stepFirstFigure').after($('timeInspection'));
+  else $('startupFirstFigure').after($('timeInspection'));
   $('startupExperiment').hidden=step;
   $('dutyStepExperiment').hidden=!step;
   $('timeExperimentHint').textContent=step?'Motor is initially at periodic steady state; duty changes from D₁ to D₂.':'Motor starts from rest with a constant PWM duty ratio.';

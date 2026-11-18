@@ -316,7 +316,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 
 
 <div class="two-scopes">
-  <section class="card scope"><div class="card-header"><div><h2>PWM source</h2><div class="scope-desc">Switching-time microscope: up to six PWM periods around the cursor</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--slate)"></i>v<sub>PWM</sub>(t)</span><span><i class="legend-line dash" style="--c:var(--teal)"></i>average voltage</span></div></div><canvas id="voltagePlot" role="img" aria-label="Zoomed PWM voltage waveform with its average voltage"></canvas><div class="scope-footer">The duty cycle controls the <b>average voltage</b>: V̄ = D V<sub>dc</sub>.</div></section>
+  <section class="card scope"><div class="card-header"><div><h2>PWM source</h2><div class="scope-desc">Switching-time microscope: up to six PWM periods around the cursor</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--slate)"></i>v<sub>PWM</sub>(t)</span><span><i class="legend-line dash" style="--c:var(--teal)"></i>average voltage</span></div></div><canvas id="voltagePlot" role="img" aria-label="Zoomed PWM voltage waveform with its average voltage"></canvas><div class="scope-footer">The mean voltage is <b>V̄ = D V<sub>dc</sub></b> in both modes. Bipolar switching uses a longer +V<sub>dc</sub> dwell and a −V<sub>dc</sub> interval to produce the same mean.</div></section>
   <section class="card scope"><div class="card-header"><div><h2>Armature current ripple</h2><div class="scope-desc">Same close-up window; current cannot jump instantaneously</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--orange)"></i>i(t)</span><span><i class="legend-line dash" style="--c:var(--navy)"></i>local cycle mean</span></div></div><canvas id="currentPlot" role="img" aria-label="Armature current showing ripple and local cycle mean"></canvas><div class="scope-footer">The armature inductance (plus any extra series inductance) limits <b>di/dt</b>.</div></section>
 </div>
 </div>
@@ -325,8 +325,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <h2>Experiment: change the PWM duty ratio between two levels</h2>
     <p>Start from the periodic steady state at D₁, then change to D₂ at the chosen time. The PWM switching frequency stays constant, and the motor states remain continuous.</p>
     <div class="step-config-grid">
-      <div><label for="stepD1">Initial duty ratio, D₁ (%)</label><input id="stepD1" type="number" min="10" max="90" step="1" value="30"></div>
-      <div><label for="stepD2">Final duty ratio, D₂ (%)</label><input id="stepD2" type="number" min="10" max="90" step="1" value="70"></div>
+      <div><label for="stepD1">Initial mean-voltage command, D₁ (%)</label><input id="stepD1" type="number" min="10" max="90" step="1" value="30"></div>
+      <div><label for="stepD2">Final mean-voltage command, D₂ (%)</label><input id="stepD2" type="number" min="10" max="90" step="1" value="70"></div>
       <div><label for="stepAtMs">Requested step time (ms)</label><input id="stepAtMs" type="number" min="1" max="319" step="1" value="40"></div>
     </div>
     <div class="step-results" aria-live="polite">
@@ -334,12 +334,12 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       <div class="step-result"><span>Steady motor speed, before → after</span><strong id="stepSpeeds">—</strong></div>
       <div class="step-result"><span>Actual step time</span><strong id="stepActualTime">—</strong></div>
     </div>
-    <p class="step-explanation">To avoid an artificial partial PWM cycle, the new duty ratio takes effect at the nearest PWM-period boundary. All curves below use the resulting actual change time. The current and speed do not jump at the change: only the PWM duty command changes.</p>
+    <p class="step-explanation" id="stepModeNote">To avoid an artificial partial PWM cycle, the new duty ratio takes effect at the nearest PWM-period boundary. All curves below use the resulting actual change time. The current and speed do not jump at the change: only the PWM duty command changes.</p>
   </section>
   <section class="card step-scope step-command">
     <div class="card-header"><div><h2>Duty command · two constant levels</h2><div class="scope-desc">The average applied voltage follows V̄(t) = D(t) V<sub>dc</sub></div></div></div>
     <canvas id="stepDutyPlot" role="img" aria-label="Duty ratio versus time, with a single change from the initial to final level"></canvas>
-    <div class="scope-footer">The duty ratio is piecewise constant. Actual PWM voltage still switches between 0 and V<sub>dc</sub> within each PWM period.</div>
+    <div class="scope-footer">The mean-voltage command is piecewise constant. The instantaneous PWM voltage switches between 0 and +V<sub>dc</sub> in unipolar mode, or −V<sub>dc</sub> and +V<sub>dc</sub> in bipolar mode.</div>
   </section>
   <section class="card step-scope">
     <div class="card-header"><div><h2>Motor speed · response to the duty step</h2><div class="scope-desc">Exact switched two-pole model compared with the averaged first-order mechanical approximation</div></div>
@@ -433,7 +433,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
    <section class="card reconstruction-card"><div class="card-header"><div><h2>Reconstruct armature current</h2><div class="scope-desc">Exact periodic current versus Fourier sum</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--orange)"></i>Exact current</span><span><i class="legend-line dash" style="--c:var(--navy)"></i>Fourier sum</span></div></div><canvas id="currentFourierPlot" role="img" aria-label="Two-period Fourier reconstruction of armature current"></canvas><div class="scope-footer">Electrical inductance attenuates the PWM voltage harmonics, but current ripple can remain significant.</div></section>
  </div>
  <section class="card reconstruction-card speed-reconstruction"><div class="card-header"><div><h2>Reconstruct motor speed</h2><div class="scope-desc">Exact periodic speed versus Fourier sum, across the same two PWM periods</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--teal)"></i>Exact speed</span><span><i class="legend-line dash" style="--c:var(--purple)"></i>Fourier sum</span></div></div><canvas id="speedFourierPlot" role="img" aria-label="Two-period Fourier reconstruction of motor speed"></canvas><div class="scope-footer">Mechanical inertia strongly attenuates switching-frequency speed ripple. The three physical traces have different units; the shared-axis comparison above makes their relative harmonic content easier to compare.</div></section>
-<section class="card teach harmonics" aria-label="Fourier harmonic response"><h2>Fourier view: steady-state harmonics</h2><p>The PWM contains a DC component and harmonics at n f<sub>PWM</sub>. Each harmonic is multiplied by the motor's frequency response. Its voltage amplitude is 2V<sub>dc</sub>|sin(πnD)|/(πn).</p><table><thead><tr><th>n</th><th>Voltage peak</th><th>Current peak</th><th>Speed peak</th></tr></thead><tbody id="harmonicRows"></tbody></table><p class="foot">Peak (not RMS) amplitudes of individual sinusoids in the <strong>periodic steady state</strong>. These are not start-up contributions. Fourier is especially convenient here because each harmonic can be handled independently.</p></section>
+<section class="card teach harmonics" aria-label="Fourier harmonic response"><h2>Fourier view: steady-state harmonics</h2><p>The PWM contains a DC component and harmonics at n f<sub>PWM</sub>. Each harmonic is multiplied by the motor's frequency response. Its input-voltage peak amplitude is 2 ΔV |sin(πnd<sub>+</sub>)|/(πn), where ΔV = V<sub>high</sub> − V<sub>low</sub> and d<sub>+</sub> is the positive-voltage dwell fraction.</p><table><thead><tr><th>n</th><th>Voltage peak</th><th>Current peak</th><th>Speed peak</th></tr></thead><tbody id="harmonicRows"></tbody></table><p class="foot">Peak (not RMS) amplitudes of individual sinusoids in the <strong>periodic steady state</strong>. These are not start-up contributions. Fourier is especially convenient here because each harmonic can be handled independently.</p></section>
  <section class="card teach frequency-explanation"><h2>The mathematical connection</h2>
  <div class="freq-equations"><div><b>Electrical approximation (speed fixed)</b><br>H<sub>RL</sub>(s) = 1/(R<sub>tot</sub> + sL<sub>tot</sub>)<br>f<sub>c</sub> = R<sub>tot</sub>/(2πL<sub>tot</sub>)</div><div><b>Complete voltage-to-current transfer</b><br>H<sub>i</sub>(s) = (Js+b)/[(R<sub>tot</sub>+sL<sub>tot</sub>)(Js+b)+k<sub>e</sub>k<sub>t</sub>]</div></div>
  <p>Here R<sub>tot</sub> = R + R<sub>f</sub> and L<sub>tot</sub> = L + L<sub>add</sub>. A sinusoidal voltage harmonic at frequency n f<sub>PWM</sub> produces a sinusoidal current harmonic at the same frequency, scaled and phase-shifted by H<sub>i</sub>(j2πnf<sub>PWM</sub>). For motor speed, use H<sub>ω</sub>(s) = k<sub>t</sub>/[(R<sub>tot</sub>+sL<sub>tot</sub>)(Js+b)+k<sub>e</sub>k<sub>t</sub>].</p>
@@ -449,6 +449,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     </div>
     <p><strong>Operating point:</strong> these are periodic steady-state losses at fixed duty <b>D = <span id="lossDutyValue">60%</span></b>, set using the shared PWM duty control. They do <strong>not</strong> describe the transient losses during the duty-step experiment.</p>
     <p><strong>Resistive filtering losses:</strong> In periodic steady state, P<sub>ripple</sub> = R(I<sub>rms</sub><sup>2</sup> − Ī<sup>2</sup>) = (R/2) ∑<sub>n≥1</sub>|I<sub>n,peak</sub>|<sup>2</sup>. This uses the complete current spectrum, not just the finite set of displayed harmonics.</p>
+    <p id="lossModeNote"><strong>Switching mode:</strong> both modes use the same mean voltage. The bipolar drive tends to produce greater current ripple and ripple-related copper heating; this teaching model assumes the same switching energy per transition in both modes and does not model semiconductor topology or energy recovery.</p>
     <p><strong>Switching-frequency choice:</strong> high f<sub>PWM</sub> reduces current ripple, but a real driver usually switches less efficiently as frequency increases. Low switching frequencies can produce audible vibration (not simulated). The proposed 20–50 kHz band is a design discussion, not a conclusion from the motor's LTI model.</p>
   </section>
 
@@ -478,7 +479,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 </div>
 </div>
 <div class="lower time-extras" id="timeExtras">
- <section class="card teach" aria-label="Mathematical model and interpretation"><h2>What is the model doing?</h2><div class="math-box">(L + L<sub>add</sub>) di/dt = v<sub>PWM</sub>(t) − (R + R<sub>f</sub>)i(t) − k<sub>e</sub>ω(t)<br>J dω/dt = k<sub>t</sub>i(t) − bω(t) − T<sub>L</sub></div><p><strong>Start-up:</strong> the current reacts quickly to the ON/OFF transitions; accumulated torque accelerates the shaft more slowly.</p><p><strong>Back EMF:</strong> as ω increases, k<sub>e</sub>ω opposes the applied armature voltage, reducing the mean current and driving the motor towards a steady speed.</p><p><strong>Model comparison:</strong> the dashed curve uses the one-pole approximation with V̄ = DV<sub>dc</sub>. It is a good approximation to the <em>slow speed response</em>, not to the switching-frequency current ripple.</p><p><strong>Frequency-domain view:</strong> for voltage-to-current and voltage-to-speed analysis, with L<sub>tot</sub> = L + L<sub>add</sub>, R<sub>tot</sub> = R + R<sub>f</sub> and Δ(s) = (R<sub>tot</sub> + sL<sub>tot</sub>)(Js + b) + k<sub>e</sub>k<sub>t</sub>, the transfer functions are H<sub>i</sub>(s) = (Js + b)/Δ(s) and H<sub>ω</sub>(s) = k<sub>t</sub>/Δ(s).</p><p><strong>Drive assumption:</strong> the source is an ideal, actively driven 0/V<sub>dc</sub> PWM terminal voltage (including a 0 V freewheel state); signed armature current is allowed. A real nonsynchronous diode/freewheel stage or current limit can change the waveform.</p></section>
+ <section class="card teach" aria-label="Mathematical model and interpretation"><h2>What is the model doing?</h2><div class="math-box">(L + L<sub>add</sub>) di/dt = v<sub>PWM</sub>(t) − (R + R<sub>f</sub>)i(t) − k<sub>e</sub>ω(t)<br>J dω/dt = k<sub>t</sub>i(t) − bω(t) − T<sub>L</sub></div><p><strong>Start-up:</strong> the current reacts quickly to the ON/OFF transitions; accumulated torque accelerates the shaft more slowly.</p><p><strong>Back EMF:</strong> as ω increases, k<sub>e</sub>ω opposes the applied armature voltage, reducing the mean current and driving the motor towards a steady speed.</p><p><strong>Model comparison:</strong> the dashed curve uses the one-pole approximation with V̄ = DV<sub>dc</sub>. It is a good approximation to the <em>slow speed response</em>, not to the switching-frequency current ripple.</p><p><strong>Frequency-domain view:</strong> for voltage-to-current and voltage-to-speed analysis, with L<sub>tot</sub> = L + L<sub>add</sub>, R<sub>tot</sub> = R + R<sub>f</sub> and Δ(s) = (R<sub>tot</sub> + sL<sub>tot</sub>)(Js + b) + k<sub>e</sub>k<sub>t</sub>, the transfer functions are H<sub>i</sub>(s) = (Js + b)/Δ(s) and H<sub>ω</sub>(s) = k<sub>t</sub>/Δ(s).</p><p><strong>Drive assumption:</strong> the source is an ideal prescribed motor-terminal voltage: 0/+V<sub>dc</sub> (unipolar) or −V<sub>dc</sub>/+V<sub>dc</sub> (bipolar). Signed armature current is allowed. The H-bridge semiconductors, freewheel and regenerative power paths, switching dead time, current limits and thermal shutdown are not simulated.</p></section>
 </div>
 <section class="card questions" id="timeQuestions"><h2>Learning outcomes · Investigate the time response</h2><ol><li>Compare the electrical and mechanical time constants. Why does armature current react faster than motor speed?</li><li>Vary PWM frequency at fixed duty. What happens to current ripple and to the slower motor-speed response?</li><li>Choose the duty-ratio step experiment and vary inertia or inductance. Which transient changes most, and why?</li></ol></section>
 <footer><span>Signals &amp; Systems · Chapter 11 · DC motor and PWM · Interactive HTML / JavaScript</span><span>Prompts provided by Joaquin Carrasco · Code produced by ChatGPT · No external libraries</span><span>Acknowledgements: Dr Ognjen Marjanovic and Dr Liam Marsh</span></footer>
@@ -739,6 +740,9 @@ function updateStepLabels(){
   $('stepVoltages').textContent=fmt(stepSettings.D1*stepData.base.bus/100,2)+' → '+fmt(stepSettings.D2*stepData.base.bus/100,2)+' V';
   $('stepSpeeds').textContent=fmt(stepData.e1.w*scale,1)+' → '+fmt(stepData.e2.w*scale,1)+' '+unit;
   $('stepActualTime').textContent=fmt(stepData.switchTime*1000,3)+' ms';
+  const a=positiveDuty({...stepData.base,D:stepSettings.D1/100})*100;
+  const b=positiveDuty({...stepData.base,D:stepSettings.D2/100})*100;
+  $('stepModeNote').textContent='Switching mode: '+switchingModeLabel(stepData.base)+'. The +Vdc dwell changes from '+fmt(a,1)+'% to '+fmt(b,1)+'%. The mean command changes from D₁ = '+fmt(stepSettings.D1,0)+'% to D₂ = '+fmt(stepSettings.D2,0)+'%. The step is applied at the nearest PWM-period boundary; current and speed remain continuous.';
   $('timeExperimentHint').textContent='Motor is initially at periodic steady state; the duty command then changes from D₁ to D₂.';
 }
 function drawStepExperiment(){
@@ -753,9 +757,9 @@ function renderStepInfo(){
   $('torqueNow').textContent=fmt(1000*p.kt*s.i,2)+' mN·m';
   $('heatNow').textContent=fmt(p.R*s.i*s.i,3)+' W';
   const sc=$('switchState'),on=s.voltage>0;
-  sc.textContent=on?'SWITCH ON · '+fmt(s.voltage,1)+' V':'SWITCH OFF · 0 V';
+  sc.textContent=(on?'POSITIVE LEVEL':'LOW LEVEL')+' · '+fmt(s.voltage,1)+' V';
   sc.classList.toggle('on',on);
-  $('pwmPath').style.stroke=on?'#00a58b':'#9db2c2';
+  $('pwmPath').style.stroke=on?'#00a58b':s.voltage<0?'#8053b4':'#9db2c2';
   $('rotor').setAttribute('transform','translate(1068 40) rotate('+s.theta*180/Math.PI+')');
 }
 function selectTimeExperiment(){
@@ -1144,7 +1148,7 @@ function sampleSteadyOutput(p,t,output){
   const periodicPhase=((t%(1/p.f))+(1/p.f))%(1/p.f),q=data.losses;
   const onDuration=Math.min(periodicPhase,positiveDuty(p)/p.f);
   let x=transition(p,onDuration,highVoltage(p))(q.i0,q.w0);
-  if(periodicPhase>onDuration)x=transition(p,periodicPhase-onDuration,0)(x[0],x[1]);
+  if(periodicPhase>onDuration)x=transition(p,periodicPhase-onDuration,lowVoltage(p))(x[0],x[1]);
   return output==='speed'?x[1]*speedOutputScale():x[0];
 }
 function drawFourierWaveforms(){
@@ -1177,7 +1181,7 @@ function drawFourierWaveforms(){
 function updateFrequencyText(){
   const q=harmonicSeries(),{p,N}=q;
   $('harmonicCountValue').textContent=String(N);
-  $('freqIntroNote').textContent='Follow all three signals. DC (n = 0) is the mean; AC components occur at n × '+fmt(p.f/1000,3)+' kHz. The three spectra use identical 0–1 axes but independent physical normalisation references, so compare relative harmonic content rather than raw volt/amp/speed magnitudes.';
+  $('freqIntroNote').textContent=switchingModeLabel(p)+': DC (n = 0) is the mean '+fmt(data.vbar,2)+' V, with AC components at n × '+fmt(p.f/1000,3)+' kHz. The normalised spectra show the relative harmonic content. The motor Bode curves are identical for both switching modes; what changes is the input harmonic spectrum.';
 }
 function drawFrequency(){
   if($('frequencyDomain').hidden||!data)return;
@@ -1264,7 +1268,7 @@ $('pwmSpectrumPlot').addEventListener('keydown',e=>{
 
 function renderInfo(){const s=at(time),p=data.p,volt=pwm(time);$('scrub').value=Math.round(time/HORIZON*1000);$('now').textContent=`${fmt(time*1000,2)} ms`;
   $('vNow').textContent=`${fmt(volt,2)} V`;$('iNow').textContent=formatCurrent(s.i);$('wNow').textContent=speedLabel(s.w,1);$('emNow').textContent=`${fmt(p.ke*s.w,2)} V`;$('torqueNow').textContent=`${fmt(1000*p.kt*s.i,2)} mN·m`;$('heatNow').textContent=`${fmt((p.Rarm+p.Rf)*s.i*s.i,3)} W`;
-  const on=volt>0,sc=$('switchState');sc.textContent=on?`SWITCH ON · ${fmt(volt,1)} V`:'SWITCH OFF · 0 V';sc.classList.toggle('on',on);$('pwmPath').style.stroke=on?'#00a58b':'#9db2c2';$('rotor').setAttribute('transform',`translate(1068 40) rotate(${s.theta*180/Math.PI})`);
+  const on=volt>0,sc=$('switchState');sc.textContent=(on?'POSITIVE LEVEL':'LOW LEVEL')+` · ${fmt(volt,1)} V`;sc.classList.toggle('on',on);$('pwmPath').style.stroke=on?'#00a58b':volt<0?'#8053b4':'#9db2c2';$('rotor').setAttribute('transform',`translate(1068 40) rotate(${s.theta*180/Math.PI})`);
 }
 function draw(){if(!data)return;if(isDutyStep()&&stepData)renderStepInfo();else renderInfo();if($('timeDomain').hidden)return;if(isDutyStep()){drawStepExperiment();return;}drawVoltage();drawCurrent();drawSpeed();drawCurrentTrend();}
 function stop(){playing=false;cancelAnimationFrame(raf);raf=0;$('play').textContent='▶ Play';$('play').setAttribute('aria-pressed','false');}
@@ -1324,9 +1328,15 @@ function updateLosses(){
   $('freqGuidance').textContent=fkhz<20?'Below 20 kHz: higher current ripple; switching may excite audible vibrations.':fkhz<=50?'20–50 kHz: the suggested design discussion range; hardware-specific losses decide the best setting.':'Above 50 kHz: current ripple is smaller, but the illustrative driver switching losses grow with frequency.';
   $('freqLossNote').textContent=`At ${displayFmt.freq(fkhz)} kHz: ripple-related copper heating ${powerFormat((data.p.Rarm+data.p.Rf)*Math.max(0,q.iRms*q.iRms-q.iAvg*q.iAvg))}; assumed switching loss ${powerFormat(sw)}. The curve is illustrative, not a measured motor driver.`;
   $('lossDutyValue').textContent=fmt(state.duty,0)+'%';
+  $('lossModeNote').innerHTML='<strong>Switching mode:</strong> '+switchingModeLabel(data.p)+', with +Vdc dwell <b>'+fmt(100*positiveDuty(data.p),1)+'%</b> and mean terminal voltage <b>'+fmt(data.vbar,2)+' V</b>. Both modes use the same illustrative E<sub>edge</sub> value, which does not capture different H-bridge switching and conduction losses or regenerative energy flow.';
   if(!$('lossesDomain').hidden)drawLossFrequency();
 }
-function updateStats(){$('avgV').textContent=`${fmt(data.vbar,2)} V`;$('tauE').textContent=`${fmt(data.tauE*1e6,1)} µs`;$('tauM').textContent=`${fmt(data.tauM*1000,2)} ms`;$('ripple').textContent=`${fmt(data.ripple,3)} A p–p`;$('steadySpeed').textContent=speedLabel(data.wss,1);updateLosses();}
+function updateStats(){const p=data.p,plus=(100*positiveDuty(p)).toFixed(1);
+  $('switchModeGuide').textContent=p.mode==='bipolar'
+    ?'Bipolar: +Vdc for '+plus+'% of each period and −Vdc otherwise; mean voltage = '+fmt(data.vbar,2)+' V. D controls the mean, not the physical positive-state dwell.'
+    :'Unipolar: +Vdc for '+plus+'% of each period and 0 V otherwise; mean voltage = '+fmt(data.vbar,2)+' V.';
+  $('driveModeLabel').textContent=p.mode==='bipolar'?'+Vdc ↔ −Vdc':'0 ↔ +Vdc';
+  $('avgV').textContent=`${fmt(data.vbar,2)} V`;$('tauE').textContent=`${fmt(data.tauE*1e6,1)} µs`;$('tauM').textContent=`${fmt(data.tauM*1000,2)} ms`;$('ripple').textContent=`${fmt(data.ripple,3)} A p–p`;$('steadySpeed').textContent=speedLabel(data.wss,1);updateLosses();}
 function syncControls(){$('switchMode').value=state.mode;for(const k of Object.keys(bounds)){const val=displayFmt[k](state[k]);$(k).value=k==='freq'?freqToSlider(state.freq):val;$(k+'Num').value=val}$('units').value=state.units;}
 function recalc(resetTime=true){stop();HORIZON=state.horizon/1000;data=simulate();if(isDutyStep()){stepSettings.changeMs=Math.min(stepSettings.changeMs,Math.max(1,state.horizon-1));syncStepControls();stepData=stepSimulation();updateStepLabels();}if(resetTime)time=0;else time=clamp(time,0,HORIZON);updateStats();harmonicTable();if(activeView()==='time')draw();else if(activeView()==='frequency')drawFrequency()}
 const presets={baseline:{duty:60,freq:20,bus:12,extraL:0,inertia:1,load:0},sub:{duty:60,freq:.2,bus:12,extraL:0,inertia:1,load:0},slow:{duty:60,freq:2,bus:12,extraL:0,inertia:1,load:0},mid:{duty:60,freq:35,bus:12,extraL:0,inertia:1,load:0},fast:{duty:60,freq:50,bus:12,extraL:0,inertia:1,load:0},extreme:{duty:60,freq:100,bus:12,extraL:0,inertia:1,load:0},inductor:{duty:60,freq:20,bus:12,extraL:1,seriesR:0,inertia:1,load:0},realFilter:{duty:60,freq:20,bus:12,extraL:1,seriesR:.5,inertia:1,load:0},inertia:{duty:60,freq:20,bus:12,extraL:0,inertia:10,load:0}};

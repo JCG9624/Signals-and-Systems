@@ -1119,7 +1119,9 @@ function bodeAxes(id,ymin,ymax){
   const xx=f=>l+(Math.log10(f)-Math.log10(minF))/Math.log10(maxF/minF)*w;
   const yy=v=>t+(ymax-v)/(ymax-ymin)*h;
   ctx.font='10px system-ui,Arial,sans-serif';ctx.lineWidth=1;
-  const step=niceStep(ymax-ymin,4);
+  // Phase ticks should use meaningful angular increments, including −90°.
+  // Keep the automatically chosen spacing for the magnitude axis only.
+  const step=id==='bodePhasePlot'?(ymax-ymin<=180?30:45):niceStep(ymax-ymin,4);
   for(let v=Math.ceil(ymin/step)*step;v<=ymax+step*.001;v+=step){
     const y=yy(v);ctx.strokeStyle=C.grid;ctx.beginPath();ctx.moveTo(l,y);ctx.lineTo(W-r,y);ctx.stroke();
     ctx.textAlign='right';ctx.fillStyle=C.text;ctx.fillText(formatTick(v),l-7,y+3);

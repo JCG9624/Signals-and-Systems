@@ -264,6 +264,20 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 
 .freq-steady-explanation{font-size:12px;line-height:1.6;color:#496b81;background:#f4f9fc;border-left:3px solid #8db5c8;border-radius:7px;margin:0 0 14px;padding:11px 15px}
 .freq-steady-explanation strong{color:var(--navy)}
+
+/* Linked short-time switching microscope. */
+.microscope-navigator{padding:13px 16px 11px;margin:0 0 13px}
+.microscope-heading{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.microscope-heading h2{margin:0 0 5px;font-size:14px;color:var(--navy)}
+.microscope-heading p{font-size:11px;line-height:1.5;color:var(--muted);margin:0 0 10px;max-width:670px}
+.microscope-heading p strong{color:var(--navy)}
+.microscope-heading output{font-size:12px;font-weight:780;font-variant-numeric:tabular-nums;color:var(--navy);background:#f0f7fa;border:1px solid #dbeaf2;border-radius:7px;padding:6px 9px;white-space:nowrap}
+.microscope-position-label{display:block;font-size:11px;font-weight:730;color:var(--navy);margin-bottom:5px}
+#zoomPosition{display:block;width:100%;accent-color:var(--teal);cursor:pointer}
+.microscope-endpoints{display:flex;align-items:center;justify-content:space-between;gap:7px;font-size:10px;color:#67869b;margin-top:4px}
+.microscope-endpoints span:nth-child(2){font-weight:740;color:#295d7d;text-align:center}
+.microscope-hint{font-size:10.5px;line-height:1.5;color:#6a8596;margin:8px 0 0}
+@media(max-width:600px){.microscope-heading output{margin-bottom:7px}.microscope-endpoints span:nth-child(2){display:none}}
 </style>
 </head>
 <body>
@@ -376,9 +390,26 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 
 
 
+<section class="card microscope-navigator" aria-label="Move the switching-waveform close-up through the experiment">
+  <div class="microscope-heading">
+    <div>
+      <h2>Explore the switching waveforms over time</h2>
+      <p>The initial view shows the <strong>beginning of the experiment</strong> (up to six PWM periods). Move the slider to inspect the current ripple later in the transient or near steady state.</p>
+    </div>
+    <output id="zoomRange" aria-live="off">0.000–0.300 ms</output>
+  </div>
+  <label for="zoomPosition" class="microscope-position-label">Position of the shared voltage and current close-up window</label>
+  <input type="range" id="zoomPosition" min="0" max="100000" step="1" value="0" aria-label="Move the voltage and current close-up window from start to end of the experiment">
+  <div class="microscope-endpoints">
+    <span>Start of experiment</span>
+    <span id="zoomStatus">Initial part of the experiment</span>
+    <span>End of experiment</span>
+  </div>
+  <p class="microscope-hint">Both plots show the same short interval. Moving this window also updates the inspection time and instantaneous readouts above.</p>
+</section>
 <div class="two-scopes">
-  <section class="card scope"><div class="card-header"><div><h2>PWM source</h2><div class="scope-desc">Switching-time microscope: up to six PWM periods around the cursor</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--slate)"></i>v<sub>PWM</sub>(t)</span><span><i class="legend-line dash" style="--c:var(--teal)"></i>average voltage</span></div></div><canvas id="voltagePlot" role="img" aria-label="Zoomed PWM voltage waveform with its average voltage"></canvas><div class="scope-footer">The mean voltage is <b>V̄ = D V<sub>dc</sub></b> in both modes. Bipolar switching uses a longer +V<sub>dc</sub> dwell and a −V<sub>dc</sub> interval to produce the same mean.</div></section>
-  <section class="card scope"><div class="card-header"><div><h2>Armature current ripple</h2><div class="scope-desc">Same close-up window; current cannot jump instantaneously</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--orange)"></i>i(t)</span><span><i class="legend-line dash" style="--c:var(--navy)"></i>local cycle mean</span></div></div><canvas id="currentPlot" role="img" aria-label="Armature current showing ripple and local cycle mean"></canvas><div class="scope-footer">The armature inductance (plus any extra series inductance) limits <b>di/dt</b>.</div></section>
+  <section class="card scope"><div class="card-header"><div><h2>PWM source</h2><div class="scope-desc">Initial view: first six PWM periods; the window can be moved across the entire experiment</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--slate)"></i>v<sub>PWM</sub>(t)</span><span><i class="legend-line dash" style="--c:var(--teal)"></i>average voltage</span></div></div><canvas id="voltagePlot" role="img" aria-label="Zoomed PWM voltage waveform with its average voltage"></canvas><div class="scope-footer">The mean voltage is <b>V̄ = D V<sub>dc</sub></b> in both modes. Bipolar switching uses a longer +V<sub>dc</sub> dwell and a −V<sub>dc</sub> interval to produce the same mean.</div></section>
+  <section class="card scope"><div class="card-header"><div><h2>Armature current ripple</h2><div class="scope-desc">Initial view: beginning of the experiment; current cannot jump instantaneously. Use the window-position slider to explore later times</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--orange)"></i>i(t)</span><span><i class="legend-line dash" style="--c:var(--navy)"></i>local cycle mean</span></div></div><canvas id="currentPlot" role="img" aria-label="Armature current showing ripple and local cycle mean"></canvas><div class="scope-footer">The armature inductance (plus any extra series inductance) limits <b>di/dt</b>.</div></section>
 </div>
 </div>
 <div id="dutyStepExperiment" hidden>
@@ -881,7 +912,19 @@ function axes(z,opts){const {ctx,W,H}=z,l=64,r=18,t=15,b=38,bw=W-l-r,bh=H-t-b;
 function drawCurve(ctx,xvalues,yvalues,ax,color,width=2.5,dash=[]){ctx.strokeStyle=color;ctx.lineWidth=width;ctx.setLineDash(dash);ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();for(let q=0;q<xvalues.length;q++){const xx=ax.xx(xvalues[q]),yy=ax.yy(yvalues[q]);if(q===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy)}ctx.stroke();ctx.setLineDash([])}
 function marker(ctx,ax,x,y,color){ctx.strokeStyle='#fff';ctx.fillStyle=color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(ax.xx(x),ax.yy(y),4.5,0,2*Math.PI);ctx.fill();ctx.stroke()}
 function drawCursor(ctx,ax,x){ctx.strokeStyle='#6f8fa3';ctx.lineWidth=1.4;ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(ax.xx(x),ax.t);ctx.lineTo(ax.xx(x),ax.t+ax.bh);ctx.stroke();ctx.setLineDash([])}
-function zoomWindow(){const width=Math.min(6*data.period,HORIZON),start=clamp(time-width/2,0,Math.max(0,HORIZON-width));return [start,start+width]}
+function zoomWindow(){
+  const width=Math.min(6*data.period,HORIZON);
+  const start=clamp(time-width/2,0,Math.max(0,HORIZON-width));
+  return [start,start+width];
+}
+function syncZoomNavigator(){
+  const [start,end]=zoomWindow();
+  const maxStart=Math.max(0,HORIZON-(end-start));
+  $('zoomPosition').value=maxStart>0?Math.round(100000*start/maxStart):0;
+  $('zoomRange').textContent=fmt(start*1000,3)+'–'+fmt(end*1000,3)+' ms';
+  const fraction=maxStart>0?start/maxStart:0;
+  $('zoomStatus').textContent=fraction<=1e-5?'Initial part of the experiment':fraction>=1-1e-5?'Final part of the experiment':'Intermediate part of the experiment';
+}
 function drawVoltage(){const z=ctxSetup('voltagePlot'),{ctx}=z,[t0,t1]=zoomWindow(),x0=t0*1000,x1=t1*1000;
   const ax=axes(z,{x0,x1,y0:(lowVoltage(data.p)<0?-data.p.bus*1.18:-data.p.bus*.07),y1:data.p.bus*1.18,xUnit:'Time (ms)',yUnit:'Voltage (V)'});
   const avg=data.vbar;ctx.strokeStyle=C.teal;ctx.lineWidth=2;ctx.setLineDash([7,5]);ctx.beginPath();ctx.moveTo(ax.xx(x0),ax.yy(avg));ctx.lineTo(ax.xx(x1),ax.yy(avg));ctx.stroke();ctx.setLineDash([]);
@@ -1356,7 +1399,7 @@ function renderInfo(){const s=at(time),p=data.p,volt=pwm(time);$('scrub').value=
   $('vNow').textContent=`${fmt(volt,2)} V`;$('iNow').textContent=formatCurrent(s.i);$('wNow').textContent=speedLabel(s.w,1);$('emNow').textContent=`${fmt(p.ke*s.w,2)} V`;$('torqueNow').textContent=`${fmt(1000*p.kt*s.i,2)} mN·m`;$('heatNow').textContent=`${fmt((p.Rarm+p.Rf)*s.i*s.i,3)} W`;
   const on=volt>0,sc=$('switchState');sc.textContent=(on?'POSITIVE LEVEL':'LOW LEVEL')+` · ${fmt(volt,1)} V`;sc.classList.toggle('on',on);$('pwmPath').style.stroke=on?'#00a58b':volt<0?'#8053b4':'#9db2c2';$('rotor').setAttribute('transform',`translate(1068 40) rotate(${s.theta*180/Math.PI})`);
 }
-function draw(){if(!data)return;if(isDutyStep()&&stepData)renderStepInfo();else renderInfo();if($('timeDomain').hidden)return;if(isDutyStep()){drawStepExperiment();return;}drawVoltage();drawCurrent();drawSpeed();drawCurrentTrend();}
+function draw(){if(!data)return;if(isDutyStep()&&stepData)renderStepInfo();else renderInfo();if($('timeDomain').hidden)return;if(isDutyStep()){drawStepExperiment();return;}syncZoomNavigator();drawVoltage();drawCurrent();drawSpeed();drawCurrentTrend();}
 function powerFormat(W){if(W===0)return '0 mW';return Math.abs(W)<1?`${fmt(W*1000,2)} mW`:`${fmt(W,3)} W`}
 
 function drawLossFrequency(){
@@ -1459,6 +1502,14 @@ $('switchMode').addEventListener('change',()=>{state.mode=$('switchMode').value;
 $('units').addEventListener('change',()=>{state.units=$('units').value;updateStats();if(activeView()==='time')draw();else if(activeView()==='frequency')drawFrequency()});
 $('reset').addEventListener('click',()=>{state={...defaults};$('preset').value='baseline';syncControls();recalc(true)});
 $('scrub').addEventListener('input',()=>{time=HORIZON*Number($('scrub').value)/100000;draw()});
+$('zoomPosition').addEventListener('input',()=>{
+  if(!data||isDutyStep())return;
+  const width=Math.min(6*data.period,HORIZON);
+  const maxStart=Math.max(0,HORIZON-width);
+  const start=maxStart*Number($('zoomPosition').value)/100000;
+  time=clamp(start+width/2,0,HORIZON);
+  draw();
+});
 $('inspectTimeNum').addEventListener('change',()=>{
   const ms=Number($('inspectTimeNum').value);
   if(!Number.isFinite(ms)||$('inspectTimeNum').value.trim()===''||ms<0||ms>state.horizon){

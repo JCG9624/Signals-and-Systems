@@ -261,6 +261,9 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .footer-attribution{display:flex;flex-wrap:wrap;gap:7px 22px;color:#8195a5}
 .footer-acknowledgements{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 13px;color:#56748b}
 .footer-acknowledgements strong{font-weight:760;color:var(--navy)}
+
+.freq-steady-explanation{font-size:12px;line-height:1.6;color:#496b81;background:#f4f9fc;border-left:3px solid #8db5c8;border-radius:7px;margin:0 0 14px;padding:11px 15px}
+.freq-steady-explanation strong{color:var(--navy)}
 </style>
 </head>
 <body>
@@ -429,6 +432,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   </div>
   <p class="freq-intro-note" id="freqIntroNote">The mean (DC) value is n = 0. AC harmonics are at n × fPWM. In the graph, each input or output spectrum is divided by its own largest component, including DC.</p>
  </section>
+ <p class="freq-steady-explanation"><strong>Periodic steady-state analysis.</strong> The Fourier spectra represent the response after the initial transient has disappeared. The motor current and speed are periodic with the PWM switching period. Their DC components represent their mean values, while the higher harmonics describe the remaining ripple. To investigate the start-up transient, use the <strong>Time response</strong> tab.</p>
  <section class="card spectrum-card spectrum-comparison" aria-label="Three linked spectra of PWM voltage, motor current and speed">
   <div class="card-header"><div><h2>From PWM voltage to armature current and motor speed</h2>
   <div class="scope-desc">Three one-sided spectra with the same 0–1 axis: DC at 0 Hz, harmonics at n × f<sub>PWM</sub></div></div>

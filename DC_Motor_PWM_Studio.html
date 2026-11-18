@@ -231,6 +231,28 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .pwm-compare-table tr:last-child td{border-bottom:0}
 .pwm-compare-table td.selected-switching{font-weight:760;color:var(--navy)}
 .pwm-mode-comparison .scope-footer{font-size:11px;line-height:1.55}
+
+/* A static time inspector replaces playback; readouts are located beside the plots. */
+.sidebar-tools{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.sidebar-tools .btn{flex:1;min-width:125px}
+.time-inspection{margin-bottom:13px;padding:14px 16px 16px;overflow:hidden}
+.inspection-heading h2{font-size:15px;font-weight:780;color:var(--navy);margin:0 0 2px}
+.inspection-heading p{font-size:11px;line-height:1.5;color:var(--muted);margin:0 0 13px}
+.inspection-controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.inspection-controls label{font-size:11px;font-weight:750;color:var(--navy)}
+.inspection-controls>input[type=range]{min-width:115px;flex:1;accent-color:var(--teal)}
+.inspection-controls input[type=number]{width:94px;min-height:35px;border-radius:7px;border:1px solid #cbdde9;background:#f8fbfd;color:var(--navy);font-size:12px;padding:6px 8px;font-variant-numeric:tabular-nums}
+.inspection-controls input[aria-invalid=true]{border-color:#b94630}
+.inspection-controls .btn{min-height:35px;padding:7px 11px}
+.inspection-time{font-size:11px;color:#58758b;margin:7px 0 0}
+.inspection-time .time-read{display:inline-block;text-align:left;font-size:12px;min-width:0;color:var(--navy)}
+#timeDomain .readouts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:13px}
+#timeDomain .readout{padding:10px 12px;border-radius:9px;min-width:0}
+#timeDomain .readout .key{font-size:11px;line-height:1.32}
+#timeDomain .readout .val{font-size:clamp(15px,1.55vw,20px);line-height:1.35;white-space:normal;overflow-wrap:anywhere}
+@media(max-width:1150px){#timeDomain .readouts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:730px){.sidebar-tools{margin-bottom:10px}#timeDomain .readouts{grid-template-columns:repeat(3,minmax(0,1fr))}#timeDomain .readout .val{font-size:16px}}
+@media(max-width:580px){#timeDomain .readouts{grid-template-columns:repeat(2,minmax(0,1fr))}.inspection-controls>input[type=range]{flex-basis:100%;order:4}.time-number-label{margin-left:auto}}
 </style>
 </head>
 <body>
@@ -265,11 +287,11 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   <button type="button" id="tabLosses" role="tab" aria-selected="false" aria-controls="lossesDomain" tabindex="-1"><span class="tab-symbol">⚡</span> Electrical losses<span class="tab-sub">Heating and trade-offs</span></button>
 </nav>
 <div class="workspace">
-<aside class="sidebar" aria-label="Parameters and animation controls">
-<section class="card player" aria-label="Animation controls">
-  <div class="play-actions"><button class="btn primary" id="play" aria-pressed="false">▶ Play</button><button class="btn" id="restart">↺ Restart</button><button class="btn muted" id="reset">Reset parameters</button><button class="btn muted" id="download">↓ Download HTML</button><label for="playSpeed">Playback</label><select id="playSpeed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></div>
-  <div class="timeline"><label for="scrub">Inspect at</label><input id="scrub" type="range" min="0" max="1000" step="1" value="0" aria-label="Simulation time"><output id="now" class="time-read">0.00 ms</output></div>
-</section>
+<aside class="sidebar" aria-label="Motor parameters and simulation settings">
+<div class="sidebar-tools" aria-label="Studio file and parameter actions">
+  <button class="btn muted" id="reset" type="button">Reset parameters</button>
+  <button class="btn muted" id="download" type="button">↓ Download HTML</button>
+</div>
 <div class="sidebar-scroll">
 <section class="card control-panel" aria-label="PWM and motor settings">
   <div class="section-line"><h2>Experiment settings</h2><div><label for="preset" class="mini-hint">Try an example &nbsp;</label><select class="preset" id="preset" aria-label="Select a teaching preset">
@@ -301,14 +323,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 </section>
 
 
-<div class="readouts" aria-live="off">
-  <div class="readout" style="--accent:var(--slate)"><div class="key">PWM voltage now</div><div class="val" id="vNow">12.00 V</div></div>
-  <div class="readout" style="--accent:var(--orange)"><div class="key">Armature current now</div><div class="val" id="iNow">0.000 A</div></div>
-  <div class="readout" style="--accent:var(--teal)"><div class="key">Speed now</div><div class="val" id="wNow">0 rad/s</div></div>
-  <div class="readout" style="--accent:var(--purple)"><div class="key">Motor back EMF now</div><div class="val" id="emNow">0.00 V</div></div>
-  <div class="readout" style="--accent:var(--green)"><div class="key">Electromagnetic torque now</div><div class="val" id="torqueNow">0.00 mN·m</div></div>
-  <div class="readout" style="--accent:var(--orange)"><div class="key">Instantaneous resistive heating</div><div class="val" id="heatNow">0.00 W</div></div>
-</div>
+
 </div>
 </aside>
 <div class="plots" aria-label="Linked motor response plots">
@@ -321,6 +336,28 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   </select>
   <span class="mini-hint" id="timeExperimentHint">Motor starts from rest with a constant PWM duty ratio.</span>
 </div>
+<section class="card time-inspection" aria-label="Inspect motor response at a chosen time">
+  <div class="inspection-heading">
+    <div><h2>Inspect a moment in time</h2>
+      <p>Choose a time to update the cursors in the plots and examine the instantaneous motor quantities.</p></div>
+  </div>
+  <div class="inspection-controls">
+    <label for="scrub">Time cursor</label>
+    <input id="scrub" type="range" min="0" max="100000" step="1" value="0" aria-label="Select simulation time" />
+    <label for="inspectTimeNum" class="time-number-label">t (ms)</label>
+    <input id="inspectTimeNum" type="number" min="0" max="80" step="any" inputmode="decimal" value="0" aria-label="Inspection time in milliseconds" />
+    <button id="zeroTime" type="button" class="btn muted" title="Inspect the beginning of the experiment">0 ms</button>
+  </div>
+  <div class="inspection-time">Selected time: <output id="now" class="time-read">0.000 ms</output></div>
+  <div class="readouts" aria-live="off">
+  <div class="readout" style="--accent:var(--slate)"><div class="key">PWM voltage</div><div class="val" id="vNow">12.00 V</div></div>
+  <div class="readout" style="--accent:var(--orange)"><div class="key">Armature current</div><div class="val" id="iNow">0.000 A</div></div>
+  <div class="readout" style="--accent:var(--teal)"><div class="key">Motor speed</div><div class="val" id="wNow">0 rad/s</div></div>
+  <div class="readout" style="--accent:var(--purple)"><div class="key">Motor back EMF</div><div class="val" id="emNow">0.00 V</div></div>
+  <div class="readout" style="--accent:var(--green)"><div class="key">Electromagnetic torque</div><div class="val" id="torqueNow">0.00 mN·m</div></div>
+  <div class="readout" style="--accent:var(--orange)"><div class="key">Resistive heating</div><div class="val" id="heatNow">0.00 W</div></div>
+</div>
+</section>
 <div id="startupExperiment">
 <section class="card speed-scope featured"><div class="card-header"><div><h2>Motor speed and current: the start-up transient</h2><span class="featured-label">PRIMARY RESULT</span><div class="scope-desc">Common time horizon: compare speed build-up with the evolving mean armature current</div></div><div class="small-legend"><span><i class="legend-line" style="--c:var(--teal)"></i>two-pole motor, PWM</span><span><i class="legend-line dash" style="--c:var(--purple)"></i>one-pole motor, averaged voltage</span></div></div><canvas id="speedPlot" role="img" aria-label="Long-time motor speed compared with the one-pole average-voltage approximation"></canvas><div class="trend-divider"><span>Armature current during start-up (cycle average and switching envelope)</span><span>Shared time axis</span></div><canvas id="currentTrendPlot" role="img" aria-label="Motor armature current versus time, including average and switching envelope"></canvas><div class="scope-footer" id="speedNote">The current rises and then changes as back EMF builds. The switching-current detail is visible in the lower plots, while this figure shows its longer-term evolution.</div></section>
 
@@ -521,7 +558,7 @@ let state={...defaults};try{const saved=JSON.parse($('saved-state').textContent)
 const bounds={duty:[10,90],freq:[0.2,100],edgeEnergy:[0,5],bus:[4,12],extraL:[0,3],seriesR:[0,2],inertia:[1,10],load:[0,8],horizon:[20,320]};
 const displayFmt={duty:v=>String(Math.round(v)),freq:v=>String(Number(v.toFixed(2))),edgeEnergy:v=>String(Number(v.toFixed(2))),bus:v=>String(v),extraL:v=>String(Number(v.toFixed(1))),seriesR:v=>Number(v.toFixed(2)).toString(),inertia:v=>String(Math.round(v)),load:v=>String(Number(v.toFixed(1))),horizon:v=>String(Math.round(v))};
 const NPER=24; let HORIZON=state.horizon/1000;
-let data=null,playing=false,raf=0,lastTs=0,time=0,playback=1;
+let data=null,time=0;
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 function fmt(v,n=2){return Number.isFinite(v)?v.toFixed(n):'—'}
 function formatCurrent(v){return Math.abs(v)<.1?`${fmt(v,3)} A`:`${fmt(v,2)} A`}
@@ -777,7 +814,9 @@ function drawStepExperiment(){
 }
 function renderStepInfo(){
   const s=stepAt(time),p=stepData.base;
-  $('scrub').value=Math.round(time/HORIZON*1000);$('now').textContent=fmt(time*1000,2)+' ms';
+  $('scrub').value=Math.round(time/HORIZON*100000);
+  $('inspectTimeNum').value=Number((time*1000).toFixed(6)).toString();
+  $('now').textContent=fmt(time*1000,3)+' ms';
   $('vNow').textContent=fmt(s.voltage,2)+' V';$('iNow').textContent=formatCurrent(s.i);
   $('wNow').textContent=speedLabel(s.w,1);$('emNow').textContent=fmt(p.ke*s.w,2)+' V';
   $('torqueNow').textContent=fmt(1000*p.kt*s.i,2)+' mN·m';
@@ -789,7 +828,7 @@ function renderStepInfo(){
   $('rotor').setAttribute('transform','translate(1068 40) rotate('+s.theta*180/Math.PI+')');
 }
 function selectTimeExperiment(){
-  stop();
+  
   const step=isDutyStep();
   $('startupExperiment').hidden=step;
   $('dutyStepExperiment').hidden=!step;
@@ -1218,14 +1257,12 @@ function drawFrequency(){
 function activeView(){return $('timeDomain').hidden?($('frequencyDomain').hidden?'losses':'frequency'):'time';}
 function activateTab(which){
   const view=['time','frequency','losses'].includes(which)?which:'time';
-  stop();
+  
   for(const [name,tab,panel] of [['time','tabTime','timeDomain'],['frequency','tabFrequency','frequencyDomain'],['losses','tabLosses','lossesDomain']]){
     const selected=name===view;
     $(tab).setAttribute('aria-selected',String(selected));$(tab).tabIndex=selected?0:-1;
     $(panel).hidden=!selected;
   }
-  document.querySelector('.sidebar>.player').hidden=view!=='time';
-  document.querySelector('.readouts').hidden=view!=='time';
   $('timeExtras').hidden=view!=='time'||isDutyStep();
   $('timeQuestions').hidden=view!=='time'||isDutyStep();
   document.querySelector('label[for="duty"]').closest('.control-field').hidden=view==='time'&&isDutyStep();
@@ -1242,7 +1279,7 @@ for(const [id,key] of [['stepD1','D1'],['stepD2','D2'],['stepAtMs','changeMs']])
     if(!Number.isFinite(val)||val<lo||val>hi){$(id).setAttribute('aria-invalid','true');return;}
     $(id).removeAttribute('aria-invalid');
     stepSettings[key]=val;
-    syncStepControls();stepData=stepSimulation();updateStepLabels();stop();time=0;draw();
+    syncStepControls();stepData=stepSimulation();updateStepLabels();time=0;draw();
   });
 }
 
@@ -1292,13 +1329,11 @@ $('pwmSpectrumPlot').addEventListener('keydown',e=>{
   $('inspectHarmonic').value=String(Math.max(0,Math.min(N,Number($('inspectHarmonic').value)+d)));drawFrequency();
 });
 
-function renderInfo(){const s=at(time),p=data.p,volt=pwm(time);$('scrub').value=Math.round(time/HORIZON*1000);$('now').textContent=`${fmt(time*1000,2)} ms`;
+function renderInfo(){const s=at(time),p=data.p,volt=pwm(time);$('scrub').value=Math.round(time/HORIZON*100000);$('inspectTimeNum').value=Number((time*1000).toFixed(6)).toString();$('now').textContent=`${fmt(time*1000,3)} ms`;
   $('vNow').textContent=`${fmt(volt,2)} V`;$('iNow').textContent=formatCurrent(s.i);$('wNow').textContent=speedLabel(s.w,1);$('emNow').textContent=`${fmt(p.ke*s.w,2)} V`;$('torqueNow').textContent=`${fmt(1000*p.kt*s.i,2)} mN·m`;$('heatNow').textContent=`${fmt((p.Rarm+p.Rf)*s.i*s.i,3)} W`;
   const on=volt>0,sc=$('switchState');sc.textContent=(on?'POSITIVE LEVEL':'LOW LEVEL')+` · ${fmt(volt,1)} V`;sc.classList.toggle('on',on);$('pwmPath').style.stroke=on?'#00a58b':volt<0?'#8053b4':'#9db2c2';$('rotor').setAttribute('transform',`translate(1068 40) rotate(${s.theta*180/Math.PI})`);
 }
 function draw(){if(!data)return;if(isDutyStep()&&stepData)renderStepInfo();else renderInfo();if($('timeDomain').hidden)return;if(isDutyStep()){drawStepExperiment();return;}drawVoltage();drawCurrent();drawSpeed();drawCurrentTrend();}
-function stop(){playing=false;cancelAnimationFrame(raf);raf=0;$('play').textContent='▶ Play';$('play').setAttribute('aria-pressed','false');}
-function animate(ts){if(!playing)return;if(!lastTs)lastTs=ts;const dt=Math.min(.10,(ts-lastTs)/1000);lastTs=ts;time=Math.min(HORIZON,time+dt*playback*HORIZON/12);draw();if(time>=HORIZON)stop();else raf=requestAnimationFrame(animate)}
 function powerFormat(W){if(W===0)return '0 mW';return Math.abs(W)<1?`${fmt(W*1000,2)} mW`:`${fmt(W,3)} W`}
 
 function drawLossFrequency(){
@@ -1388,7 +1423,7 @@ function updateStats(){const p=data.p,plus=(100*positiveDuty(p)).toFixed(1);
   $('driveModeLabel').textContent=p.mode==='bipolar'?'+Vdc ↔ −Vdc':'0 ↔ +Vdc';
   $('avgV').textContent=`${fmt(data.vbar,2)} V`;$('tauE').textContent=`${fmt(data.tauE*1e6,1)} µs`;$('tauM').textContent=`${fmt(data.tauM*1000,2)} ms`;$('ripple').textContent=`${fmt(data.ripple,3)} A p–p`;$('steadySpeed').textContent=speedLabel(data.wss,1);updateLosses();}
 function syncControls(){$('switchMode').value=state.mode;for(const k of Object.keys(bounds)){const val=displayFmt[k](state[k]);$(k).value=k==='freq'?freqToSlider(state.freq):val;$(k+'Num').value=val}$('units').value=state.units;}
-function recalc(resetTime=true){stop();HORIZON=state.horizon/1000;data=simulate();if(isDutyStep()){stepSettings.changeMs=Math.min(stepSettings.changeMs,Math.max(1,state.horizon-1));syncStepControls();stepData=stepSimulation();updateStepLabels();}if(resetTime)time=0;else time=clamp(time,0,HORIZON);updateStats();harmonicTable();if(activeView()==='time')draw();else if(activeView()==='frequency')drawFrequency()}
+function recalc(resetTime=true){HORIZON=state.horizon/1000;$('inspectTimeNum').max=String(state.horizon);data=simulate();if(isDutyStep()){stepSettings.changeMs=Math.min(stepSettings.changeMs,Math.max(1,state.horizon-1));syncStepControls();stepData=stepSimulation();updateStepLabels();}if(resetTime)time=0;else time=clamp(time,0,HORIZON);updateStats();harmonicTable();if(activeView()==='time')draw();else if(activeView()==='frequency')drawFrequency()}
 const presets={baseline:{duty:60,freq:20,bus:12,extraL:0,inertia:1,load:0},sub:{duty:60,freq:.2,bus:12,extraL:0,inertia:1,load:0},slow:{duty:60,freq:2,bus:12,extraL:0,inertia:1,load:0},mid:{duty:60,freq:35,bus:12,extraL:0,inertia:1,load:0},fast:{duty:60,freq:50,bus:12,extraL:0,inertia:1,load:0},extreme:{duty:60,freq:100,bus:12,extraL:0,inertia:1,load:0},inductor:{duty:60,freq:20,bus:12,extraL:1,seriesR:0,inertia:1,load:0},realFilter:{duty:60,freq:20,bus:12,extraL:1,seriesR:.5,inertia:1,load:0},inertia:{duty:60,freq:20,bus:12,extraL:0,inertia:10,load:0}};
 for(const k of Object.keys(bounds)){
   const range=$(k),num=$(k+'Num');
@@ -1399,11 +1434,23 @@ for(const k of Object.keys(bounds)){
 $('preset').addEventListener('change',()=>{state={...state,...presets[$('preset').value]};syncControls();recalc(true)});
 $('switchMode').addEventListener('change',()=>{state.mode=$('switchMode').value;recalc(false);});
 $('units').addEventListener('change',()=>{state.units=$('units').value;updateStats();if(activeView()==='time')draw();else if(activeView()==='frequency')drawFrequency()});
-$('playSpeed').addEventListener('change',()=>{playback=Number($('playSpeed').value)});
-$('play').addEventListener('click',()=>{if(activeView()!=='time')activateTab('time');if(playing){stop();return}if(time>=HORIZON)time=0;playing=true;lastTs=0;$('play').textContent='Ⅱ Pause';$('play').setAttribute('aria-pressed','true');raf=requestAnimationFrame(animate)});
-$('restart').addEventListener('click',()=>{stop();time=0;draw()});
 $('reset').addEventListener('click',()=>{state={...defaults};$('preset').value='baseline';syncControls();recalc(true)});
-$('scrub').addEventListener('input',()=>{stop();time=HORIZON*Number($('scrub').value)/1000;draw()});
+$('scrub').addEventListener('input',()=>{time=HORIZON*Number($('scrub').value)/100000;draw()});
+$('inspectTimeNum').addEventListener('change',()=>{
+  const ms=Number($('inspectTimeNum').value);
+  if(!Number.isFinite(ms)||$('inspectTimeNum').value.trim()===''||ms<0||ms>state.horizon){
+    $('inspectTimeNum').setAttribute('aria-invalid','true');return;
+  }
+  $('inspectTimeNum').removeAttribute('aria-invalid');
+  time=ms/1000;draw();
+});
+$('inspectTimeNum').addEventListener('blur',()=>{
+  if($('inspectTimeNum').getAttribute('aria-invalid')==='true'){
+    $('inspectTimeNum').removeAttribute('aria-invalid');
+    $('inspectTimeNum').value=Number((time*1000).toFixed(6)).toString();
+  }
+});
+$('zeroTime').addEventListener('click',()=>{time=0;draw();});
 $('download').addEventListener('click',()=>{
   const copy=document.documentElement.cloneNode(true);copy.querySelector('#saved-state').textContent=JSON.stringify(state).replace(/</g,'\\u003c');
   const html='<!DOCTYPE html>\n'+copy.outerHTML;

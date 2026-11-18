@@ -434,7 +434,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       <span class="losses-tag">PERIODIC STEADY STATE</span>
     </div>
     <p><strong>Operating point:</strong> these are periodic steady-state losses at fixed duty <b>D = <span id="lossDutyValue">60%</span></b>, set using the shared PWM duty control. They do <strong>not</strong> describe the transient losses during the duty-step experiment.</p>
-    <p><strong>Resistive filtering losses:</strong> In periodic steady state, P<sub>ripple</sub> = R(I<sub>rms</sub><sup>2</sup> − Ī<sup>2</sup>) = (R/2) ∑<sub>n≥1</sub>|I<sub>n,peak</sub>|<sup>2</sup>. This uses the complete current spectrum, not just the first six displayed harmonics.</p>
+    <p><strong>Resistive filtering losses:</strong> In periodic steady state, P<sub>ripple</sub> = R(I<sub>rms</sub><sup>2</sup> − Ī<sup>2</sup>) = (R/2) ∑<sub>n≥1</sub>|I<sub>n,peak</sub>|<sup>2</sup>. This uses the complete current spectrum, not just the finite set of displayed harmonics.</p>
     <p><strong>Switching-frequency choice:</strong> high f<sub>PWM</sub> reduces current ripple, but a real driver usually switches less efficiently as frequency increases. Low switching frequencies can produce audible vibration (not simulated). The proposed 20–50 kHz band is a design discussion, not a conclusion from the motor's LTI model.</p>
   </section>
 
@@ -1306,7 +1306,7 @@ function updateLosses(){
 }
 function updateStats(){$('avgV').textContent=`${fmt(data.vbar,2)} V`;$('tauE').textContent=`${fmt(data.tauE*1e6,1)} µs`;$('tauM').textContent=`${fmt(data.tauM*1000,2)} ms`;$('ripple').textContent=`${fmt(data.ripple,3)} A p–p`;$('steadySpeed').textContent=speedLabel(data.wss,1);updateLosses();}
 function syncControls(){for(const k of Object.keys(bounds)){const val=displayFmt[k](state[k]);$(k).value=k==='freq'?freqToSlider(state.freq):val;$(k+'Num').value=val}$('units').value=state.units;}
-function recalc(resetTime=true){stop();HORIZON=state.horizon/1000;data=simulate();if(isDutyStep()){stepSettings.changeMs=Math.min(stepSettings.changeMs,Math.max(1,state.horizon-1));syncStepControls();stepData=stepSimulation();updateStepLabels();}if(resetTime)time=0;else time=clamp(time,0,HORIZON);updateStats();harmonicTable();if(activeView()==='time')draw();else if(activeView()==='frequency')drawFrequency();else updateLosses()}
+function recalc(resetTime=true){stop();HORIZON=state.horizon/1000;data=simulate();if(isDutyStep()){stepSettings.changeMs=Math.min(stepSettings.changeMs,Math.max(1,state.horizon-1));syncStepControls();stepData=stepSimulation();updateStepLabels();}if(resetTime)time=0;else time=clamp(time,0,HORIZON);updateStats();harmonicTable();if(activeView()==='time')draw();else if(activeView()==='frequency')drawFrequency()}
 const presets={baseline:{duty:60,freq:20,bus:12,extraL:0,inertia:1,load:0},sub:{duty:60,freq:.2,bus:12,extraL:0,inertia:1,load:0},slow:{duty:60,freq:2,bus:12,extraL:0,inertia:1,load:0},mid:{duty:60,freq:35,bus:12,extraL:0,inertia:1,load:0},fast:{duty:60,freq:50,bus:12,extraL:0,inertia:1,load:0},extreme:{duty:60,freq:100,bus:12,extraL:0,inertia:1,load:0},inductor:{duty:60,freq:20,bus:12,extraL:1,seriesR:0,inertia:1,load:0},realFilter:{duty:60,freq:20,bus:12,extraL:1,seriesR:.5,inertia:1,load:0},inertia:{duty:60,freq:20,bus:12,extraL:0,inertia:10,load:0}};
 for(const k of Object.keys(bounds)){
   const range=$(k),num=$(k+'Num');
@@ -1315,7 +1315,7 @@ for(const k of Object.keys(bounds)){
   num.addEventListener('blur',()=>{if(num.getAttribute('aria-invalid')==='true'){num.removeAttribute('aria-invalid');num.value=displayFmt[k](state[k]);}})
 }
 $('preset').addEventListener('change',()=>{state={...state,...presets[$('preset').value]};syncControls();recalc(true)});
-$('units').addEventListener('change',()=>{state.units=$('units').value;updateStats();if(activeView()==='time')draw();else if(activeView()==='frequency')drawFrequency();else updateLosses()});
+$('units').addEventListener('change',()=>{state.units=$('units').value;updateStats();if(activeView()==='time')draw();else if(activeView()==='frequency')drawFrequency()});
 $('playSpeed').addEventListener('change',()=>{playback=Number($('playSpeed').value)});
 $('play').addEventListener('click',()=>{if(activeView()!=='time')activateTab('time');if(playing){stop();return}if(time>=HORIZON)time=0;playing=true;lastTs=0;$('play').textContent='Ⅱ Pause';$('play').setAttribute('aria-pressed','true');raf=requestAnimationFrame(animate)});
 $('restart').addEventListener('click',()=>{stop();time=0;draw()});

@@ -118,7 +118,7 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
 .bode-key{display:flex;flex-wrap:wrap;gap:11px 19px;font-size:11px;color:#58758b;border-top:1px solid #ecf2f6;padding:11px 22px 0}
 .bode-key span{display:inline-flex;align-items:center;gap:7px}
 .bode-sample{width:24px;height:0;display:inline-block;border-top:2px dashed #467197}
-.bode-zero{border-color:#df7b28}.bode-input{border-color:#008e9a;border-top-style:dotted;border-top-width:3px}
+.bode-zero{border-color:#df7b28}.bode-notch{border-color:#8155b6}.bode-input{border-color:#008e9a;border-top-style:dotted;border-top-width:3px}
 .bode-landmarks{padding:17px 21px 16px}
 .bode-feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px}
 .bode-feature{padding:10px 13px;border:1px solid #dfe9ef;border-left:4px solid #467197;background:#fafcfe;border-radius:8px}
@@ -226,7 +226,7 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
   <div class="chart-sep"></div>
   <div class="chart-head"><h2>Phase response</h2><span>arg H(j2πf) · degrees</span></div>
   <svg id="bodePhasePlot" class="chart-svg" viewBox="0 0 1120 290" role="img" aria-label="Log-frequency Bode phase plot, showing corner and zero frequencies"></svg>
-  <div class="bode-key"><span><i class="bode-sample bode-pole"></i>Pole frequency</span><span><i class="bode-sample bode-zero"></i>Zero frequency / notch</span><span><i class="bode-sample bode-input"></i>Selected sinusoidal input</span></div>
+  <div class="bode-key"><span><i class="bode-sample bode-pole"></i>Pole frequency</span><span><i class="bode-sample bode-zero"></i>Finite-zero frequency</span><span><i class="bode-sample bode-notch"></i>Imaginary-axis zeros / LC notch</span><span><i class="bode-sample bode-input"></i>Selected sinusoidal input</span></div>
  </div>
  <div class="panel bode-landmarks"><h2>Poles, zeros and characteristic frequencies</h2><div id="bodeFeatures" class="bode-feature-grid"></div><p id="bodeExplanation" class="bode-explanation"></p></div>
 </section>
@@ -479,7 +479,9 @@ function drawBode(){
    const x=xx(m.f),color=m.kind==='input'?'#008e9a':m.kind==='notch'?'#8155b6':m.kind==='zero'?'#df7b28':'#467197';
    svg('line',{x1:x,x2:x,y1:top,y2:top+ph,stroke:color,'stroke-width':m.kind==='input'?2:1.6,'stroke-dasharray':m.kind==='input'?'3 4':'6 5',opacity:.83},el);
    const cap=Math.max(left+32,Math.min(left+pw-32,x));
-   text(el,cap,top-17,m.kind==='input'?'f input':m.kind==='notch'?'LC notch':m.kind==='zero'?'zero':'pole',{'text-anchor':'middle','font-size':10,fill:color,'font-weight':750});
+   const caption=m.kind==='input'?'Input':m.kind==='notch'?'LC notch':m.kind==='zero'?'Zero':'Pole';
+   const annotationY=m.kind==='input'?top-4:m.kind==='pole'?top-32:top-18;
+   text(el,cap,annotationY,caption+' '+bodeFormatFrequency(m.f),{'text-anchor':'middle','font-size':9.5,fill:color,'font-weight':750});
    svg('title',{},svg('circle',{cx:x,cy:top+3,r:4,fill:color},el)).textContent=m.names.join(' / ')+': '+bodeFormatFrequency(m.f);
   }
   const yval=q=>field==='phase'?q.phase:q.db;
@@ -513,7 +515,6 @@ function drawBode(){
  $('bodeInputMagnitude').textContent=Number.isFinite(chosen.db)?fixed(chosen.db,2)+' dB':'−∞ dB';
  $('bodeInputPhase').textContent=Number.isFinite(chosen.phase)?fixed(chosen.phase,1)+'°':'Undefined at notch';
  const root=$('bodeFeatures');root.replaceChildren();
- const natural=svg; // SVG helper remains separate from the HTML feature cards.
  const cards=[...features];
  if(zeta>1+1e-7)cards.unshift({f:fn,kind:'natural',title:'Natural frequency (reference)',detail:'ωₙ = 1/√(LC) = '+fixed(wn,3)+' rad/s; overdamped poles have distinct real break frequencies.'});
  for(const feature of cards){

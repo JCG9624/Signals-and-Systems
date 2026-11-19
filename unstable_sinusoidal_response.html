@@ -42,6 +42,27 @@
 .site-return-nav .site-return-link:hover { background: #f4f9fe; border-color: #6c9dc7; }
 .site-return-nav .site-return-link:focus-visible { outline: 3px solid #e8a82c; outline-offset: 3px; }
 
+
+/* Static trajectories with a linked time inspector, consistent with other studios. */
+.time-inspector{display:block;padding:14px 20px 16px;background:#fff}
+.inspection-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.inspection-top h3{font-size:14px;color:var(--ink);margin:0 0 3px}
+.inspection-top p{color:var(--muted);font-size:12px;max-width:550px;line-height:1.5;margin:0 0 11px}
+.inspection-entry{display:flex;align-items:center;gap:8px}
+.inspection-entry label,.inspection-slider-label{font-size:12px;font-weight:700;color:var(--ink)}
+.inspection-entry input{width:86px;min-height:38px;padding:7px 8px;font-variant-numeric:tabular-nums}
+.inspection-entry input[aria-invalid="true"]{border-color:#bd4a2c}
+.inspection-entry button{padding:7px 12px;min-height:38px;font-size:12px}
+.inspection-slider-label{margin-top:4px}
+.time-inspector .scrub{display:block;margin:6px 0 4px}
+.inspection-time{color:var(--ink);font-size:12px;font-weight:750;font-variant-numeric:tabular-nums}
+.inspected-values{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:13px}
+.inspected-values>div{border:1px solid #e2eaf0;background:#f8fbfd;border-radius:8px;padding:8px 10px;min-width:0}
+.inspected-values span{display:block;color:var(--muted);font-size:11px}
+.inspected-values strong{display:block;color:var(--ink);font-size:15px;font-variant-numeric:tabular-nums;margin-top:3px;overflow-wrap:anywhere}
+.clear-disturb{display:block;width:100%;font-size:12px;margin-top:7px;min-height:36px;padding:8px}
+@media(max-width:650px){.inspected-values{grid-template-columns:repeat(2,minmax(0,1fr))}.inspection-entry{width:100%}.inspection-entry label{margin-right:auto}.time-inspector{padding:13px}}
+@media print{.inspected-values{grid-template-columns:repeat(4,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -66,12 +87,27 @@
       <div class="display-head"><h2 id="response-title">Input and output</h2><span id="status" class="status">Growing natural response</span></div>
       <div class="legend"><span><i class="swatch input"></i>Input x(t)</span><span><i class="swatch output"></i>Total output y(t)</span><span><i class="swatch reference"></i>Sinusoidal particular response</span></div>
       <div class="chart-wrap"><canvas id="wave" role="img" aria-label="Two aligned time plots: the sinusoidal input and the total output compared with the bounded sinusoidal particular response. The unstable exponential appears whenever cancellation is imperfect.">Animated input and output plots. Exact cancellation gives a bounded periodic output; any initial error grows as exp(a t).</canvas></div>
-      <div class="chart-info"><span id="axis-note">Output axis fixed to ±2; values outside it are marked.</span><label for="scale">Output scale <select id="scale"><option value="fixed">Fixed ±2</option><option value="fit">Fit visible output</option></select></label></div>
+      <div class="chart-info"><span id="axis-note">Complete response shown; the cursor marks the selected time.</span><label for="scale">Output axis <select id="scale"><option value="fit" selected>Fit full response</option><option value="fixed">Fixed ±2</option></select></label></div>
       <div class="note-line" id="scenario-note" role="status">With <strong>y(0) = 0</strong>, the zero-state response contains a growing exponential.</div>
-      <div class="transport">
-        <div class="transport-row"><button class="primary" id="play" aria-label="Play animation">Play</button><button id="restart">Restart</button><select id="speed" aria-label="Playback speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select><span class="time" id="time">t = 0.00 s</span></div>
-        <label class="sr-only" for="scrub">Time</label><input class="scrub" id="scrub" type="range" min="0" max="12" step="0.01" value="0"><div class="scrub-labels"><span>0 s</span><span id="duration-end">12 s</span></div>
-      </div>
+      <section class="transport time-inspector" aria-label="Inspect the complete response at a selected time">
+        <div class="inspection-top">
+          <div><h3>Inspect a moment in time</h3><p>The complete trajectories are shown above. Change the initial condition to see its effect immediately, then move this cursor to inspect any time.</p></div>
+          <div class="inspection-entry">
+            <label for="timeNum">t (s)</label>
+            <input id="timeNum" type="number" inputmode="decimal" min="0" max="12" step="any" value="0" aria-label="Inspection time in seconds">
+            <button id="zeroTime" type="button" title="Move the inspection cursor to the start">0 s</button>
+          </div>
+        </div>
+        <label class="inspection-slider-label" for="scrub">Time cursor</label>
+        <input class="scrub" id="scrub" type="range" min="0" max="12" step="0.01" value="0" aria-label="Move inspection time through the experiment">
+        <div class="scrub-labels"><span>Start · 0 s</span><strong class="inspection-time" id="time">t = 0.00 s</strong><span id="duration-end">12 s · End</span></div>
+        <div class="inspected-values" aria-label="Values at the selected inspection time">
+          <div><span>Input x(t)</span><strong id="inputNow">0.000</strong></div>
+          <div><span>Output y(t)</span><strong id="outputNow">0.000</strong></div>
+          <div><span>Sinusoidal part</span><strong id="periodicNow">−0.313</strong></div>
+          <div><span>Natural contribution</span><strong id="naturalNow">+0.313</strong></div>
+        </div>
+      </section>
     </section>
     <aside class="panel controls" aria-label="System and initial-condition controls">
       <h2>Set the experiment</h2>
@@ -80,7 +116,8 @@
         <div class="presets" aria-label="Initial condition presets"><button class="preset active" id="zero" aria-pressed="true"><span>1. Start from rest</span><span class="formula">y(0) = 0</span></button><button class="preset" id="exact" aria-pressed="false"><span>2. Exact cancellation</span><span class="formula">y(0) = y₀*</span></button><button class="preset" id="error" aria-pressed="false"><span>3. Add a 1% initial error</span><span class="formula">y₀* + ε</span></button></div>
         <label class="initial-entry" for="y0"><span style="white-space:nowrap">y(0) =</span><input id="y0" type="number" step="any" value="0" aria-describedby="ic-note"></label>
         <p class="ic-note" id="ic-note">The 1% error is measured relative to the sinusoidal output amplitude.</p>
-        <button class="disturb" id="disturb">Add a 1% disturbance now</button>
+        <button class="disturb" id="disturb">Add 1% disturbance at selected time</button>
+        <button class="clear-disturb" id="clearDisturb" type="button">Clear disturbances</button>
       </div>
       <div class="control"><label class="control-title" for="a"><span>Unstable pole a</span><output id="a-value">0.40 s⁻¹</output></label><input type="range" id="a" min="0.1" max="1" step="0.01" value="0.4"><div class="range-ends"><span>0.10 s⁻¹</span><span>1.00 s⁻¹</span></div></div>
       <div class="control"><label class="control-title" for="f"><span>Input frequency f</span><output id="f-value">0.50 Hz</output></label><input type="range" id="f" min="0.1" max="2" step="0.01" value="0.5"><div class="range-ends"><span>0.10 Hz</span><span>2.00 Hz</span></div></div>
@@ -93,7 +130,7 @@
     <div class="equation-large math" aria-label="The output equals the sinusoidal particular response plus the initial-condition error times the unstable exponential."><i>y</i>(<i>t</i>) = <span class="periodic-label"><i>y</i><sub>sin</sub>(<i>t</i>)</span> + <span class="natural-label">(<i>y</i>₀ − <i>y</i>₀*)e<sup><i>at</i></sup></span><span id="kick-formula" hidden class="natural-label"> + <span id="kick-symbol">δe<sup>a(t−t<sub>d</sub>)</sup>u(t−t<sub>d</sub>)</span></span></div>
     <div class="equation-sub math"><span class="periodic-label"><i>y</i><sub>sin</sub>(<i>t</i>) = <span class="frac"><span>−<i>a</i> sin(<i>ωt</i>) − <i>ω</i> cos(<i>ωt</i>)</span><span><i>a</i>² + <i>ω</i>²</span></span></span><span><i>y</i>₀* = <i>y</i><sub>sin</sub>(0) = <span class="frac"><span>−<i>ω</i></span><span><i>a</i>² + <i>ω</i>²</span></span></span></div>
     <p class="explanation">Set <span class="math"><i>y</i>₀ = <i>y</i>₀*</span> and the coefficient of the unstable mode is exactly zero. The output is then <span class="math"><i>y</i><sub>sin</sub>(<i>t</i>) = |<i>H</i>(j<i>ω</i>)| sin(<i>ωt</i> + ∠<i>H</i>(j<i>ω</i>))</span> from the start.</p>
-    <details id="decomposition"><summary>See how the zero-input and zero-state exponentials cancel</summary><div class="decomp"><div><h3>The two exponential terms</h3><p class="math"><span style="color:var(--blue)">From the input: −<i>y</i>₀* e<sup><i>at</i></sup></span><br><span style="color:var(--orange)">From the initial state: <i>y</i>₀ e<sup><i>at</i></sup></span></p><p>The zero-state response is y<sub>zs</sub>(t) = y<sub>sin</sub>(t) − y₀*e<sup>at</sup>; the zero-input response is y<sub>zi</sub>(t) = y₀e<sup>at</sup>. Only their exponential terms cancel. Each can grow while their sum remains bounded.</p><p id="event-note">No disturbance has been added.</p></div><div><canvas id="modal" role="img" aria-label="Plot of the two exponential terms and their sum, before any disturbance. Opposite terms cancel exactly for the special initial condition.">The exponential driven by the input and the exponential due to the initial state sum to the natural response.</canvas><p class="small">Blue: input term · Orange dashed: initial-state term · Black: sum. Independent vertical scale; disturbance term excluded here.</p></div></div></details>
+    <details id="decomposition"><summary>See how the zero-input and zero-state exponentials cancel</summary><div class="decomp"><div><h3>The two exponential terms</h3><p class="math"><span style="color:var(--blue)">From the input: −<i>y</i>₀* e<sup><i>at</i></sup></span><br><span style="color:var(--orange)">From the initial state: <i>y</i>₀ e<sup><i>at</i></sup></span></p><p>The zero-state response is y<sub>zs</sub>(t) = y<sub>sin</sub>(t) − y₀*e<sup>at</sup>; the zero-input response is y<sub>zi</sub>(t) = y₀e<sup>at</sup>. Only their exponential terms cancel. Each can grow while their sum remains bounded.</p><p id="event-note">No disturbance has been added.</p></div><div><canvas id="modal" role="img" aria-label="Plot of the two exponential terms and their sum, before any disturbance. Opposite terms cancel exactly for the special initial condition.">The exponential driven by the input and the exponential due to the initial state sum to the natural response.</canvas><p class="small">Blue: input term · Orange dashed: initial-state term · Black: sum. Complete trajectories, with the selected time marked; disturbance terms are excluded here.</p></div></div></details>
   </section>
   <div class="two-notes"><section><h3>What “frequency response” means here</h3><p>H(jω) gives the gain and phase of this special sinusoidal particular solution. For the causal unstable system, h(t) = e<sup>at</sup>u(t) has no ordinary Fourier transform; its Laplace ROC is Re(s) &gt; a. The value H(jω) is the algebraic evaluation of the rational transfer function, outside that ROC. It is not an attracting steady-state response.</p></section><section><h3>Why feedback is needed in practice</h3><p>Exact cancellation needs exact dynamics and an exact initial state. Initial errors, model errors and disturbances excite the unstable mode. Feedback is used to stabilise the dynamics and maintain the desired behaviour despite these imperfections. The matched initial condition alone does not stabilise the system.</p></section></div>
   <footer class="footer"><span>Analytical trajectories · No time-stepping error · Self-contained and usable offline</span><button id="fullscreen">Full screen</button></footer>
@@ -102,10 +139,9 @@
 (() => {
  'use strict';
  const $ = id => document.getElementById(id);
- const state = {a:.4,f:.5,T:12,t:0,y0:0,mode:'zero',playing:false,speed:1,kicks:[]};
+ const state = {a:.4,f:.5,T:12,t:0,y0:0,mode:'zero',kicks:[]};
  const colours={ink:'#142a42',muted:'#53667a',grid:'#e4eaf0',teal:'#087e82',orange:'#c0561d',blue:'#4468a2'};
  const wave=$('wave'), modal=$('modal');
- let lastFrame=0, lastReadout=0, motionHandle=null;
  function parameters(){const w=2*Math.PI*state.f,d=state.a**2+w*w,M=1/Math.sqrt(d),ystar=-w/d;return {w,d,M,ystar,phase:Math.atan2(-w,-state.a)*180/Math.PI};}
  function coefficient(){return state.mode==='exact'?0:state.y0-parameters().ystar;}
  function sinusoid(t){const p=parameters();return(-state.a*Math.sin(p.w*t)-p.w*Math.cos(p.w*t))/p.d;}
@@ -118,6 +154,11 @@
   $('a-value').textContent=state.a.toFixed(2)+' s⁻¹';$('f-value').textContent=state.f.toFixed(2)+' Hz';$('duration-value').textContent=state.T+' s';$('duration-end').textContent=state.T+' s';
   $('gain').textContent=fmt(p.M);$('phase').textContent=fmt(p.phase,2)+'°';$('ic').textContent=fmt(p.ystar);$('natural').textContent=fmt(natural(state.t));
   $('time').textContent='t = '+state.t.toFixed(2)+' s';$('scrub').value=state.t;
+  $('timeNum').value=Number(state.t.toFixed(4)).toString();
+  $('inputNow').textContent=fmt(Math.sin(p.w*state.t),3);
+  $('outputNow').textContent=fmt(output(state.t),3);
+  $('periodicNow').textContent=fmt(sinusoid(state.t),3);
+  $('naturalNow').textContent=fmt(natural(state.t),3);
   $('coefficient').textContent='Coefficient of eᵃᵗ: C = '+signed(coefficient());
   for(const name of ['zero','exact','error']){$(name).classList.toggle('active',state.mode===name);$(name).setAttribute('aria-pressed',String(state.mode===name));}
   const clean=coefficient()===0&&state.kicks.length===0;
@@ -132,6 +173,7 @@
   $('kick-symbol').innerHTML=state.kicks.length>1?'Σ δ<sub>k</sub>e<sup>a(t−t<sub>k</sub>)</sup>u(t−t<sub>k</sub>)':'δe<sup>a(t−t<sub>d</sub>)</sup>u(t−t<sub>d</sub>)';
   $('event-note').textContent=state.kicks.length?state.kicks.map(k=>'State jump +'+fmt(k.delta)+' at t = '+k.t.toFixed(2)+' s.').join(' '):'No disturbance has been added.';
   $('disturb').disabled=state.t>=state.T;
+  $('clearDisturb').disabled=state.kicks.length===0;
  }
  function context(canvas){const box=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);const w=Math.max(1,box.width),h=Math.max(1,box.height);if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);}const c=canvas.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);return {c,w,h};}
  function niceRange(x){if(x<=2)return 2;const power=10**Math.floor(Math.log10(x)),s=x/power;return (s<=2?2:s<=5?5:10)*power;}
@@ -150,46 +192,125 @@
  }
  function dot(c,box,range,t,v,color,r=3.6){if(Math.abs(v)>range)return;c.fillStyle=color;c.strokeStyle='#fff';c.lineWidth=1.5;c.beginPath();c.arc(box.x+t/state.T*box.w,box.y+box.h/2-v/range*box.h/2,r,0,2*Math.PI);c.fill();c.stroke();}
  function drawWave(){
-  const {c,w,h}=context(wave);if(w<10)return;const left=w<500?47:59,right=18,top=31,gap=44,bottom=39;const total=h-top-bottom-gap,hi=Math.round(total*.27),ho=total-hi;
+  const {c,w,h}=context(wave);if(w<10)return;
+  const left=w<500?47:59,right=18,top=31,gap=44,bottom=39;
+  const total=h-top-bottom-gap,hi=Math.round(total*.27),ho=total-hi;
   const inputBox={x:left,y:top,w:w-left-right,h:hi},outBox={x:left,y:top+hi+gap,w:w-left-right,h:ho};
-  let range=2;if($('scale').value==='fit'){let max=1.6;for(let i=0;i<=400;i++)max=Math.max(max,Math.abs(output(state.t*i/400))*1.14);range=niceRange(max);}
-  axes(c,inputBox,1.2,'Input x(t)',false);axes(c,outBox,range,'Output y(t)');
-  c.font='11px system-ui';c.fillStyle=colours.muted;c.textAlign='right';c.fillText('Time t (s)',outBox.x+outBox.w,h-5);
-  path(c,inputBox,1.2,t=>Math.sin(parameters().w*t),state.T,'#e2e9f3',1.3);
-  path(c,inputBox,1.2,t=>Math.sin(parameters().w*t),state.t,colours.blue,2.1);
-  path(c,outBox,range,sinusoid,state.T,'#badbd9',1.7,[5,5]);
-  path(c,outBox,range,sinusoid,state.t,colours.teal,2,[6,5]);
-  // Include one-sided limits at disturbance instants so state jumps are visible.
-  const cuts=[0,...state.kicks.filter(k=>k.t>0&&k.t<state.t).map(k=>k.t),state.t].sort((a,b)=>a-b);
-  for(let i=0;i<cuts.length-1;i++){const start=cuts[i],end=cuts[i+1],before=state.kicks.some(k=>k.t===end)&&end<state.t?Math.max(start,end-1e-9):end;path(c,outBox,range,output,before,colours.orange,2.7,[],start);}
-  for(const k of state.kicks){if(k.t<=state.t){c.save();c.beginPath();c.rect(outBox.x,outBox.y,outBox.w,outBox.h);c.clip();const xx=outBox.x+k.t/state.T*outBox.w;c.setLineDash([2,4]);c.strokeStyle='#a57559';c.lineWidth=1;c.beginPath();c.moveTo(xx,outBox.y);c.lineTo(xx,outBox.y+outBox.h);c.stroke();c.setLineDash([]);c.strokeStyle=colours.orange;c.lineWidth=2.7;c.beginPath();const after=output(k.t),before=after-state.kicks.filter(x=>x.t===k.t).reduce((s,x)=>s+x.delta,0);c.moveTo(xx,outBox.y+outBox.h/2-before/range*outBox.h/2);c.lineTo(xx,outBox.y+outBox.h/2-after/range*outBox.h/2);c.stroke();c.restore();}}
-  const cursor=inputBox.x+state.t/state.T*inputBox.w;c.setLineDash([3,4]);c.strokeStyle='#8295a8';c.lineWidth=1;for(const b of [inputBox,outBox]){c.beginPath();c.moveTo(cursor,b.y);c.lineTo(cursor,b.y+b.h);c.stroke();}c.setLineDash([]);
-  dot(c,inputBox,1.2,state.t,Math.sin(parameters().w*state.t),colours.blue);dot(c,outBox,range,state.t,output(state.t),colours.orange);
-  let clipped=false,firstT=0;for(let j=0;j<=700;j++){const t=state.t*j/700;if(Math.abs(output(t))>range){clipped=true;firstT=t;break;}}
-  if(clipped){const sign=Math.sign(output(firstT)),xx=Math.max(outBox.x+8,Math.min(outBox.x+outBox.w-8,outBox.x+firstT/state.T*outBox.w)),yy=sign>0?outBox.y+3:outBox.y+outBox.h-3;c.fillStyle=colours.orange;c.beginPath();c.moveTo(xx,yy);c.lineTo(xx-5,yy+sign*8);c.lineTo(xx+5,yy+sign*8);c.closePath();c.fill();}
-  $('axis-note').textContent='Output axis: ±'+labelNumber(range)+(clipped?' · Curve leaves the plotted range; y(t) = '+fmt(output(state.t))+'.':'.');
+  let range=2;
+  if($('scale').value==='fit'){
+    let max=1.6;
+    for(let i=0;i<=700;i++)max=Math.max(max,Math.abs(output(state.T*i/700))*1.14);
+    for(const k of state.kicks){if(k.t>state.T)continue;const at=output(k.t),jump=state.kicks.filter(x=>x.t===k.t).reduce((sum,x)=>sum+x.delta,0);max=Math.max(max,Math.abs(at)*1.14,Math.abs(at-jump)*1.14);}
+    range=niceRange(max);
+  }
+  axes(c,inputBox,1.2,'Input x(t)',false);
+  axes(c,outBox,range,'Output y(t)');
+  c.font='11px system-ui';c.fillStyle=colours.muted;c.textAlign='right';
+  c.fillText('Time t (s)',outBox.x+outBox.w,h-5);
+  // Always show the COMPLETE input, particular output and total output.
+  // Only the vertical time cursor and readouts change when scrubbing.
+  path(c,inputBox,1.2,t=>Math.sin(parameters().w*t),state.T,colours.blue,2.1);
+  path(c,outBox,range,sinusoid,state.T,colours.teal,2,[6,5]);
+  // Draw continuous pieces separately to preserve instantaneous state jumps.
+  const kickTimes=[...new Set(state.kicks.filter(k=>k.t>0&&k.t<state.T).map(k=>k.t))].sort((a,b)=>a-b);
+  const cuts=[0,...kickTimes,state.T];
+  for(let i=0;i<cuts.length-1;i++){
+    const start=cuts[i],end=cuts[i+1];
+    const before=i<cuts.length-2?Math.max(start,end-1e-9):end;
+    path(c,outBox,range,output,before,colours.orange,2.7,[],start);
+  }
+  for(const t of kickTimes){
+    c.save();c.beginPath();c.rect(outBox.x,outBox.y,outBox.w,outBox.h);c.clip();
+    const xx=outBox.x+t/state.T*outBox.w;
+    c.setLineDash([2,4]);c.strokeStyle='#a57559';c.lineWidth=1;
+    c.beginPath();c.moveTo(xx,outBox.y);c.lineTo(xx,outBox.y+outBox.h);c.stroke();c.setLineDash([]);
+    const after=output(t),jump=state.kicks.filter(k=>k.t===t).reduce((sum,k)=>sum+k.delta,0),before=after-jump;
+    c.strokeStyle=colours.orange;c.lineWidth=2.7;c.beginPath();
+    c.moveTo(xx,outBox.y+outBox.h/2-before/range*outBox.h/2);
+    c.lineTo(xx,outBox.y+outBox.h/2-after/range*outBox.h/2);c.stroke();c.restore();
+  }
+  const cursor=inputBox.x+state.t/state.T*inputBox.w;
+  c.setLineDash([4,4]);c.strokeStyle='#7891a8';c.lineWidth=1.3;
+  for(const b of [inputBox,outBox]){c.beginPath();c.moveTo(cursor,b.y);c.lineTo(cursor,b.y+b.h);c.stroke();}
+  c.setLineDash([]);
+  dot(c,inputBox,1.2,state.t,Math.sin(parameters().w*state.t),colours.blue,4.1);
+  dot(c,outBox,range,state.t,output(state.t),colours.orange,4.1);
+  let clipped=false,firstT=0;
+  for(let j=0;j<=700;j++){const t=state.T*j/700;if(Math.abs(output(t))>range){clipped=true;firstT=t;break;}}
+  if(clipped){
+    const sign=Math.sign(output(firstT)),xx=Math.max(outBox.x+8,Math.min(outBox.x+outBox.w-8,outBox.x+firstT/state.T*outBox.w)),yy=sign>0?outBox.y+3:outBox.y+outBox.h-3;
+    c.fillStyle=colours.orange;c.beginPath();c.moveTo(xx,yy);c.lineTo(xx-5,yy+sign*8);c.lineTo(xx+5,yy+sign*8);c.closePath();c.fill();
+  }
+  $('axis-note').textContent='Entire time interval displayed · Output axis ±'+labelNumber(range)+(clipped?' (response exceeds the plotted scale).':'.');
  }
- function drawModal(){if(!$('decomposition').open)return;const {c,w,h}=context(modal);if(w<10)return;const p=parameters(),box={x:52,y:23,w:w-67,h:h-56};let max=Math.max(Math.abs(p.ystar),Math.abs(state.y0),Math.abs(coefficient()))*Math.exp(state.a*state.t)*1.12;const range=niceRange(Math.max(2,max));axes(c,box,range,'Exponential terms');path(c,box,range,t=>-p.ystar*Math.exp(state.a*t),state.t,colours.blue,2);path(c,box,range,t=>state.y0*Math.exp(state.a*t),state.t,colours.orange,2,[6,4]);path(c,box,range,t=>coefficient()*Math.exp(state.a*t),state.t,colours.ink,2);}
+ function drawModal(){
+  if(!$('decomposition').open)return;
+  const {c,w,h}=context(modal);if(w<10)return;
+  const p=parameters(),box={x:52,y:23,w:w-67,h:h-56};
+  const factor=Math.exp(state.a*state.T);
+  const max=Math.max(Math.abs(p.ystar),Math.abs(state.y0),Math.abs(coefficient()))*factor*1.12;
+  const range=niceRange(Math.max(2,max));
+  axes(c,box,range,'Exponential terms');
+  path(c,box,range,t=>-p.ystar*Math.exp(state.a*t),state.T,colours.blue,2);
+  path(c,box,range,t=>state.y0*Math.exp(state.a*t),state.T,colours.orange,2,[6,4]);
+  path(c,box,range,t=>coefficient()*Math.exp(state.a*t),state.T,colours.ink,2);
+  const xx=box.x+state.t/state.T*box.w;
+  c.strokeStyle='#8295a8';c.lineWidth=1.2;c.setLineDash([4,4]);
+  c.beginPath();c.moveTo(xx,box.y);c.lineTo(xx,box.y+box.h);c.stroke();c.setLineDash([]);
+ }
+
  function draw(){drawWave();drawModal();}
- function setPlaying(value){state.playing=value;$('play').textContent=value?'Pause':'Play';$('play').setAttribute('aria-label',value?'Pause animation':'Play animation');lastFrame=0;if(motionHandle!==null){cancelAnimationFrame(motionHandle);motionHandle=null;}if(value)motionHandle=requestAnimationFrame(frame);}
- function frame(now){motionHandle=null;if(!state.playing)return;if(lastFrame)state.t=Math.min(state.T,state.t+Math.min((now-lastFrame)/1000,.1)*state.speed);lastFrame=now;draw();if(now-lastReadout>70){updateReadouts();lastReadout=now;}if(state.t>=state.T){setPlaying(false);updateReadouts();return;}motionHandle=requestAnimationFrame(frame);}
- function restart(){setPlaying(false);state.t=0;state.kicks=[];updateReadouts();draw();}
- function choose(mode){state.mode=mode;const p=parameters();state.y0=mode==='zero'?0:mode==='exact'?p.ystar:p.ystar+.01*p.M;$('y0').value=String(state.y0);restart();}
+ function redraw(){updateReadouts();draw();}
+ function choose(mode){
+  state.mode=mode;const p=parameters();
+  state.y0=mode==='zero'?0:mode==='exact'?p.ystar:p.ystar+.01*p.M;
+  state.kicks=[];$('y0').value=String(state.y0);
+  redraw(); // Do not reset the selected time: compare initial conditions at the same instant.
+ }
  for(const m of ['zero','exact','error'])$(m).addEventListener('click',()=>choose(m));
- for(const id of ['a','f'])$(id).addEventListener('input',()=>{state[id]=Number($(id).value);if(state.mode==='custom')restart();else choose(state.mode);});
- $('duration').addEventListener('input',()=>{state.T=Number($('duration').value);$('scrub').max=state.T;state.t=Math.min(state.t,state.T);if(state.t>=state.T)setPlaying(false);updateReadouts();draw();});
- $('y0').addEventListener('change',()=>{const v=$('y0').valueAsNumber;if(!Number.isFinite(v)){$('y0').value=String(state.y0);return;}state.y0=v;state.mode='custom';restart();});
- $('play').addEventListener('click',()=>{if(!state.playing&&state.t>=state.T){state.t=0;state.kicks=[];updateReadouts();}setPlaying(!state.playing);draw();});
- $('restart').addEventListener('click',restart);
- $('speed').addEventListener('change',()=>{state.speed=Number($('speed').value);});
- $('scrub').addEventListener('input',()=>{setPlaying(false);state.t=Number($('scrub').value);updateReadouts();draw();});
- $('disturb').addEventListener('click',()=>{if(state.t>=state.T)return;state.kicks.push({t:state.t,delta:.01*parameters().M});updateReadouts();draw();});
+ for(const id of ['a','f'])$(id).addEventListener('input',()=>{
+  state[id]=Number($(id).value);state.kicks=[];
+  if(state.mode==='custom')redraw();else choose(state.mode);
+ });
+ $('duration').addEventListener('input',()=>{
+  state.T=Number($('duration').value);$('scrub').max=state.T;$('timeNum').max=state.T;
+  state.t=Math.min(state.t,state.T);redraw();
+ });
+ $('y0').addEventListener('change',()=>{
+  const v=$('y0').valueAsNumber;
+  if(!Number.isFinite(v)){$('y0').value=String(state.y0);return;}
+  state.y0=v;state.mode='custom';state.kicks=[];redraw();
+ });
+ $('scrub').addEventListener('input',()=>{state.t=Number($('scrub').value);redraw();});
+ $('timeNum').addEventListener('change',()=>{
+  const raw=$('timeNum').value.trim(),t=Number(raw);
+  if(!raw||!Number.isFinite(t)||t<0||t>state.T){
+    $('timeNum').setAttribute('aria-invalid','true');return;
+  }
+  $('timeNum').removeAttribute('aria-invalid');state.t=t;redraw();
+ });
+ $('timeNum').addEventListener('blur',()=>{
+  if($('timeNum').getAttribute('aria-invalid')==='true'){
+    $('timeNum').removeAttribute('aria-invalid');
+    $('timeNum').value=String(Number(state.t.toFixed(4)));
+  }
+ });
+ $('zeroTime').addEventListener('click',()=>{state.t=0;redraw();});
+ $('disturb').addEventListener('click',()=>{
+  if(state.t>=state.T)return;
+  state.kicks.push({t:state.t,delta:.01*parameters().M});redraw();
+ });
+ $('clearDisturb').addEventListener('click',()=>{state.kicks=[];redraw();});
  $('scale').addEventListener('change',draw);
  $('decomposition').addEventListener('toggle',drawModal);
- $('fullscreen').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch(e){$('fullscreen').textContent='Full screen unavailable';}});
- document.addEventListener('fullscreenchange',()=>{$('fullscreen').textContent=document.fullscreenElement?'Exit full screen':'Full screen';draw();});
- document.addEventListener('keydown',e=>{if(e.code==='Space'&&!['INPUT','BUTTON','SELECT','SUMMARY','TEXTAREA'].includes(document.activeElement.tagName)){e.preventDefault();$('play').click();}});
- document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.playing)setPlaying(false);});
+ $('fullscreen').addEventListener('click',async()=>{
+  try{if(document.fullscreenElement)await document.exitFullscreen();
+  else await document.documentElement.requestFullscreen();}
+  catch(e){$('fullscreen').textContent='Full screen unavailable';}
+ });
+ document.addEventListener('fullscreenchange',()=>{
+  $('fullscreen').textContent=document.fullscreenElement?'Exit full screen':'Full screen';draw();
+ });
  new ResizeObserver(draw).observe(document.querySelector('.display'));
  updateReadouts();draw();
 })();

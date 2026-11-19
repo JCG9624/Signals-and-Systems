@@ -267,6 +267,17 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
 .studio-workspace.step-input-active .sine-stat{display:none!important}
 .studio-workspace.step-input-active:not(.frequency-active) .parameter-note{display:none!important}
 @media(max-width:500px){.input-selector{align-items:flex-start;flex-direction:column;gap:5px}}
+
+/* Flexible time inspection spanning the expanded 0.01–100 Hz input range. */
+.time-window-controls{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-left:auto}
+.time-window-controls label{font-size:11px;color:#526f86;font-weight:750;white-space:nowrap}
+.time-window-controls select,.time-window-controls input{font:600 11px/1.3 inherit;border:1px solid #bfd5e3;border-radius:7px;background:#f9fcfe;color:var(--navy);padding:5px 7px;min-width:0}
+.time-window-controls select{max-width:180px}
+.time-window-controls input{width:72px;max-width:72px;text-align:right;font-variant-numeric:tabular-nums}
+.time-window-controls .window-unit{font-size:11px;color:#66849a}
+.time-window-note{font-size:10.5px;color:#587d91;margin:0 13px 12px;line-height:1.45}
+@media(max-width:1050px){.time-window-controls{margin-left:0}}
+@media(max-width:570px){.time-window-controls{flex:1 1 100%}}
 </style>
 </head>
 <body>
@@ -346,7 +357,22 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
  </div>
  <p class="cancel-note" id="cancellationNote" hidden>Both initial states match steady state. The switching and initial-condition contributions cancel for the selected output, so total output equals steady state.</p>
  <svg id="partsPlot" class="chart-svg" viewBox="0 0 1120 272" role="img" aria-label="Sinusoidal steady state, switching transient and initial-condition response over time"></svg>
- <div class="bottom-row"><label for="scrub">Inspect at time</label><input type="range" min="0" max="1000" step="1" value="0" id="scrub"><output id="scrubTime" class="time-read">0.000 s</output><span class="bottom-hint">Static slider — no running-time animation</span><label for="window" style="margin-left:auto">Time window</label><select id="window" style="background:#fff;border:1px solid #d6e5ee;border-radius:7px;padding:5px;color:#284f6f"><option value="2">2 s</option><option value="4" selected>4 s</option><option value="6">6 s</option><option value="10">10 s</option><option value="15">15 s</option></select></div>
+ <div class="bottom-row">
+  <label for="scrub">Inspect at time</label><input type="range" min="0" max="1000" step="1" value="0" id="scrub"><output id="scrubTime" class="time-read">0.000 s</output>
+  <div class="time-window-controls">
+   <label for="windowMode">Time view</label>
+   <select id="windowMode" aria-label="Time window selection">
+    <option value="manual" selected>Custom</option>
+    <option value="auto">Auto · cycles + transient</option>
+    <option value="cycles" id="cyclesWindowOption">3 input cycles</option>
+    <option value="transient">5 slow-pole time constants</option>
+   </select>
+   <label for="windowLength">Window</label>
+   <input id="windowLength" type="number" inputmode="decimal" min="0.01" max="500" step="any" value="4" aria-label="Time window duration in seconds">
+   <span class="window-unit">s</span>
+  </div>
+ </div>
+ <p id="timeWindowNote" class="time-window-note">Window: 4 s · choose a time view or enter any duration from 0.01 to 500 s.</p>
  <div class="readouts" aria-label="Curve values at selected time">
   <div class="readout" style="--color:var(--slate)"><div class="key">Input u(t)</div><div class="value" id="uRead">0.000 V</div></div>
   <div class="readout" style="--color:var(--navy)"><div class="key">Steady-state voltage</div><div class="value" id="ssRead">0.000 V</div></div>
@@ -479,7 +505,7 @@ const $=id=>document.getElementById(id);
 const NS='http://www.w3.org/2000/svg';
 const clr={input:'#9aabba',total:'#008e9a',steady:'#173b65',transient:'#e87528',initial:'#8155b6'};
 const enabled={input:true,total:true,steady:true,transient:true,initial:true};
-const state={f:1.5,R:3,L:0.4,C:0.015,V0:0,I0:0,manualV0:0,manualI0:0,output:"capacitor",inputType:"sine",cancel:false,T:4,t:0};
+const state={f:1.5,R:3,L:0.4,C:0.015,V0:0,I0:0,manualV0:0,manualI0:0,output:"capacitor",inputType:"sine",cancel:false,T:4,t:0,timeMode:"manual",manualT:4};
 const refs=[];
 const paramDefs={freq:{key:'f'},res:{key:'R'},ind:{key:'L'},cap:{key:'C',scale:.001},vc:{key:'V0'},il:{key:'I0'}};
 function svg(tag,props,parent){const el=document.createElementNS(NS,tag); for(const [k,v] of Object.entries(props||{}))el.setAttribute(k,String(v));if(parent)parent.appendChild(el);return el;}
@@ -660,8 +686,46 @@ function drawPoleZero(){
  $('stepCancellation').hidden=!stepCancelled;
  el.setAttribute('aria-label','Pole-zero map: system poles '+content.textContent+'; system zeros '+zv.textContent+'; '+(state.inputType==='step'?'step input pole at s=0.':'sinusoidal input poles at ±j'+poleZeroText(omegaInput)+' radians per second.')+(cancelled?' Input poles coincide with notch zeros.':'')+(stepCancelled?' Step pole at the origin is cancelled by a system zero.':''));
 }
+/**
+ * The fastest and slowest system modes can be far apart in overdamped
+ * circuits. Use the slowest decay rate rather than only 1/(ζω_n).
+ */
+function slowPoleTimeConstant(){
+ const wn=1/Math.sqrt(state.L*state.C),alpha=state.R/(2*state.L);
+ const rate=alpha<=wn?alpha:wn*wn/(alpha+Math.sqrt(alpha*alpha-wn*wn));
+ return 1/rate;
+}
+function adaptiveTimeWindow(){
+ const tau=slowPoleTimeConstant();
+ const decay=5*tau;
+ const cycles=state.inputType==='step'?0:3/state.f;
+ const mode=state.timeMode;
+ if(mode==='cycles')return Math.min(500,Math.max(.01,cycles||decay));
+ if(mode==='transient')return Math.min(500,Math.max(.01,decay));
+ if(mode==='auto')return Math.min(500,Math.max(.01,Math.max(decay,cycles)));
+ return Math.min(500,Math.max(.01,state.manualT));
+}
+function syncTimeWindow(){
+ const mode=state.timeMode,tau=slowPoleTimeConstant();
+ if(state.inputType==='step'&&mode==='cycles'){
+  state.timeMode='transient';
+ }
+ const next=adaptiveTimeWindow();
+ state.T=next;
+ state.t=Math.min(state.t,state.T);
+ $('windowMode').value=state.timeMode;
+ $('cyclesWindowOption').disabled=state.inputType==='step';
+ const windowField=$('windowLength');
+ if(document.activeElement!==windowField||state.timeMode!=='manual')
+  windowField.value=Number(state.T.toPrecision(8)).toString();
+ const fmtSeconds=value=>value<.1?value.toPrecision(3):value<10?Number(value.toPrecision(4)).toString():Number(value.toPrecision(5)).toString();
+ const desc=state.timeMode==='manual'?'Custom duration':state.timeMode==='auto'?'At least 3 input cycles and 5 slow-pole time constants':state.timeMode==='cycles'?'Three input cycles':'Five slow-pole time constants';
+ const period=state.inputType==='sine'?' · input period '+fmtSeconds(1/state.f)+' s':' · step input';
+ const dense=state.inputType==='sine'&&state.T*state.f>200?' · Many cycles are compressed; choose “3 input cycles” for waveform detail.':'';
+ $('timeWindowNote').textContent=desc+' · window '+fmtSeconds(state.T)+' s · slow-pole τ ≈ '+fmtSeconds(tau)+' s'+period+dense;
+}
 function redraw(){
- currentModel=model();updateStats();updatePresentation();
+ syncTimeWindow();currentModel=model();updateStats();updatePresentation();
  // Render only the active plots so slider changes remain responsive.
  if(!$('rlcTimePanel').hidden){
   refs.length=0;
@@ -971,7 +1035,26 @@ document.querySelectorAll('[data-zeta]').forEach(btn=>btn.addEventListener('clic
  $('res').value=String(value);$('resNum').value=precise(value);changeParameters();
 }));
 document.querySelectorAll('[data-series]').forEach(inp=>inp.addEventListener('change',()=>{enabled[inp.dataset.series]=inp.checked;updateCursor();document.querySelectorAll(`[data-series="${inp.dataset.series}"]`).forEach(x=>{x.checked=inp.checked;});}));
-$('window').addEventListener('change',()=>{const prev=state.T;state.T=Number($('window').value);state.t=Math.min(state.t,state.T);redraw();});
+$('windowMode').addEventListener('change',()=>{
+ state.timeMode=$('windowMode').value;
+ redraw();
+});
+const windowLength=$('windowLength');
+const updateManualWindow=()=>{
+ const raw=windowLength.value.trim(),value=Number(raw);
+ if(raw===''||!Number.isFinite(value)||value<.01||value>500)return;
+ state.timeMode='manual';state.manualT=value;redraw();
+};
+windowLength.addEventListener('input',updateManualWindow);
+const commitManualWindow=()=>{
+ const raw=windowLength.value.trim(),v=Number(raw);
+ if(raw!==''&&Number.isFinite(v)){
+  state.timeMode='manual';state.manualT=Math.max(.01,Math.min(500,v));
+ }
+ redraw();
+};
+windowLength.addEventListener('change',commitManualWindow);
+windowLength.addEventListener('blur',commitManualWindow);
 $('scrub').addEventListener('input',()=>{state.t=state.T*Number($('scrub').value)/1000;updateCursor();});
 let resizeFrame;
 window.addEventListener('resize',()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(redraw);});

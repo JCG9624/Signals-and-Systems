@@ -98,6 +98,36 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
 .site-return-nav .site-return-link:hover { background: #f4f9fe; border-color: #6c9dc7; }
 .site-return-nav .site-return-link:focus-visible { outline: 3px solid #e8a82c; outline-offset: 3px; }
 
+
+/* Coordinated time-domain and frequency-domain studies. */
+.studio-tabs{display:flex;gap:7px;border-bottom:2px solid #dbe7ee;margin:12px 0 14px;flex-wrap:wrap}
+.studio-tab{appearance:none;cursor:pointer;padding:10px 18px 12px;background:transparent;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;font-size:13px;font-weight:750;color:#637e90;border-radius:8px 8px 0 0}
+.studio-tab.active{background:#ecf7f8;color:var(--navy);border-bottom-color:var(--teal)}
+.studio-tab:hover{background:#edf4f8}.studio-tab:focus-visible{outline:3px solid #85c7d3;outline-offset:2px}
+#rlcFrequencyPanel{display:grid;gap:14px}
+#rlcFrequencyPanel[hidden]{display:none!important}
+.bode-introduction{padding:18px 21px}
+.bode-introduction h2,.bode-landmarks h2{font-size:16px;font-weight:780;color:var(--navy);margin:0 0 9px}
+.bode-introduction p{font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 9px}
+.bode-introduction .bode-ic-note{color:#3b6c80;margin:0 0 13px;background:#f3f9fc;padding:9px 12px;border-left:3px solid #96c9d1;border-radius:5px}
+.bode-readouts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.bode-readouts>div{border:1px solid #dcebf1;border-radius:8px;background:#fbfdff;padding:8px 12px;font-size:11px;color:var(--muted)}
+.bode-readouts strong{display:block;font-size:17px;color:var(--navy);font-variant-numeric:tabular-nums;margin-top:3px}
+.bode-card{overflow:hidden;padding-bottom:12px}
+.bode-card .chart-svg{height:auto;min-height:220px}
+.bode-key{display:flex;flex-wrap:wrap;gap:11px 19px;font-size:11px;color:#58758b;border-top:1px solid #ecf2f6;padding:11px 22px 0}
+.bode-key span{display:inline-flex;align-items:center;gap:7px}
+.bode-sample{width:24px;height:0;display:inline-block;border-top:2px dashed #467197}
+.bode-zero{border-color:#df7b28}.bode-input{border-color:#008e9a;border-top-style:dotted;border-top-width:3px}
+.bode-landmarks{padding:17px 21px 16px}
+.bode-feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px}
+.bode-feature{padding:10px 13px;border:1px solid #dfe9ef;border-left:4px solid #467197;background:#fafcfe;border-radius:8px}
+.bode-feature.zero{border-left-color:#df7b28}.bode-feature.notch{border-left-color:#8155b6}
+.bode-feature .feature-name{font-size:11px;font-weight:750;color:#315873}
+.bode-feature .feature-frequency{font-size:17px;font-weight:790;color:var(--navy);font-variant-numeric:tabular-nums;margin:3px 0}
+.bode-feature .feature-detail{font-size:11px;color:var(--muted);line-height:1.45}
+.bode-explanation{font-size:12px;color:#59768b;line-height:1.6;margin:12px 0 0}
+@media(max-width:680px){.bode-introduction,.bode-landmarks{padding:13px}.bode-readouts{grid-template-columns:repeat(2,minmax(0,1fr))}.studio-tab{padding:9px 12px;font-size:12px}}
 </style>
 </head>
 <body>
@@ -144,6 +174,11 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
  <div class="schematic-caption" id="outputRelation">y(t) = vC(t)</div><div class="schematic-caption">C v̇C = iL; &nbsp; L i̇L = u − RiL − vC</div>
 </section>
 </div>
+<nav class="studio-tabs" role="tablist" aria-label="Analysis domain">
+ <button type="button" id="rlcTabTime" class="studio-tab active" role="tab" aria-controls="rlcTimePanel" aria-selected="true">Time response</button>
+ <button type="button" id="rlcTabFrequency" class="studio-tab" role="tab" aria-controls="rlcFrequencyPanel" aria-selected="false">Frequency response · Bode plots</button>
+</nav>
+<div id="rlcTimePanel" role="tabpanel" aria-labelledby="rlcTabTime">
 <section class="panel chart-card" id="responsePlots" aria-label="Capacitor response plots">
  <div class="chart-head"><h2 id="outputPlotTitle">Input and capacitor output</h2><span>Curves show the whole time interval · click on a plot to inspect a time</span></div>
  <div class="legend">
@@ -177,6 +212,24 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
  <div class="eqcard" style="--color:var(--teal)"><h3><span class="eqdot"></span>Total selected voltage</h3><div class="eqtext">y(t) = y<sub>ss</sub>(t) + y<sub>tr</sub>(t) + y<sub>IC</sub>(t)</div><div class="eqsub" id="outputInitialValue">vC(0⁺) = VC(0⁻).</div><div class="eqsub">g₀(0) = 1, ġ₀(0) = 0; g₁(0) = 0, ġ₁(0) = 1. Both solve g̈ + (R/L)ġ + g/(LC) = 0.</div></div>
 </section>
 <p class="explanation"><b>What to notice:</b> all six outputs belong to the same circuit and share its two stored-energy states. Capacitor voltage gives a low-pass response, resistor voltage a band-pass response, and inductor voltage a high-pass response. Combined element voltages produce additional finite zeros or an LC notch. The <b>switching transient</b> is part of the zero-state response; the <b>initial-condition response</b> comes from stored capacitor and inductor energy. Matching both initial states to steady state cancels the net transient for all three outputs. Their total voltages always satisfy vC + vR + vL = u.</p>
+</div>
+<section id="rlcFrequencyPanel" role="tabpanel" aria-labelledby="rlcTabFrequency" hidden>
+ <div class="panel bode-introduction">
+  <h2>Bode plots of the selected output</h2>
+  <p>Vary <strong>R, L and C</strong> above, then choose any of the six outputs. The magnitude and phase plots show the exact sinusoidal steady-state transfer function. Dashed vertical markers identify the circuit's characteristic frequencies; the teal marker identifies the selected sinusoidal input frequency.</p>
+  <p class="bode-ic-note"><strong>Frequency response is independent of initial conditions.</strong> Initial capacitor voltage and inductor current affect the transient in the Time response tab, but not these Bode plots.</p>
+  <div class="bode-readouts"><div>Input frequency <strong id="bodeInputFrequency">—</strong></div><div>Magnitude at input <strong id="bodeInputMagnitude">—</strong></div><div>Phase at input <strong id="bodeInputPhase">—</strong></div><div>Natural frequency <strong id="bodeNaturalFrequency">—</strong></div></div>
+ </div>
+ <div class="panel bode-card">
+  <div class="chart-head"><h2>Magnitude response</h2><span>20 log₁₀ |H(j2πf)| · dB</span></div>
+  <svg id="bodeMagnitudePlot" class="chart-svg" viewBox="0 0 1120 320" role="img" aria-label="Log-frequency Bode magnitude plot, showing corner and zero frequencies"></svg>
+  <div class="chart-sep"></div>
+  <div class="chart-head"><h2>Phase response</h2><span>arg H(j2πf) · degrees</span></div>
+  <svg id="bodePhasePlot" class="chart-svg" viewBox="0 0 1120 290" role="img" aria-label="Log-frequency Bode phase plot, showing corner and zero frequencies"></svg>
+  <div class="bode-key"><span><i class="bode-sample bode-pole"></i>Pole frequency</span><span><i class="bode-sample bode-zero"></i>Zero frequency / notch</span><span><i class="bode-sample bode-input"></i>Selected sinusoidal input</span></div>
+ </div>
+ <div class="panel bode-landmarks"><h2>Poles, zeros and characteristic frequencies</h2><div id="bodeFeatures" class="bode-feature-grid"></div><p id="bodeExplanation" class="bode-explanation"></p></div>
+</section>
 <footer>Ideal series RLC circuit · u(t) = sin(2πft) V for t ≥ 0 · output selected across C, R, L, RC, LC or RL · static inspection slider · standalone HTML / JavaScript without external libraries</footer>
 </main>
 <script id="rlc-math">
@@ -283,7 +336,7 @@ function drawPlot(plotId,series,height){
  track.addEventListener('click',e=>{const r=el.getBoundingClientRect();const px=(e.clientX-r.left)*W/r.width;state.t=Math.max(0,Math.min(state.T,(px-left)/pw*state.T));updateCursor();});
  refs.push({paths,points,cursor,xx,yy});
 }
-function redraw(){currentModel=model();updateStats();updatePresentation();refs.length=0;drawPlot('mainPlot',['input','steady','total'],325);drawPlot('partsPlot',['steady','transient','initial'],272);updateCursor();}
+function redraw(){currentModel=model();updateStats();updatePresentation();refs.length=0;drawPlot('mainPlot',['input','steady','total'],325);drawPlot('partsPlot',['steady','transient','initial'],272);updateCursor();if(!$('rlcFrequencyPanel').hidden)drawBode();}
 function updateCursor(){
  const v=currentModel.values(state.t);
  for(const ref of refs){const x=ref.xx(state.t);ref.cursor.setAttribute('x1',x);ref.cursor.setAttribute('x2',x);
@@ -348,6 +401,131 @@ function updatePresentation(){
  $('basisFormula').innerHTML=o.basis;$('outputInitialValue').textContent=o.initial;
  $('cancellationNote').hidden=!state.cancel;
 }
+
+function bodeFormatFrequency(f){
+ if(!Number.isFinite(f))return '—';
+ if(f>=1e6)return fixed(f/1e6,2)+' MHz';
+ if(f>=1000)return fixed(f/1000,2)+' kHz';
+ if(f>=1)return fixed(f,2)+' Hz';
+ if(f>=.001)return fixed(f,Math.min(5,Math.max(2,Math.ceil(-Math.log10(f))+1)))+' Hz';
+ return f.toExponential(2)+' Hz';
+}
+function bodeFeatures(){
+ const {R,L,C}=state,wn=1/Math.sqrt(L*C),fn=wn/(2*Math.PI),alpha=R/(2*L),zeta=alpha/wn;
+ const features=[];
+ if(zeta<1-1e-7)features.push({f:fn,kind:'pole',title:'Complex pole pair',detail:'Natural frequency ωₙ = 1/√(LC); ζ = '+fixed(zeta,3)+'. The poles are not on the imaginary axis.'});
+ else if(zeta<=1+1e-7)features.push({f:fn,kind:'pole',title:'Repeated real pole',detail:'Critical damping: both pole break frequencies coincide at fₙ.'});
+ else {
+  const beta=Math.sqrt(alpha*alpha-wn*wn);
+  const slow=wn*wn/(alpha+beta)/(2*Math.PI),fast=(alpha+beta)/(2*Math.PI);
+  features.push({f:slow,kind:'pole',title:'Lower real-pole break',detail:'First-order pole at s = −'+fixed(slow*2*Math.PI,3)+' rad/s.'});
+  features.push({f:fast,kind:'pole',title:'Upper real-pole break',detail:'First-order pole at s = −'+fixed(fast*2*Math.PI,3)+' rad/s.'});
+ }
+ if(state.output==='rc')features.push({f:1/(2*Math.PI*R*C),kind:'zero',title:'RC zero frequency',detail:'Real zero at s = −1/(RC). Above this frequency the numerator introduces +20 dB/decade.'});
+ if(state.output==='rl')features.push({f:R/(2*Math.PI*L),kind:'zero',title:'RL finite-zero frequency',detail:'Real zero at s = −R/L; there is also a zero at the origin.'});
+ if(state.output==='lc')features.push({f:fn,kind:'notch',title:'LC notch (imaginary-axis zeros)',detail:'Zeros at s = ±j/√(LC). The ideal magnitude is exactly zero (−∞ dB), and phase is undefined at fₙ.'});
+ return {fn,wn,zeta,features};
+}
+function bodeValue(f,fn){
+ if(state.output==='lc'&&Math.abs(f/fn-1)<1e-12)return {db:-Infinity,phase:NaN};
+ const h=RLCMath.parameters({...state,f}).phasors[state.output];
+ const mag=Math.hypot(h.re,h.im);
+ return {db:mag>0?20*Math.log10(mag):-Infinity,phase:mag>0?180*Math.atan2(h.im,h.re)/Math.PI:NaN};
+}
+function drawBode(){
+ const {fn,wn,zeta,features}=bodeFeatures(),group=[...features.map(x=>x.f),fn,state.f].filter(f=>f>0);
+ const fLow=Math.pow(10,Math.floor(Math.log10(Math.min(...group)/12)));
+ const fHigh=Math.pow(10,Math.ceil(Math.log10(Math.max(...group)*12)));
+ const N=950,freqs=Array.from({length:N+1},(_,i)=>fLow*Math.pow(fHigh/fLow,i/N));
+ if(state.output==='lc'&&fn>fLow&&fn<fHigh)freqs.push(fn);
+ freqs.sort((a,b)=>a-b);
+ const samples=freqs.map(f=>({f,...bodeValue(f,fn)}));
+ const finite=samples.map(x=>x.db).filter(Number.isFinite);
+ const dbLow=Math.max(-110,Math.min(-20,Math.floor((Math.min(...finite)-6)/20)*20));
+ const dbHigh=Math.max(20,Math.ceil((Math.max(...finite)+6)/20)*20);
+ const markers=[...features,{f:state.f,kind:'input',title:'Selected input frequency'}];
+ function drawOne(id,field,ymin,ymax,H){
+  const el=$(id);el.replaceChildren();
+  const W=Math.max(340,el.clientWidth||1120),small=W<650;
+  el.setAttribute('viewBox','0 0 '+W+' '+H);
+  const left=small?60:74,right=20,top=47,bottom=42,pw=W-left-right,ph=H-top-bottom;
+  const lmin=Math.log10(fLow),lmax=Math.log10(fHigh);
+  const xx=f=>left+pw*(Math.log10(f)-lmin)/(lmax-lmin);
+  const yy=v=>top+ph*(ymax-Math.max(ymin,Math.min(ymax,v)))/(ymax-ymin);
+  svg('rect',{x:left,y:top,width:pw,height:ph,fill:'#fff'},el);
+  const yStep=field==='phase'?45:20;
+  for(let v=Math.ceil(ymin/yStep)*yStep;v<=ymax+1e-9;v+=yStep){
+   const y=yy(v);svg('line',{x1:left,y1:y,x2:left+pw,y2:y,stroke:v===0?'#c0d1dc':'#e7eef3'},el);
+   text(el,left-10,y+4,field==='phase'?v+'°':v+'',{'text-anchor':'end','font-size':11});
+  }
+  for(let k=Math.ceil(lmin);k<=Math.floor(lmax);k++){
+   const f=Math.pow(10,k),x=xx(f);
+   svg('line',{x1:x,y1:top,x2:x,y2:top+ph,stroke:'#e7eef4'},el);
+   const label=bodeFormatFrequency(f).replace(' Hz','').replace(' kHz','k').replace(' MHz','M');
+   text(el,x,top+ph+20,label,{'text-anchor':'middle','font-size':small?10:11});
+   for(const multiple of [2,5]){
+    const fm=f*multiple;if(fm>=fHigh)continue;
+    svg('line',{x1:xx(fm),y1:top,x2:xx(fm),y2:top+ph,stroke:'#f1f5f8'},el);
+   }
+  }
+  const grouped=[];
+  for(const m of markers){
+   const match=grouped.find(q=>Math.abs(Math.log(m.f/q.f))<1e-7);
+   if(match){match.names.push(m.title);if(m.kind==='notch')match.kind='notch';}
+   else grouped.push({f:m.f,kind:m.kind,names:[m.title]});
+  }
+  for(const m of grouped){
+   if(m.f<fLow||m.f>fHigh)continue;
+   const x=xx(m.f),color=m.kind==='input'?'#008e9a':m.kind==='notch'?'#8155b6':m.kind==='zero'?'#df7b28':'#467197';
+   svg('line',{x1:x,x2:x,y1:top,y2:top+ph,stroke:color,'stroke-width':m.kind==='input'?2:1.6,'stroke-dasharray':m.kind==='input'?'3 4':'6 5',opacity:.83},el);
+   const cap=Math.max(left+32,Math.min(left+pw-32,x));
+   text(el,cap,top-17,m.kind==='input'?'f input':m.kind==='notch'?'LC notch':m.kind==='zero'?'zero':'pole',{'text-anchor':'middle','font-size':10,fill:color,'font-weight':750});
+   svg('title',{},svg('circle',{cx:x,cy:top+3,r:4,fill:color},el)).textContent=m.names.join(' / ')+': '+bodeFormatFrequency(m.f);
+  }
+  const yval=q=>field==='phase'?q.phase:q.db;
+  let d='',inSegment=false,prev=null;
+  for(const q of samples){
+   const v=yval(q),valid=Number.isFinite(v);
+   const crossed=field==='phase'&&state.output==='lc'&&prev&&prev.f<fn&&q.f>fn;
+   if(!valid){inSegment=false;prev=q;continue;}
+   const x=xx(q.f),y=yy(v);
+   d+=(inSegment&&!crossed?'L':'M')+x.toFixed(2)+','+y.toFixed(2)+' ';
+   inSegment=true;prev=q;
+  }
+  svg('path',{d,fill:'none',stroke:'#008e9a','stroke-width':2.7,'stroke-linejoin':'round','stroke-linecap':'round'},el);
+  svg('rect',{x:left,y:top,width:pw,height:ph,fill:'none',stroke:'#9cb8ca','stroke-width':1},el);
+  text(el,W/2,H-6,'Frequency (Hz) · logarithmic scale',{'text-anchor':'middle',fill:'#4a6d85'});
+  text(el,left,17,field==='phase'?'Phase (degrees)':'Magnitude (dB)',{fill:'#244b6a','font-size':12,'font-weight':750});
+  if(state.output==='lc'&&field==='db'){
+   const x=xx(fn);
+   text(el,Math.min(W-89,Math.max(left+54,x)),top+ph-9,'Notch: −∞ dB',{'text-anchor':'middle','font-size':11,fill:'#8155b6','font-weight':750});
+  }
+  const chosen=bodeValue(state.f,fn),v=yval(chosen);
+  if(Number.isFinite(v)&&v>=ymin&&v<=ymax){
+   svg('circle',{cx:xx(state.f),cy:yy(v),r:5,fill:'#e87528',stroke:'#fff','stroke-width':2},el);
+  }
+ }
+ drawOne('bodeMagnitudePlot','db',dbLow,dbHigh,320);
+ drawOne('bodePhasePlot','phase',-180,180,290);
+ const chosen=bodeValue(state.f,fn);
+ $('bodeInputFrequency').textContent=bodeFormatFrequency(state.f);
+ $('bodeNaturalFrequency').textContent=bodeFormatFrequency(fn);
+ $('bodeInputMagnitude').textContent=Number.isFinite(chosen.db)?fixed(chosen.db,2)+' dB':'−∞ dB';
+ $('bodeInputPhase').textContent=Number.isFinite(chosen.phase)?fixed(chosen.phase,1)+'°':'Undefined at notch';
+ const root=$('bodeFeatures');root.replaceChildren();
+ const natural=svg; // SVG helper remains separate from the HTML feature cards.
+ const cards=[...features];
+ if(zeta>1+1e-7)cards.unshift({f:fn,kind:'natural',title:'Natural frequency (reference)',detail:'ωₙ = 1/√(LC) = '+fixed(wn,3)+' rad/s; overdamped poles have distinct real break frequencies.'});
+ for(const feature of cards){
+  const card=document.createElement('div');card.className='bode-feature '+(feature.kind==='notch'?'notch':feature.kind==='zero'?'zero':'');
+  const name=document.createElement('div');name.className='feature-name';name.textContent=feature.title;
+  const frequency=document.createElement('div');frequency.className='feature-frequency';frequency.textContent=bodeFormatFrequency(feature.f);
+  const detail=document.createElement('div');detail.className='feature-detail';detail.textContent=feature.detail;
+  card.append(name,frequency,detail);root.appendChild(card);
+ }
+ const origins={capacitor:'No zeros.',resistor:'A zero at s = 0 (band-pass).',inductor:'A double zero at s = 0 (high-pass).',rc:'One finite real zero at −1/(RC).',lc:'Two imaginary-axis zeros at ±jωₙ, giving an exact notch.',rl:'A zero at the origin and another at −R/L.'};
+ $('bodeExplanation').textContent=origins[state.output]+' A complex pole pair is identified by its natural frequency (not necessarily its −3 dB frequency). At critical or overdamping, real pole break frequencies are shown. For the LC notch the ideal magnitude is zero, and the phase is undefined exactly at the notch. The selected input frequency is highlighted on both plots.';
+}
 function updateStats(){
  const m=currentModel,label=m.zeta<1-1e-6?'Underdamped':m.zeta>1+1e-6?'Overdamped':'Critically damped';
  $('regime').textContent=label;$('zetaStat').textContent=fixed(m.zeta);
@@ -376,6 +554,14 @@ for(const [id,def] of Object.entries(paramDefs)){
  num.addEventListener('change',commit);num.addEventListener('blur',commit);
 }
 $('output').addEventListener('change',changeParameters);
+for(const [button,panel,otherButton,otherPanel] of [['rlcTabTime','rlcTimePanel','rlcTabFrequency','rlcFrequencyPanel'],['rlcTabFrequency','rlcFrequencyPanel','rlcTabTime','rlcTimePanel']]){
+ $(button).addEventListener('click',()=>{
+  $(panel).hidden=false;$(otherPanel).hidden=true;
+  $(button).classList.add('active');$(otherButton).classList.remove('active');
+  $(button).setAttribute('aria-selected','true');$(otherButton).setAttribute('aria-selected','false');
+  redraw();
+ });
+}
 $('cancelTransient').addEventListener('change',()=>{
  if(!$('cancelTransient').checked){syncInitialControl('vc',state.manualV0,false);syncInitialControl('il',state.manualI0,false);}
  changeParameters();

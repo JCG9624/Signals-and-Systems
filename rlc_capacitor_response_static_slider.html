@@ -194,6 +194,55 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
  .architecture-row .schematic svg{width:100px;max-width:100px}
  .architecture-choice .output-row select{min-width:180px}
 }
+
+/* Time-domain figures and live s-plane positions share the right-side workspace. */
+.time-figure-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(235px,270px);gap:12px;align-items:start}
+.time-figure-row>#responsePlots{min-width:0}
+.time-figure-row .chart-head{padding:11px 13px 3px}
+.time-figure-row .chart-head h2{font-size:14px}
+.time-figure-row .chart-head span{font-size:10px}
+.time-figure-row .legend{padding:3px 13px 6px;gap:7px 12px}
+.time-figure-row .legend label{font-size:10.5px}
+.time-figure-row .swatch{width:20px}
+.time-figure-row .bottom-row{margin:0 12px;padding:9px 0;gap:8px;flex-wrap:wrap}
+.time-figure-row .bottom-row label{font-size:11px}
+.time-figure-row .bottom-row .bottom-hint{display:none}
+.time-figure-row .bottom-row input{min-width:130px}
+.time-figure-row .readouts{grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:6px;margin:0 12px 12px}
+.time-figure-row .readout{padding:6px 8px}
+.time-figure-row .readout .key{font-size:10px}
+.time-figure-row .readout .value{font-size:14px}
+.pole-zero-panel{padding:13px 12px 14px;position:sticky;top:12px;min-width:0}
+.pole-zero-heading h2{font-size:14px;color:var(--navy);font-weight:800;margin:0 0 4px}
+.pole-zero-heading p{font-size:11px;line-height:1.45;color:var(--muted);margin:0 0 8px}
+.pz-symbol-key{display:flex;gap:12px;align-items:center;color:#57738a;font-size:11px;border-top:1px solid #e8eff4;padding:7px 0 3px}
+.pz-symbol-key span{display:flex;gap:5px;align-items:center}
+.pz-cross{font-size:20px;line-height:1;color:#dc6d30;font-weight:750}
+.pz-circle{font-size:23px;line-height:1;color:var(--teal)}
+.pole-zero-svg{display:block;width:100%;height:auto;background:white;min-height:220px}
+.pole-zero-details{display:grid;gap:7px;border-top:1px solid #e6edf3;padding-top:9px}
+.pz-reading{display:flex;flex-direction:column;gap:3px;background:#f8fbfd;border:1px solid #e4edf3;border-radius:7px;padding:8px 9px}
+.pz-reading strong{color:var(--navy);font-size:11px;font-weight:800}
+.pz-reading span{color:#4c6c83;font-size:11px;font-variant-numeric:tabular-nums;line-height:1.5;overflow-wrap:anywhere}
+.pole-zero-help{color:#6b8596;font-size:10px;line-height:1.5;margin-top:9px}
+@media(max-width:1250px){
+ .time-figure-row{grid-template-columns:minmax(0,1fr)}
+ .pole-zero-panel{position:relative;top:auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7px 12px}
+ .pole-zero-heading,.pole-zero-panel .pz-symbol-key,.pole-zero-svg{grid-column:1}
+ .pole-zero-details,.pole-zero-help{grid-column:2}
+ .pole-zero-details{grid-row:1/4;align-self:start;padding-top:0;border-top:0}
+ .pole-zero-help{grid-row:4}
+}
+@media(max-width:820px){
+ .time-figure-row{grid-template-columns:minmax(0,1fr) minmax(225px,285px)}
+ .pole-zero-panel{position:relative;top:auto;display:block}
+}
+@media(max-width:680px){
+ .time-figure-row{grid-template-columns:minmax(0,1fr)}
+ .pole-zero-panel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .time-figure-row .readouts{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:480px){.pole-zero-panel{display:block}}
 </style>
 </head>
 <body>
@@ -254,6 +303,7 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
 <div class="studio-figures">
 
 <div id="rlcTimePanel" role="tabpanel" aria-labelledby="rlcTabTime">
+<div class="time-figure-row">
 <section class="panel chart-card" id="responsePlots" aria-label="Capacitor response plots">
  <div class="chart-head"><h2 id="outputPlotTitle">Input and capacitor output</h2><span>Curves show the whole time interval · click on a plot to inspect a time</span></div>
  <div class="legend">
@@ -280,6 +330,17 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
   <div class="readout" style="--color:var(--teal)"><div class="key" id="outputReadLabel">Total capacitor voltage</div><div class="value" id="yRead">0.000 V</div></div>
  </div>
 </section>
+<aside class="panel pole-zero-panel" id="poleZeroPanel" aria-label="Live pole-zero map of the selected transfer function">
+ <div class="pole-zero-heading">
+  <h2>Pole–zero positions</h2>
+  <p>Same R, L and C as the time-response plots. Change the sliders to see how the poles and zeros move.</p>
+ </div>
+ <div class="pz-symbol-key"><span><b class="pz-cross">×</b> Poles</span><span><b class="pz-circle">○</b> Zeros</span></div>
+ <svg id="poleZeroPlot" class="pole-zero-svg" viewBox="0 0 340 330" role="img" aria-label="Complex s-plane pole-zero diagram for the selected series RLC voltage output"></svg>
+ <div id="poleZeroDetails" class="pole-zero-details" aria-live="off"></div>
+ <div class="pole-zero-help">The poles are determined by R, L and C and are shared by all six outputs. The zeros depend on the selected voltage. Axis units: rad/s.</div>
+</aside>
+</div>
 <section class="equations" aria-label="Analytical expressions">
  <div class="eqcard" style="--color:var(--navy)"><h3><span class="eqdot"></span>Sinusoidal steady state</h3><div class="eqtext">y<sub>ss</sub>(t) = M sin(ω₀t + φ)</div><div class="eqsub" id="steadyFormula">M = |HC(jω₀)|; φ = arg HC(jω₀).</div></div>
  <div class="eqcard" style="--color:var(--orange)"><h3><span class="eqdot"></span>Switching transient (zero-state)</h3><div class="eqtext">y<sub>tr</sub>(t) = −v<sub>C,ss</sub>(0) F<sub>V</sub>(t) − i<sub>L,ss</sub>(0) F<sub>I</sub>(t)</div><div class="eqsub">Cancels the two initial circuit states of the steady-state particular solution.</div></div>
@@ -413,6 +474,117 @@ function drawPlot(plotId,series,height){
  track.addEventListener('click',e=>{const r=el.getBoundingClientRect();const px=(e.clientX-r.left)*W/r.width;state.t=Math.max(0,Math.min(state.T,(px-left)/pw*state.T));updateCursor();});
  refs.push({paths,points,cursor,xx,yy});
 }
+
+/** Poles from D(s)=LCs²+RCs+1; zeros from the selected output numerator. */
+function poleZeroLocations(){
+ const {R,L,C,output}=state,wn=1/Math.sqrt(L*C),alpha=R/(2*L),disc=wn*wn-alpha*alpha;
+ let poles;
+ if(disc>1e-9*wn*wn){
+  const wd=Math.sqrt(disc);
+  poles=[{re:-alpha,im:wd},{re:-alpha,im:-wd}];
+ }else if(disc< -1e-9*wn*wn){
+  const beta=Math.sqrt(-disc);
+  const fast=-alpha-beta,slow=-(wn*wn)/(alpha+beta);
+  poles=[{re:slow,im:0},{re:fast,im:0}];
+ }else poles=[{re:-wn,im:0},{re:-wn,im:0}];
+ let zeros=[];
+ switch(output){
+  case 'resistor':zeros=[{re:0,im:0}];break;
+  case 'inductor':zeros=[{re:0,im:0},{re:0,im:0}];break;
+  case 'rc':zeros=[{re:-1/(R*C),im:0}];break;
+  case 'lc':zeros=[{re:0,im:wn},{re:0,im:-wn}];break;
+  case 'rl':zeros=[{re:0,im:0},{re:-R/L,im:0}];break;
+ }
+ return {poles,zeros,wn,alpha};
+}
+function poleZeroText(value){
+ if(Math.abs(value)<1e-10)return '0';
+ return fixed(value,Math.abs(value)>=100?1:Math.abs(value)>=10?2:3).replace(/^-/, '−');
+}
+function drawPoleZero(){
+ const el=$('poleZeroPlot');el.replaceChildren();
+ const {poles,zeros,wn,alpha}=poleZeroLocations(),all=[{re:0,im:0},...poles,...zeros];
+ const W=340,H=330,margin={l:44,r:20,t:30,b:38},pw=W-margin.l-margin.r,ph=H-margin.t-margin.b;
+ const reMin=Math.min(...all.map(p=>p.re)),reMax=Math.max(...all.map(p=>p.re));
+ const imAbs=Math.max(...all.map(p=>Math.abs(p.im))),reSpan=Math.max(1e-6,reMax-reMin);
+ // Use identical scale in both directions: the s-plane must not distort pole angles.
+ const spanRe=Math.max(reSpan*1.35,wn*.75),spanIm=Math.max(imAbs*2.35,wn*.5);
+ const scale=Math.min(pw/spanRe,ph/spanIm);
+ const centerRe=(reMin+reMax)/2,centerIm=0,centerX=margin.l+pw/2,centerY=margin.t+ph/2;
+ const xx=re=>centerX+(re-centerRe)*scale,yy=im=>centerY-(im-centerIm)*scale;
+ const xLeft=margin.l,xRight=W-margin.r,yTop=margin.t,yBottom=H-margin.b;
+ svg('rect',{x:xLeft,y:yTop,width:pw,height:ph,fill:'#fcfefe'},el);
+ // Subtle grid and axis ticks in rad/s.
+ let step=Math.pow(10,Math.floor(Math.log10(Math.max(spanRe,spanIm)/5)));
+ for(const m of [1,2,5,10]){if((spanRe/step)>9){step*=m===1?2:m===2?2.5:2;}}
+ step=Math.max(1e-6,step);
+ const minRe=centerRe-(pw/(2*scale)),maxRe=centerRe+(pw/(2*scale));
+ const maxIm=ph/(2*scale);
+ let gridLines=0;
+ for(let k=Math.ceil(minRe/step);k<=Math.floor(maxRe/step)&&gridLines<25;k++,gridLines++){
+  const value=k*step,x=xx(value);
+  svg('line',{x1:x,x2:x,y1:yTop,y2:yBottom,stroke:Math.abs(value)<step*.01?'#7491a4':'#edf2f6','stroke-width':Math.abs(value)<step*.01?1.7:1},el);
+  if(k%2===0||step>=10)text(el,x,H-17,poleZeroText(value),{'text-anchor':'middle','font-size':10});
+ }
+ gridLines=0;
+ for(let k=Math.ceil(-maxIm/step);k<=Math.floor(maxIm/step)&&gridLines<25;k++,gridLines++){
+  const value=k*step,y=yy(value);
+  svg('line',{x1:xLeft,x2:xRight,y1:y,y2:y,stroke:Math.abs(value)<step*.01?'#7491a4':'#edf2f6','stroke-width':Math.abs(value)<step*.01?1.7:1},el);
+  if(k!==0&&(k%2===0||step>=10))text(el,xLeft-5,y+4,poleZeroText(value),{'text-anchor':'end','font-size':10});
+ }
+ const xOrigin=xx(0),yOrigin=yy(0);
+ if(xOrigin>=xLeft&&xOrigin<=xRight){
+  text(el,Math.min(xRight-8,xOrigin+4),yTop+13,'Im',{'font-size':11,fill:'#4d6980','font-weight':750});
+ }
+ text(el,W/2,H-2,'Re(s) [rad/s]',{'text-anchor':'middle','font-size':11,fill:'#43647c'});
+ const imaginaryLabel=text(el,12,H/2,'Im(s)',{'text-anchor':'middle','font-size':11,fill:'#43647c'});
+ imaginaryLabel.setAttribute('transform','rotate(-90 12 '+(H/2)+')');
+ function atPoint(re,im){return {x:xx(re),y:yy(im)}}
+ function glyph(p,type,multiple){
+  const {x,y}=atPoint(p.re,p.im),size=7;
+  if(type==='pole'){
+   const d='M'+(x-size)+','+(y-size)+' L'+(x+size)+','+(y+size)+' M'+(x-size)+','+(y+size)+' L'+(x+size)+','+(y-size);
+   svg('path',{d,fill:'none',stroke:'#dc6d30','stroke-width':2.8,'stroke-linecap':'round'},el);
+   if(multiple>1)text(el,x+11,y-11,'×'+multiple,{'font-size':11,'font-weight':800,fill:'#b65b24'});
+  }else{
+   svg('circle',{cx:x,cy:y,r:7,stroke:'#008e9a','stroke-width':2.7,fill:'#fff'},el);
+   if(multiple>1)text(el,x+11,y-11,'×'+multiple,{'font-size':11,'font-weight':800,fill:'#006e79'});
+  }
+ }
+ function drawGroup(points,type){
+  const groups=[];
+  for(const p of points){
+   const previous=groups.find(g=>Math.abs(g.re-p.re)<1e-8&&Math.abs(g.im-p.im)<1e-8);
+   if(previous)previous.multiple++;else groups.push({...p,multiple:1});
+  }
+  for(const g of groups)glyph(g,type,g.multiple);
+ }
+ drawGroup(poles,'pole');drawGroup(zeros,'zero');
+ const fmtLocation=p=>{
+  const re=poleZeroText(p.re),im=Math.abs(p.im);
+  return im<1e-10?re:re+(p.im>=0?' + j':' − j')+poleZeroText(im);
+ };
+ const root=$('poleZeroDetails');root.replaceChildren();
+ const d=document.createElement('div');d.className='pz-reading';
+ const head=document.createElement('strong');head.textContent='Poles (×)';
+ const content=document.createElement('span');
+ if(Math.abs(poles[0].re-poles[1].re)<1e-8&&Math.abs(poles[0].im-poles[1].im)<1e-8)content.textContent='Repeated pole: '+fmtLocation(poles[0])+' rad/s';
+ else content.textContent=poles.map(fmtLocation).join('; ')+' rad/s';
+ d.append(head,content);root.appendChild(d);
+ const z=document.createElement('div');z.className='pz-reading';
+ const zh=document.createElement('strong');zh.textContent='Zeros (○)';
+ const zv=document.createElement('span');
+ if(!zeros.length)zv.textContent='None — constant numerator';
+ else if(zeros.length===2&&Math.abs(zeros[0].re-zeros[1].re)<1e-8&&Math.abs(zeros[0].im-zeros[1].im)<1e-8)zv.textContent='Repeated zero: '+fmtLocation(zeros[0])+' rad/s';
+ else zv.textContent=zeros.map(fmtLocation).join('; ')+' rad/s';
+ z.append(zh,zv);root.appendChild(z);
+ const eig=document.createElement('div');eig.className='pz-reading';
+ const eh=document.createElement('strong');eh.textContent='Damping and natural frequency';
+ const ev=document.createElement('span');
+ ev.textContent='ζ = '+fixed(alpha/wn,3)+' · ωₙ = '+fixed(wn,3)+' rad/s';
+ eig.append(eh,ev);root.appendChild(eig);
+ el.setAttribute('aria-label','Pole-zero map: poles '+content.textContent+'; zeros '+zv.textContent+'.');
+}
 function redraw(){
  currentModel=model();updateStats();updatePresentation();
  // Render only the active plots so slider changes remain responsive.
@@ -421,6 +593,7 @@ function redraw(){
   drawPlot('mainPlot',['input','steady','total'],325);
   drawPlot('partsPlot',['steady','transient','initial'],272);
   updateCursor();
+  drawPoleZero();
  }
  if(!$('rlcFrequencyPanel').hidden)drawBode();
 }

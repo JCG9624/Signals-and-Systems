@@ -218,8 +218,17 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
 .pz-symbol-key{display:flex;gap:12px;align-items:center;color:#57738a;font-size:11px;border-top:1px solid #e8eff4;padding:7px 0 3px}
 .pz-symbol-key span{display:flex;gap:5px;align-items:center}
 .pz-cross{font-size:20px;line-height:1;color:#dc6d30;font-weight:750}
-.pz-circle{font-size:23px;line-height:1;color:var(--teal)}
+.pz-circle{font-size:23px;line-height:1;color:var(--teal)}.pz-diamond{font-size:17px;line-height:1;color:var(--purple)}
 .pole-zero-svg{display:block;width:100%;height:auto;background:white;min-height:220px}
+.pz-symbol-key{flex-wrap:wrap;gap:4px 12px}
+.pz-match-button{display:block;width:100%;margin:7px 0 5px;padding:8px 10px;font:700 11px/1.4 inherit;background:#eef8f8;border:1px solid #b8ddde;border-radius:8px;color:#176f75;cursor:pointer}
+.pz-match-button[hidden]{display:none!important}
+.pz-match-button:hover{background:#dcf1f0}
+.pz-match-button:focus-visible{outline:3px solid #90c5d1;outline-offset:2px}
+.pz-cancellation{display:flex;flex-direction:column;gap:3px;border-radius:8px;border:1px solid #cfc1e7;background:#f7f1fd;padding:9px 10px;margin-bottom:9px;font-size:11px;line-height:1.5;color:#604483}
+.pz-cancellation strong{font-weight:800;color:#674299}
+.pz-cancellation[hidden]{display:none!important}
+.input-reading{border-left:3px solid #8155b6}
 .pole-zero-details{display:grid;gap:7px;border-top:1px solid #e6edf3;padding-top:9px}
 .pz-reading{display:flex;flex-direction:column;gap:3px;background:#f8fbfd;border:1px solid #e4edf3;border-radius:7px;padding:8px 9px}
 .pz-reading strong{color:var(--navy);font-size:11px;font-weight:800}
@@ -336,15 +345,24 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
   <div class="readout" style="--color:var(--teal)"><div class="key" id="outputReadLabel">Total capacitor voltage</div><div class="value" id="yRead">0.000 V</div></div>
  </div>
 </section>
-<aside class="panel pole-zero-panel" id="poleZeroPanel" aria-label="Live pole-zero map of the selected transfer function">
+<aside class="panel pole-zero-panel" id="poleZeroPanel" aria-label="Live s-plane map of circuit poles, transfer-function zeros and input poles">
  <div class="pole-zero-heading">
-  <h2>Pole–zero positions</h2>
-  <p>Same R, L and C as the time-response plots. Change the sliders to see how the poles and zeros move.</p>
+  <h2>Circuit and input: the s-plane</h2>
+  <p>The input x(t) = sin(ω₀t)u(t) has Laplace poles at ±jω₀. Move the input-frequency slider to see them move along the imaginary axis.</p>
  </div>
- <div class="pz-symbol-key"><span><b class="pz-cross">×</b> Poles</span><span><b class="pz-circle">○</b> Zeros</span></div>
- <svg id="poleZeroPlot" class="pole-zero-svg" viewBox="0 0 340 330" role="img" aria-label="Complex s-plane pole-zero diagram for the selected series RLC voltage output"></svg>
+ <div class="pz-symbol-key">
+  <span><b class="pz-cross">×</b> Circuit poles</span>
+  <span><b class="pz-circle">○</b> System zeros</span>
+  <span><b class="pz-diamond">◆</b> Input poles</span>
+ </div>
+ <button type="button" id="matchNotchFrequency" class="pz-match-button" hidden>Set input frequency to LC notch (f = fₙ)</button>
+ <svg id="poleZeroPlot" class="pole-zero-svg" viewBox="0 0 340 330" role="img" aria-label="Complex s-plane diagram with circuit poles, system zeros and sinusoidal-input poles"></svg>
+ <div id="notchCancellation" class="pz-cancellation" hidden>
+  <strong>Exact pole–zero cancellation at the notch.</strong>
+  <span>The two input poles coincide with the LC transfer-function zeros. For zero initial conditions, the sinusoidal terms cancel in Y(s): only decaying natural modes remain, with no sustained output sinusoid.</span>
+ </div>
  <div id="poleZeroDetails" class="pole-zero-details" aria-live="off"></div>
- <div class="pole-zero-help">The poles are determined by R, L and C and are shared by all six outputs. The zeros depend on the selected voltage. Axis units: rad/s.</div>
+ <div class="pole-zero-help">System poles depend on R, L, C; zeros depend on the selected voltage. Input poles depend only on the selected frequency. Axis units: rad/s. Exact cancellation of input poles applies to the zero-state response; initial conditions may introduce additional natural transients.</div>
 </aside>
 </div>
 <section class="equations" aria-label="Analytical expressions">
@@ -486,7 +504,7 @@ function drawPlot(plotId,series,height){
 
 /** Poles from D(s)=LCs²+RCs+1; zeros from the selected output numerator. */
 function poleZeroLocations(){
- const {R,L,C,output}=state,wn=1/Math.sqrt(L*C),alpha=R/(2*L),disc=wn*wn-alpha*alpha;
+ const {R,L,C,output}=state,wn=1/Math.sqrt(L*C),alpha=R/(2*L),disc=wn*wn-alpha*alpha,omegaInput=2*Math.PI*state.f;
  let poles;
  if(disc>1e-9*wn*wn){
   const wd=Math.sqrt(disc);
@@ -504,7 +522,9 @@ function poleZeroLocations(){
   case 'lc':zeros=[{re:0,im:wn},{re:0,im:-wn}];break;
   case 'rl':zeros=[{re:0,im:0},{re:-R/L,im:0}];break;
  }
- return {poles,zeros,wn,alpha};
+ const inputPoles=[{re:0,im:omegaInput},{re:0,im:-omegaInput}];
+ const cancelled=output==='lc'&&Math.abs(omegaInput/wn-1)<1e-11;
+ return {poles,zeros,inputPoles,wn,alpha,omegaInput,cancelled};
 }
 function poleZeroText(value){
  if(Math.abs(value)<1e-10)return '0';
@@ -512,7 +532,7 @@ function poleZeroText(value){
 }
 function drawPoleZero(){
  const el=$('poleZeroPlot');el.replaceChildren();
- const {poles,zeros,wn,alpha}=poleZeroLocations(),all=[{re:0,im:0},...poles,...zeros];
+ const {poles,zeros,inputPoles,wn,alpha,omegaInput,cancelled}=poleZeroLocations(),all=[{re:0,im:0},...poles,...zeros,...inputPoles];
  const W=340,H=330,margin={l:44,r:20,t:30,b:38},pw=W-margin.l-margin.r,ph=H-margin.t-margin.b;
  const reMin=Math.min(...all.map(p=>p.re)),reMax=Math.max(...all.map(p=>p.re));
  const imAbs=Math.max(...all.map(p=>Math.abs(p.im))),reSpan=Math.max(1e-6,reMax-reMin);
@@ -569,6 +589,25 @@ function drawPoleZero(){
   for(const g of groups)glyph(g,type,g.multiple);
  }
  drawGroup(poles,'pole');drawGroup(zeros,'zero');
+ // Distinguish poles of the causal sinusoidal input X(s)=ω₀/(s²+ω₀²)
+ // from the poles and zeros of H(s). Draw diamonds inside circles when
+ // the input poles coincide with the LC notch zeros.
+ for(const inputPole of inputPoles){
+  const {x,y}=atPoint(inputPole.re,inputPole.im);
+  if(cancelled){
+   svg('circle',{cx:x,cy:y,r:13,fill:'#eee6f9',stroke:'#8756bb','stroke-width':1.5,'stroke-dasharray':'3 3'},el);
+   // Re-emphasise the system zero after drawing the cancellation halo.
+   svg('circle',{cx:x,cy:y,r:8.5,fill:'#fff',stroke:'#008e9a','stroke-width':2.7},el);
+  }
+  const radius=cancelled?4.9:6.2;
+  const d='M'+x+','+(y-radius)+' L'+(x+radius)+','+y+' L'+x+','+(y+radius)+' L'+(x-radius)+','+y+' Z';
+  svg('path',{d,fill:'#8155b6',stroke:'#fff','stroke-width':1.5,'stroke-linejoin':'round'},el);
+ }
+ if(cancelled){
+  const upper=atPoint(0,wn),lower=atPoint(0,-wn);
+  text(el,Math.max(xLeft+64,Math.min(xRight-64,upper.x+66)),Math.max(yTop+11,upper.y-13),'Cancellation!',{'font-size':10,'font-weight':800,fill:'#8155b6','text-anchor':'middle'});
+  text(el,Math.max(xLeft+64,Math.min(xRight-64,lower.x+66)),Math.min(yBottom-4,lower.y+17),'Cancellation!',{'font-size':10,'font-weight':800,fill:'#8155b6','text-anchor':'middle'});
+ }
  const fmtLocation=p=>{
   const re=poleZeroText(p.re),im=Math.abs(p.im);
   return im<1e-10?re:re+(p.im>=0?' + j':' − j')+poleZeroText(im);
@@ -587,12 +626,19 @@ function drawPoleZero(){
  else if(zeros.length===2&&Math.abs(zeros[0].re-zeros[1].re)<1e-8&&Math.abs(zeros[0].im-zeros[1].im)<1e-8)zv.textContent='Repeated zero: '+fmtLocation(zeros[0])+' rad/s';
  else zv.textContent=zeros.map(fmtLocation).join('; ')+' rad/s';
  z.append(zh,zv);root.appendChild(z);
+ const ip=document.createElement('div');ip.className='pz-reading input-reading';
+ const iph=document.createElement('strong');iph.textContent='Input poles (◆)';
+ const ipv=document.createElement('span');
+ ipv.textContent='s = ±j'+poleZeroText(omegaInput)+' rad/s · f = '+fixed(state.f,state.f<.1?3:2)+' Hz';
+ ip.append(iph,ipv);root.appendChild(ip);
  const eig=document.createElement('div');eig.className='pz-reading';
  const eh=document.createElement('strong');eh.textContent='Damping and natural frequency';
  const ev=document.createElement('span');
  ev.textContent='ζ = '+fixed(alpha/wn,3)+' · ωₙ = '+fixed(wn,3)+' rad/s';
  eig.append(eh,ev);root.appendChild(eig);
- el.setAttribute('aria-label','Pole-zero map: poles '+content.textContent+'; zeros '+zv.textContent+'.');
+ $('matchNotchFrequency').hidden=state.output!=='lc';
+ $('notchCancellation').hidden=!cancelled;
+ el.setAttribute('aria-label','Pole-zero map: system poles '+content.textContent+'; system zeros '+zv.textContent+'; sinusoidal input poles at ±j'+poleZeroText(omegaInput)+' radians per second.'+(cancelled?' Input poles coincide with notch zeros: exact cancellation.':''));
 }
 function redraw(){
  currentModel=model();updateStats();updatePresentation();
@@ -854,6 +900,14 @@ for(const [id,def] of Object.entries(paramDefs)){
  num.addEventListener('change',commit);num.addEventListener('blur',commit);
 }
 $('output').addEventListener('change',changeParameters);
+$('matchNotchFrequency').addEventListener('click',()=>{
+ // The LC notch lies in the supported 0.01–100 Hz input-frequency range.
+ const fn=1/(2*Math.PI*Math.sqrt(state.L*state.C));
+ state.f=fn;
+ $('freq').value=String(Math.log10(fn));
+ $('freqNum').value=Number(fn.toPrecision(9)).toString();
+ changeParameters();
+});
 for(const [button,panel,otherButton,otherPanel] of [['rlcTabTime','rlcTimePanel','rlcTabFrequency','rlcFrequencyPanel'],['rlcTabFrequency','rlcFrequencyPanel','rlcTabTime','rlcTimePanel']]){
  $(button).addEventListener('click',()=>{
   $(panel).hidden=false;$(otherPanel).hidden=true;

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="RLC Studio: capacitor, resistor and inductor voltage responses to a sinusoidal input, with damping controls, initial conditions and exact transient cancellation.">
-<title>RLC Studio — Three Voltage Outputs</title>
+<meta name="description" content="RLC Studio: six voltage outputs across a series RLC circuit, with time-domain and frequency-domain Bode plots.">
+<title>RLC Studio — Six Voltage Outputs and Bode Plots</title>
 <style>
 :root{--navy:#133b62;--navy2:#235276;--teal:#008e9a;--orange:#e87528;--purple:#8155b6;--slate:#9aabba;--ink:#1b344a;--muted:#59758b;--line:#dbe6ed;--bg:#f6f9fc;--shadow:0 2px 13px rgba(20,61,96,.045)}
 *{box-sizing:border-box}
@@ -107,13 +107,13 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
 
 <main>
 <header>
- <div><div class="eyebrow">Signals &amp; Systems · series RLC circuit</div><div class="title-row"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 64 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h6l2-4 4 8 4-8 4 8 2-4h4c0-10 6-10 6 0 0-10 6-10 6 0 0-10 6-10 6 0h7v12M47 25h14M47 30h14M54 30v12H3"/></svg></span><h1>RLC Studio</h1></div><p class="subtitle">Choose capacitor, resistor or inductor voltage as the output. Adjust the frequency, R, L, C and initial conditions, or match the initial state to cancel the net transient. The full curves update immediately.</p></div>
+ <div><div class="eyebrow">Signals &amp; Systems · series RLC circuit</div><div class="title-row"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 64 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h6l2-4 4 8 4-8 4 8 2-4h4c0-10 6-10 6 0 0-10 6-10 6 0 0-10 6-10 6 0h7v12M47 25h14M47 30h14M54 30v12H3"/></svg></span><h1>RLC Studio</h1></div><p class="subtitle">Select the voltage across C, R or L, or the combined voltages across RC, LC or RL. Compare time responses and frequency-domain Bode plots using the same R, L and C values.</p></div>
  <div class="formula"><span class="orange">H<sub id="transferSub">C</sub></span>(s) = <span class="frac"><span class="num" id="transferNumerator">1</span><span class="den">LCs² + RCs + 1</span></span></div>
 </header>
 <div class="top-row">
 <section class="panel controls" aria-label="RLC circuit parameters">
  <h2 class="section-name">Output, parameters and initial conditions</h2>
- <div class="output-row"><label for="output">Measured output</label><select id="output"><option value="capacitor">Capacitor voltage · low-pass</option><option value="resistor">Resistor voltage · band-pass</option><option value="inductor">Inductor voltage · high-pass</option></select><span class="filter-type" id="filterType">Low-pass</span></div>
+ <div class="output-row"><label for="output">Measured output</label><select id="output"><option value="capacitor">Capacitor voltage · low-pass</option><option value="resistor">Resistor voltage · band-pass</option><option value="inductor">Inductor voltage · high-pass</option><option value="rc">R + C voltage sum · finite zero</option><option value="lc">L + C voltage sum · notch</option><option value="rl">R + L voltage sum · finite zero</option></select><span class="filter-type" id="filterType">Low-pass</span></div>
  <div class="control-grid">
   <div><div class="control-head"><label for="freq">Input frequency</label><span class="number-wrap"><input id="freqNum" type="number" min="0.2" max="12" step="0.05" value="1.50"><span>Hz</span></span></div><input id="freq" type="range" min="0.2" max="12" step="0.05" value="1.50"><div class="range-label"><span>0.2 Hz</span><span>12 Hz</span></div></div>
   <div><div class="control-head"><label for="res">Resistance R</label><span class="number-wrap"><input id="resNum" type="number" min="0.1" max="120" step="any" value="3"><span>Ω</span></span></div><input id="res" type="range" min="0.1" max="120" step="any" value="3"><div class="range-label"><span>0.1 Ω</span><span>120 Ω</span></div></div>
@@ -122,7 +122,7 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
   <div><div class="control-head"><label for="vc">Initial capacitor voltage</label><span class="number-wrap"><input id="vcNum" aria-label="Initial capacitor voltage number" type="number" min="-2" max="2" step="0.05" value="0.45"><span>V</span></span></div><input id="vc" type="range" min="-2" max="2" step="0.05" value="0.45"><div class="range-label"><span id="vcMinLabel">−2 V</span><span id="vcMaxLabel">+2 V</span></div></div>
   <div><div class="control-head"><label for="il">Initial inductor current</label><span class="number-wrap"><input id="ilNum" aria-label="Initial inductor current number" type="number" min="-0.3" max="0.3" step="0.01" value="0"><span>A</span></span></div><input id="il" type="range" min="-0.3" max="0.3" step="0.01" value="0"><div class="range-label"><span id="ilMinLabel">−0.3 A</span><span id="ilMaxLabel">+0.3 A</span></div></div>
  </div>
- <div class="initial-options"><label class="cancel-toggle"><input id="cancelTransient" type="checkbox" aria-describedby="initialHelp">Cancel net transient for all three outputs</label><div class="matched-values"><span>Match V<sub>C</sub>(0<sup>−</sup>): <strong id="matchV">—</strong></span><span>Match i<sub>L</sub>(0<sup>−</sup>): <strong id="matchI">—</strong></span></div><p class="initial-help" id="initialHelp">Match both stored-energy states to their steady-state values at t = 0.</p><p class="initial-help range-note" id="matchedRangeNote" hidden>Near resonance, the required stored voltage or current can exceed the usual manual ranges. The matching values are applied without clipping.</p></div>
+ <div class="initial-options"><label class="cancel-toggle"><input id="cancelTransient" type="checkbox" aria-describedby="initialHelp">Cancel net transient for all six outputs</label><div class="matched-values"><span>Match V<sub>C</sub>(0<sup>−</sup>): <strong id="matchV">—</strong></span><span>Match i<sub>L</sub>(0<sup>−</sup>): <strong id="matchI">—</strong></span></div><p class="initial-help" id="initialHelp">Match both stored-energy states to their steady-state values at t = 0.</p><p class="initial-help range-note" id="matchedRangeNote" hidden>Near resonance, the required stored voltage or current can exceed the usual manual ranges. The matching values are applied without clipping.</p></div>
  <div class="preset-row"><span class="preset-title">Damping examples:</span><button class="preset" type="button" data-zeta="0.3">Underdamped</button><button class="preset" type="button" data-zeta="1">Critical damping</button><button class="preset" type="button" data-zeta="2">Overdamped</button><span class="stat" style="margin-left:auto">Input amplitude: <b>1 V</b></span></div>
  <div class="statbar"><span class="regime" id="regime">Underdamped</span><span class="stat">ζ = <b id="zetaStat">0.290</b></span><span class="stat">Input ω₀ = <b id="omegaStat">—</b></span><span class="stat">Natural ωₙ = <b id="wnStat">—</b></span><span class="stat">fₙ = <b id="fnStat">2.055 Hz</b></span><span class="stat">r = ω₀/ωₙ = <b id="ratioStat">—</b></span><span class="stat">R<sub>crit</sub> = <b id="rcritStat">10.328 Ω</b></span><span class="stat">|H(jω₀)| = <b id="gainStat">0.000</b></span><span class="stat">Phase = <b id="phaseStat">0°</b></span></div>
  <p class="parameter-note"><math><msub><mi>ω</mi><mn>0</mn></msub><mo>=</mo><mn>2</mn><mi>π</mi><mi>f</mi></math> is the input angular frequency; <math><msub><mi>ω</mi><mi>n</mi></msub><mo>=</mo><mfrac><mn>1</mn><msqrt><mrow><mi>L</mi><mi>C</mi></mrow></msqrt></mfrac></math> is the natural angular frequency; ζ = (R/2)√(C/L). The frequency ratio r = ω₀/ωₙ is dimensionless.</p>
@@ -176,8 +176,8 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
  <div class="eqcard" style="--color:var(--purple)"><h3><span class="eqdot"></span>Initial-condition response (zero-input)</h3><div class="eqtext">y<sub>IC</sub>(t) = V<sub>C</sub>(0<sup>−</sup>) F<sub>V</sub>(t) + i<sub>L</sub>(0<sup>−</sup>) F<sub>I</sub>(t)</div><div class="eqsub" id="basisFormula">FV = g₀; FI = g₁/C.</div><div class="eqsub">F<sub>V</sub> is the selected output per unit initial capacitor voltage; F<sub>I</sub> is the selected output per unit initial inductor current.</div></div>
  <div class="eqcard" style="--color:var(--teal)"><h3><span class="eqdot"></span>Total selected voltage</h3><div class="eqtext">y(t) = y<sub>ss</sub>(t) + y<sub>tr</sub>(t) + y<sub>IC</sub>(t)</div><div class="eqsub" id="outputInitialValue">vC(0⁺) = VC(0⁻).</div><div class="eqsub">g₀(0) = 1, ġ₀(0) = 0; g₁(0) = 0, ġ₁(0) = 1. Both solve g̈ + (R/L)ġ + g/(LC) = 0.</div></div>
 </section>
-<p class="explanation"><b>What to notice:</b> all three outputs belong to the same circuit and share its two stored-energy states. Capacitor voltage gives a low-pass response, resistor voltage a band-pass response, and inductor voltage a high-pass response. The <b>switching transient</b> is part of the zero-state response; the <b>initial-condition response</b> comes from stored capacitor and inductor energy. Matching both initial states to steady state cancels the net transient for all three outputs. Their total voltages always satisfy vC + vR + vL = u.</p>
-<footer>Ideal series RLC circuit · u(t) = sin(2πft) V for t ≥ 0 · output selected across C, R or L · static inspection slider · standalone HTML / JavaScript without external libraries</footer>
+<p class="explanation"><b>What to notice:</b> all six outputs belong to the same circuit and share its two stored-energy states. Capacitor voltage gives a low-pass response, resistor voltage a band-pass response, and inductor voltage a high-pass response. Combined element voltages produce additional finite zeros or an LC notch. The <b>switching transient</b> is part of the zero-state response; the <b>initial-condition response</b> comes from stored capacitor and inductor energy. Matching both initial states to steady state cancels the net transient for all three outputs. Their total voltages always satisfy vC + vR + vL = u.</p>
+<footer>Ideal series RLC circuit · u(t) = sin(2πft) V for t ≥ 0 · output selected across C, R, L, RC, LC or RL · static inspection slider · standalone HTML / JavaScript without external libraries</footer>
 </main>
 <script id="rlc-math">
 (function(root){
@@ -189,7 +189,10 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
     const capacitor={re:a/den,im:-b/den};
     const resistor={re:-b*capacitor.im,im:b*capacitor.re};
     const inductor={re:-L*C*omega0**2*capacitor.re,im:-L*C*omega0**2*capacitor.im};
-    const phasors={capacitor,resistor,inductor},selected=phasors[s.output]||capacitor;
+    const rc={re:capacitor.re+resistor.re,im:capacitor.im+resistor.im};
+    const lc={re:capacitor.re+inductor.re,im:capacitor.im+inductor.im};
+    const rl={re:resistor.re+inductor.re,im:resistor.im+inductor.im};
+    const phasors={capacitor,resistor,inductor,rc,lc,rl},selected=phasors[s.output]||capacitor;
     return {omega0,wn,alpha,zeta,ratio:omega0/wn,Rcrit:2*Math.sqrt(L/C),phasors,
       M:Math.hypot(selected.re,selected.im),phase:Math.atan2(selected.im,selected.re),
       matchV:capacitor.im,matchI:C*omega0*capacitor.re};
@@ -211,7 +214,16 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
       return {g0,g1,dg0:-wn*wn*g1,dg1};
     }
     function natural(b,v,i){return {v:v*b.g0+(i/C)*b.g1,i:C*v*b.dg0+i*b.dg1};}
-    function project(x,input=0){return output==='resistor'?R*x.i:output==='inductor'?input-x.v-R*x.i:x.v;}
+    function project(x,input=0){
+      switch(output){
+        case 'resistor':return R*x.i;
+        case 'inductor':return input-x.v-R*x.i;
+        case 'rc':return x.v+R*x.i;
+        case 'lc':return input-R*x.i;
+        case 'rl':return input-x.v;
+        default:return x.v;
+      }
+    }
     return {...p,basis,values(t){
       const sin=Math.sin(omega0*t),cos=Math.cos(omega0*t),h=p.phasors.capacitor;
       const steadyState={v:h.re*sin+h.im*cos,i:C*omega0*(h.re*cos-h.im*sin)};
@@ -283,17 +295,26 @@ function updateCursor(){
 }
 const outputs={
  capacitor:{sub:'C',name:'capacitor',type:'Low-pass',numerator:'1',relation:'y(t) = vC(t)',
-  steady:'M = 1/|D(jω₀)|; φ = −atan2(RCω₀, 1 − LCω₀²).',
+  steady:'M = 1/|D(jω₀)|; φ = −arg D(jω₀).',
   basis:'F<sub>V</sub> = g₀; F<sub>I</sub> = g₁/C.',initial:'vC(0⁺) = VC(0⁻).',
-  plus:[226,80],minus:[226,140],label:[207,113]},
+  plus:[226,80],minus:[226,140],label:[207,113],elements:['C']},
  resistor:{sub:'R',name:'resistor',type:'Band-pass',numerator:'RCs',relation:'y(t) = vR(t) = RiL(t)',
-  steady:'M = RCω₀/|D(jω₀)|; φ = π/2 − atan2(RCω₀, 1 − LCω₀²).',
+  steady:'M = RCω₀/|D(jω₀)|; φ = π/2 − arg D(jω₀).',
   basis:'F<sub>V</sub> = RC ġ₀; F<sub>I</sub> = R ġ₁.',initial:'vR(0⁺) = R iL(0⁻).',
-  plus:[57,37],minus:[130,37],label:[81,23]},
+  plus:[57,37],minus:[130,37],label:[81,23],elements:['R']},
  inductor:{sub:'L',name:'inductor',type:'High-pass',numerator:'LCs²',relation:'y(t) = vL(t) = u(t) − vC(t) − RiL(t)',
-  steady:'M = LCω₀²/|D(jω₀)|; φ = π − atan2(RCω₀, 1 − LCω₀²).',
+  steady:'M = LCω₀²/|D(jω₀)|; φ = π − arg D(jω₀).',
   basis:'F<sub>V</sub> = −g₀ − RC ġ₀; F<sub>I</sub> = −g₁/C − R ġ₁.',initial:'vL(0⁺) = −VC(0⁻) − R iL(0⁻), since u(0) = 0.',
-  plus:[139,31],minus:[190,31],label:[157,16]}
+  plus:[139,31],minus:[190,31],label:[157,16],elements:['L']},
+ rc:{sub:'RC',name:'R + C',type:'Low-pass with zero',numerator:'RCs + 1',relation:'y(t) = vR(t) + vC(t)',
+  steady:'M = |1 + jRCω₀| / |D(jω₀)|; φ = arg(1 + jRCω₀) − arg D(jω₀).',
+  basis:'F<sub>V</sub> = g₀ + RC ġ₀; F<sub>I</sub> = g₁/C + R ġ₁.',initial:'vRC(0⁺) = VC(0⁻) + R iL(0⁻).',elements:['R','C']},
+ lc:{sub:'LC',name:'L + C',type:'Band-stop / notch',numerator:'LCs² + 1',relation:'y(t) = vL(t) + vC(t) = u(t) − R iL(t)',
+  steady:'M = |1 − LCω₀²| / |D(jω₀)|; phase is undefined at ωₙ (the notch).',
+  basis:'F<sub>V</sub> = −RC ġ₀; F<sub>I</sub> = −R ġ₁.',initial:'vLC(0⁺) = −R iL(0⁻), since u(0) = 0.',elements:['L','C']},
+ rl:{sub:'RL',name:'R + L',type:'High-pass with zero',numerator:'LCs² + RCs',relation:'y(t) = vR(t) + vL(t) = u(t) − vC(t)',
+  steady:'M = |−LCω₀² + jRCω₀| / |D(jω₀)|; φ = arg(−LCω₀² + jRCω₀) − arg D(jω₀).',
+  basis:'F<sub>V</sub> = −g₀; F<sub>I</sub> = −g₁/C.',initial:'vRL(0⁺) = −VC(0⁻), since u(0) = 0.',elements:['R','L']}
 };
 const initialDefs={vc:{min:-2,max:2,step:'0.05',unit:'V'},il:{min:-.3,max:.3,step:'0.01',unit:'A'}};
 const precise=x=>Math.abs(x)<1e-12?'0':Number(x.toPrecision(8)).toString();
@@ -316,11 +337,13 @@ function updatePresentation(){
  $('mainPlot').setAttribute('aria-label','Input, total '+o.name+' voltage and sinusoidal steady state over time.');
  $('responsePlots').setAttribute('aria-label',o.name+' voltage response plots');
  $('schematicPanel').setAttribute('aria-label','Series RLC schematic; '+o.name+' voltage output.');
- $('circuitDiagram').setAttribute('aria-label','Sinusoidal input drives a series RLC circuit. Output is measured across the '+o.name+'.');
+ $('circuitDiagram').setAttribute('aria-label','Sinusoidal input drives a series RLC circuit. The selected output comprises '+o.elements.join(' and ')+' element voltage drops.');
  $('schematicTitle').textContent='Series RLC · '+o.name+' output';$('voltageSub').textContent=o.sub;
- for(const sub of ['C','R','L']){$('schematic'+sub).setAttribute('stroke',sub===o.sub?'#008e9a':'#1e4b70');$('schematic'+sub).setAttribute('stroke-width',sub===o.sub?'3.5':'2.5');}
- for(const [id,coords] of [['outputPlus',o.plus],['outputMinus',o.minus],['voltageLabel',o.label]]){$(id).setAttribute('x',coords[0]);$(id).setAttribute('y',coords[1]);}
- $('outputRelation').textContent=o.relation;
+ for(const sub of ['C','R','L']){$('schematic'+sub).setAttribute('stroke',o.elements.includes(sub)?'#008e9a':'#1e4b70');$('schematic'+sub).setAttribute('stroke-width',o.elements.includes(sub)?'3.5':'2.5');}
+ const paired=o.elements.length>1;
+ for(const id of ['outputPlus','outputMinus','voltageLabel'])$(id).setAttribute('visibility',paired?'hidden':'visible');
+ if(!paired)for(const [id,coords] of [['outputPlus',o.plus],['outputMinus',o.minus],['voltageLabel',o.label]]){$(id).setAttribute('x',coords[0]);$(id).setAttribute('y',coords[1]);}
+ $('outputRelation').textContent=o.relation+(paired?' · sum of highlighted element voltages':'');
  $('steadyFormula').textContent=o.steady+' D(jω₀) = 1 − LCω₀² + jRCω₀.';
  $('basisFormula').innerHTML=o.basis;$('outputInitialValue').textContent=o.initial;
  $('cancellationNote').hidden=!state.cancel;

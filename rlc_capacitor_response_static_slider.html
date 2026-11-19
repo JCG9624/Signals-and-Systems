@@ -258,6 +258,15 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
 .freq-decade-labels span{flex:1;text-align:center;font-variant-numeric:tabular-nums}
 .freq-decade-labels span:first-child{text-align:left}
 .freq-decade-labels span:last-child{text-align:right}
+
+/* Input waveform selector; the step has no input frequency.
+   Frequency slider remains available as a Bode probe in the frequency tab. */
+.input-selector{padding:3px 0 7px;border-bottom:1px solid #e9f0f5;margin-bottom:8px!important}
+.input-type-hint{font-size:11px;color:#54788f}
+.studio-workspace.step-input-active:not(.frequency-active) .frequency-control{display:none!important}
+.studio-workspace.step-input-active .sine-stat{display:none!important}
+.studio-workspace.step-input-active:not(.frequency-active) .parameter-note{display:none!important}
+@media(max-width:500px){.input-selector{align-items:flex-start;flex-direction:column;gap:5px}}
 </style>
 </head>
 <body>
@@ -531,9 +540,11 @@ function poleZeroLocations(){
   case 'lc':zeros=[{re:0,im:wn},{re:0,im:-wn}];break;
   case 'rl':zeros=[{re:0,im:0},{re:-R/L,im:0}];break;
  }
- const inputPoles=[{re:0,im:omegaInput},{re:0,im:-omegaInput}];
- const cancelled=output==='lc'&&Math.abs(omegaInput/wn-1)<1e-11;
- return {poles,zeros,inputPoles,wn,alpha,omegaInput,cancelled};
+ const isStep=state.inputType==='step';
+ const inputPoles=isStep?[{re:0,im:0}]:[{re:0,im:omegaInput},{re:0,im:-omegaInput}];
+ const cancelled=!isStep&&output==='lc'&&Math.abs(omegaInput/wn-1)<1e-11;
+ const stepCancelled=isStep&&['resistor','inductor','rl'].includes(output);
+ return {poles,zeros,inputPoles,wn,alpha,omegaInput,cancelled,stepCancelled};
 }
 function poleZeroText(value){
  if(Math.abs(value)<1e-10)return '0';
@@ -541,7 +552,7 @@ function poleZeroText(value){
 }
 function drawPoleZero(){
  const el=$('poleZeroPlot');el.replaceChildren();
- const {poles,zeros,inputPoles,wn,alpha,omegaInput,cancelled}=poleZeroLocations(),all=[{re:0,im:0},...poles,...zeros,...inputPoles];
+ const {poles,zeros,inputPoles,wn,alpha,omegaInput,cancelled,stepCancelled}=poleZeroLocations(),all=[{re:0,im:0},...poles,...zeros,...inputPoles];
  const W=340,H=330,margin={l:44,r:20,t:30,b:38},pw=W-margin.l-margin.r,ph=H-margin.t-margin.b;
  const reMin=Math.min(...all.map(p=>p.re)),reMax=Math.max(...all.map(p=>p.re));
  const imAbs=Math.max(...all.map(p=>Math.abs(p.im))),reSpan=Math.max(1e-6,reMax-reMin);
@@ -598,17 +609,16 @@ function drawPoleZero(){
   for(const g of groups)glyph(g,type,g.multiple);
  }
  drawGroup(poles,'pole');drawGroup(zeros,'zero');
- // Distinguish poles of the causal sinusoidal input X(s)=ω₀/(s²+ω₀²)
- // from the poles and zeros of H(s). Draw diamonds inside circles when
- // the input poles coincide with the LC notch zeros.
+ // Diamonds indicate the input poles: one at s=0 for 1/s, two at
+ // s=±jω₀ for a causal sinusoid. Circle+diamond indicates cancellation.
  for(const inputPole of inputPoles){
   const {x,y}=atPoint(inputPole.re,inputPole.im);
-  if(cancelled){
+  if(cancelled||stepCancelled){
    svg('circle',{cx:x,cy:y,r:13,fill:'#eee6f9',stroke:'#8756bb','stroke-width':1.5,'stroke-dasharray':'3 3'},el);
    // Re-emphasise the system zero after drawing the cancellation halo.
    svg('circle',{cx:x,cy:y,r:8.5,fill:'#fff',stroke:'#008e9a','stroke-width':2.7},el);
   }
-  const radius=cancelled?4.9:6.2;
+  const radius=(cancelled||stepCancelled)?4.9:6.2;
   const d='M'+x+','+(y-radius)+' L'+(x+radius)+','+y+' L'+x+','+(y+radius)+' L'+(x-radius)+','+y+' Z';
   svg('path',{d,fill:'#8155b6',stroke:'#fff','stroke-width':1.5,'stroke-linejoin':'round'},el);
  }
@@ -638,16 +648,17 @@ function drawPoleZero(){
  const ip=document.createElement('div');ip.className='pz-reading input-reading';
  const iph=document.createElement('strong');iph.textContent='Input poles (◆)';
  const ipv=document.createElement('span');
- ipv.textContent='s = ±j'+poleZeroText(omegaInput)+' rad/s · f = '+fixed(state.f,state.f<.1?3:2)+' Hz';
+ ipv.textContent=state.inputType==='step'?'s = 0 · X(s) = 1/s (one pole)':'s = ±j'+poleZeroText(omegaInput)+' rad/s · f = '+fixed(state.f,state.f<.1?3:2)+' Hz';
  ip.append(iph,ipv);root.appendChild(ip);
  const eig=document.createElement('div');eig.className='pz-reading';
  const eh=document.createElement('strong');eh.textContent='Damping and natural frequency';
  const ev=document.createElement('span');
  ev.textContent='ζ = '+fixed(alpha/wn,3)+' · ωₙ = '+fixed(wn,3)+' rad/s';
  eig.append(eh,ev);root.appendChild(eig);
- $('matchNotchFrequency').hidden=state.output!=='lc';
+ $('matchNotchFrequency').hidden=state.output!=='lc'||state.inputType==='step';
  $('notchCancellation').hidden=!cancelled;
- el.setAttribute('aria-label','Pole-zero map: system poles '+content.textContent+'; system zeros '+zv.textContent+'; sinusoidal input poles at ±j'+poleZeroText(omegaInput)+' radians per second.'+(cancelled?' Input poles coincide with notch zeros: exact cancellation.':''));
+ $('stepCancellation').hidden=!stepCancelled;
+ el.setAttribute('aria-label','Pole-zero map: system poles '+content.textContent+'; system zeros '+zv.textContent+'; '+(state.inputType==='step'?'step input pole at s=0.':'sinusoidal input poles at ±j'+poleZeroText(omegaInput)+' radians per second.')+(cancelled?' Input poles coincide with notch zeros.':'')+(stepCancelled?' Step pole at the origin is cancelled by a system zero.':''));
 }
 function redraw(){
  currentModel=model();updateStats();updatePresentation();
@@ -707,22 +718,44 @@ function syncInitialControl(id,value,matched){
 }
 function updatePresentation(){
  const o=outputs[state.output];
+ const step=state.inputType==='step',frequencyTab=!$('rlcFrequencyPanel').hidden;
+ $('rlcStudioWorkspace').classList.toggle('step-input-active',step);
+ $('inputTypeHint').textContent=step?'u(t) = 1 V for t ≥ 0':'u(t) = sin(2πft) V for t ≥ 0';
+ $('frequencyLabel').textContent=step?'Bode probe frequency':'Input frequency';
+ $('stepBodeNote').hidden=!step;
+ $('bodeProbeLabel').textContent=step?'Bode probe frequency':'Input frequency';
+ $('inputPoleDescription').textContent=step?'For a 1 V unit step, U(s)=1/s: the input has one pole at s=0. A system zero at the origin cancels the DC response.':'For a causal sinusoid, U(s)=ω₀/(s²+ω₀²): two input poles lie at ±jω₀. Move the frequency slider to explore cancellation with the LC zeros.';
+ $('particularHeading').textContent=step?'Constant particular solution':'Sinusoidal steady state';
+ $('particularEquation').innerHTML=step?'y<sub>p</sub>(t) = H(0) · 1 V':'y<sub>ss</sub>(t) = M sin(ω₀t + φ)';
+ $('transientEquation').innerHTML=step?'y<sub>tr</sub>(t) = −F<sub>V</sub>(t)':'y<sub>tr</sub>(t) = −v<sub>C,ss</sub>(0) F<sub>V</sub>(t) − i<sub>L,ss</sub>(0) F<sub>I</sub>(t)';
+ $('transientExplanation').textContent=step?'Zero-state transient after applying a unit step to an initially unenergised circuit.':'Cancels the two initial circuit states of the sinusoidal particular solution.';
+ $('cancellationNote').textContent=step?'Initial capacitor voltage 1 V and inductor current 0 A match the step-input particular state, cancelling the natural transient.':'Both initial states match the sinusoidal particular solution. Switching and initial-condition contributions cancel.';
+ const dcGain=['capacitor','rc','lc'].includes(state.output)?1:0;
+ $('steadyFormula').textContent=step?'DC gain H(0) = '+dcGain+'; particular output yₚ = '+dcGain+' V.':o.steady+' D(jω₀) = 1 − LCω₀² + jRCω₀.';
+ $('timeExplanation').innerHTML=step?'<b>Unit-step experiment:</b> A 1 V step has Laplace transform 1/s and an input pole at the origin. After the natural response decays, the output tends to H(0): 1 V for C, RC and LC; 0 V for R, L and RL. For each output, total = constant particular solution + zero-state transient + response from the selected initial capacitor voltage and inductor current.':'<b>Sinusoidal experiment:</b> All six outputs share the same circuit poles. C, R and L are low-, band- and high-pass; combinations RC, LC and RL add zeros, including the LC notch. The initial-condition response and switching transient combine with the sinusoidal particular solution. Exact matching of stored states cancels the net transient.';
+ const stepInitial={
+  capacitor:'vC(0⁺) = VC(0⁻).',
+  resistor:'vR(0⁺) = R iL(0⁻).',
+  inductor:'vL(0⁺) = 1 V − VC(0⁻) − R iL(0⁻).',
+  rc:'vRC(0⁺) = VC(0⁻) + R iL(0⁻).',
+  lc:'vLC(0⁺) = 1 V − R iL(0⁻).',
+  rl:'vRL(0⁺) = 1 V − VC(0⁻).'
+ };
  $('transferSub').textContent=o.sub;$('transferNumerator').textContent=o.numerator;
  $('filterType').textContent=o.type;$('outputPlotTitle').textContent='Input and '+o.name+' voltage';
  $('outputReadLabel').textContent='Total '+o.name+' voltage';
  document.querySelectorAll('.output-sub').forEach(el=>el.textContent=o.sub);
- $('mainPlot').setAttribute('aria-label','Input, total '+o.name+' voltage and sinusoidal steady state over time.');
+ $('mainPlot').setAttribute('aria-label','Input, total '+o.name+' voltage and '+(step?'constant':'sinusoidal')+' particular response over time.');
  $('responsePlots').setAttribute('aria-label',o.name+' voltage response plots');
  $('schematicPanel').setAttribute('aria-label','Series RLC schematic; '+o.name+' voltage output.');
- $('circuitDiagram').setAttribute('aria-label','Sinusoidal input drives a series RLC circuit. The selected output comprises '+o.elements.join(' and ')+' element voltage drops.');
+ $('circuitDiagram').setAttribute('aria-label',(step?'Step':'Sinusoidal')+' input drives a series RLC circuit. The selected output comprises '+o.elements.join(' and ')+' element voltage drops.');
  $('schematicTitle').textContent='Series RLC · '+o.name+' output';$('voltageSub').textContent=o.sub;
  for(const sub of ['C','R','L']){$('schematic'+sub).setAttribute('stroke',o.elements.includes(sub)?'#008e9a':'#1e4b70');$('schematic'+sub).setAttribute('stroke-width',o.elements.includes(sub)?'3.5':'2.5');}
  const paired=o.elements.length>1;
  for(const id of ['outputPlus','outputMinus','voltageLabel'])$(id).setAttribute('visibility',paired?'hidden':'visible');
  if(!paired)for(const [id,coords] of [['outputPlus',o.plus],['outputMinus',o.minus],['voltageLabel',o.label]]){$(id).setAttribute('x',coords[0]);$(id).setAttribute('y',coords[1]);}
  $('outputRelation').textContent=o.relation+(paired?' · sum of highlighted element voltages':'');
- $('steadyFormula').textContent=o.steady+' D(jω₀) = 1 − LCω₀² + jRCω₀.';
- $('basisFormula').innerHTML=o.basis;$('outputInitialValue').textContent=o.initial;
+ $('basisFormula').innerHTML=o.basis;$('outputInitialValue').textContent=step?stepInitial[state.output]:o.initial;
  $('cancellationNote').hidden=!state.cancel;
 }
 
@@ -767,7 +800,7 @@ function drawBode(){
  const finite=samples.map(x=>x.db).filter(Number.isFinite);
  const dbLow=Math.max(-110,Math.min(-20,Math.floor((Math.min(...finite)-6)/20)*20));
  const dbHigh=Math.max(20,Math.ceil((Math.max(...finite)+6)/20)*20);
- const markers=[...features,{f:state.f,kind:'input',title:'Selected input frequency'}];
+ const markers=[...features,{f:state.f,kind:'input',title:state.inputType==='step'?'Bode probe frequency':'Selected input frequency'}];
  function drawOne(id,field,ymin,ymax,H){
   const el=$(id);el.replaceChildren();
   const W=Math.max(340,el.clientWidth||1120),small=W<650;
@@ -803,7 +836,7 @@ function drawBode(){
    const x=xx(m.f),color=m.kind==='input'?'#008e9a':m.kind==='notch'?'#8155b6':m.kind==='zero'?'#df7b28':'#467197';
    svg('line',{x1:x,x2:x,y1:top,y2:top+ph,stroke:color,'stroke-width':m.kind==='input'?2:1.6,'stroke-dasharray':m.kind==='input'?'3 4':'6 5',opacity:.83},el);
    const cap=Math.max(left+32,Math.min(left+pw-32,x));
-   const caption=m.kind==='input'?'Input':m.kind==='notch'?'LC notch':m.kind==='zero'?'Zero':'Pole';
+   const caption=m.kind==='input'?(state.inputType==='step'?'Probe':'Input'):m.kind==='notch'?'LC notch':m.kind==='zero'?'Zero':'Pole';
    const annotationY=m.kind==='input'?top-4:m.kind==='pole'?top-32:top-18;
    text(el,cap,annotationY,caption+' '+bodeFormatFrequency(m.f),{'text-anchor':'middle','font-size':9.5,fill:color,'font-weight':750});
    svg('title',{},svg('circle',{cx:x,cy:top+3,r:4,fill:color},el)).textContent=m.names.join(' / ')+': '+bodeFormatFrequency(m.f);
@@ -858,13 +891,15 @@ function updateStats(){
  $('fnStat').textContent=fixed(m.wn/(2*Math.PI),2)+' Hz';$('ratioStat').textContent=fixed(m.ratio);
  $('rcritStat').textContent=fixed(m.Rcrit,2)+' Ω';$('gainStat').textContent=fixed(m.M);$('phaseStat').textContent=fixed(m.phase*180/Math.PI,1)+'°';
  $('matchV').textContent=precise(m.matchV).replace('-','−')+' V';$('matchI').textContent=precise(m.matchI).replace('-','−')+' A';
- $('initialHelp').textContent=state.cancel?'Both initial states are matched exactly; they update when f, R, L or C changes.':'Match both stored-energy states to their steady-state values at t = 0.';
+ $('initialHelp').textContent=state.inputType==='step'?
+  (state.cancel?'Step matched: V_C(0⁻) = 1 V and i_L(0⁻) = 0 A.':'For a 1 V step, matching the constant particular state requires V_C(0⁻) = 1 V and i_L(0⁻) = 0 A.'):
+  (state.cancel?'Both sinusoidal initial states are matched exactly; they update when f, R, L or C changes.':'Match both stored-energy states to the sinusoidal particular values at t = 0.');
  $('matchedRangeNote').hidden=!(state.cancel&&(m.matchV < -2||m.matchV>2||m.matchI<-.3||m.matchI>.3));
  document.querySelectorAll('[data-zeta]').forEach(btn=>{const active=Math.abs(+btn.dataset.zeta-m.zeta)<.005;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active));});
 }
 function changeParameters(){
  for(const [id,def] of Object.entries(paramDefs))if(id!=='freq'&&id!=='vc'&&id!=='il')state[def.key]=Number($(id).value)*(def.scale||1);
- state.output=$('output').value;state.cancel=$('cancelTransient').checked;
+ state.output=$('output').value;state.inputType=$('inputType').value;state.cancel=$('cancelTransient').checked;
  if(state.cancel){const p=RLCMath.parameters(state);state.V0=p.matchV;state.I0=p.matchI;}
  else{state.V0=+$('vc').value;state.I0=+$('il').value;state.manualV0=state.V0;state.manualI0=state.I0;}
  syncInitialControl('vc',state.V0,state.cancel);syncInitialControl('il',state.I0,state.cancel);
@@ -909,6 +944,7 @@ for(const [id,def] of Object.entries(paramDefs)){
  num.addEventListener('change',commit);num.addEventListener('blur',commit);
 }
 $('output').addEventListener('change',changeParameters);
+$('inputType').addEventListener('change',changeParameters);
 $('matchNotchFrequency').addEventListener('click',()=>{
  // The LC notch lies in the supported 0.01–100 Hz input-frequency range.
  const fn=1/(2*Math.PI*Math.sqrt(state.L*state.C));

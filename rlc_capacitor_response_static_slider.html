@@ -363,8 +363,8 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
   <div class="time-window-controls">
    <label for="windowMode">Time view</label>
    <select id="windowMode" aria-label="Time window selection">
-    <option value="manual" selected>Custom</option>
-    <option value="auto">Auto · cycles + transient</option>
+    <option value="manual">Custom</option>
+    <option value="auto" selected>Auto · cycles + transient</option>
     <option value="cycles" id="cyclesWindowOption">3 input cycles</option>
     <option value="transient">5 slow-pole time constants</option>
    </select>
@@ -506,7 +506,7 @@ const $=id=>document.getElementById(id);
 const NS='http://www.w3.org/2000/svg';
 const clr={input:'#9aabba',total:'#008e9a',steady:'#173b65',transient:'#e87528',initial:'#8155b6'};
 const enabled={input:true,total:true,steady:true,transient:true,initial:true};
-const state={f:1.5,R:3,L:0.4,C:0.015,V0:0,I0:0,manualV0:0,manualI0:0,output:"capacitor",inputType:"sine",cancel:false,T:4,t:0,timeMode:"manual",manualT:4};
+const state={f:1.5,R:3,L:0.4,C:0.015,V0:0,I0:0,manualV0:0,manualI0:0,output:"capacitor",inputType:"sine",cancel:false,T:4,t:0,timeMode:"auto",manualT:4};
 const refs=[];
 const paramDefs={freq:{key:'f'},res:{key:'R'},ind:{key:'L'},cap:{key:'C',scale:.001},vc:{key:'V0'},il:{key:'I0'}};
 function svg(tag,props,parent){const el=document.createElementNS(NS,tag); for(const [k,v] of Object.entries(props||{}))el.setAttribute(k,String(v));if(parent)parent.appendChild(el);return el;}

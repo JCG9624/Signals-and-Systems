@@ -364,7 +364,7 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
    <label for="windowMode">Time view</label>
    <select id="windowMode" aria-label="Time window selection">
     <option value="manual">Custom</option>
-    <option value="auto" selected>Auto · cycles + transient</option>
+    <option value="auto" selected>Auto · system dynamics</option>
     <option value="cycles" id="cyclesWindowOption">3 input cycles</option>
     <option value="transient">5 slow-pole time constants</option>
    </select>
@@ -755,7 +755,9 @@ function adaptiveTimeWindow(){
  const mode=state.timeMode;
  if(mode==='cycles')return Math.min(500,Math.max(.01,cycles||decay));
  if(mode==='transient')return Math.min(500,Math.max(.01,decay));
- if(mode==='auto')return Math.min(500,Math.max(.01,Math.max(decay,cycles)));
+ // Auto follows only the circuit's natural dynamics, NOT the input frequency.
+ // Frequency should change the waveform, never the explorer's time axis.
+ if(mode==='auto')return Math.min(500,Math.max(2,decay));
  return Math.min(500,Math.max(.01,state.manualT));
 }
 function syncTimeWindow(){
@@ -772,7 +774,7 @@ function syncTimeWindow(){
  if(document.activeElement!==windowField||state.timeMode!=='manual')
   windowField.value=Number(state.T.toPrecision(8)).toString();
  const fmtSeconds=value=>value<.1?value.toPrecision(3):value<10?Number(value.toPrecision(4)).toString():Number(value.toPrecision(5)).toString();
- const desc=state.timeMode==='manual'?'Custom duration':state.timeMode==='auto'?(state.inputType==='step'?'Five slow-pole time constants (step input)':'At least 3 input cycles and 5 slow-pole time constants'):state.timeMode==='cycles'?'Three input cycles':'Five slow-pole time constants';
+ const desc=state.timeMode==='manual'?'Custom duration':state.timeMode==='auto'?'Circuit-based window (at least 2 s and 5 slow-pole time constants; independent of input frequency)':state.timeMode==='cycles'?'Three input cycles (explicit frequency-linked view)':'Five slow-pole time constants';
  const period=state.inputType==='sine'?' · input period '+fmtSeconds(1/state.f)+' s':' · step input';
  const dense=state.inputType==='sine'&&state.T*state.f>200?' · More than 200 cycles: shaded oscillation envelopes replace densely packed waveforms. Select “3 input cycles” for detail.':'';
  $('timeWindowNote').textContent=desc+' · window '+fmtSeconds(state.T)+' s · slow-pole τ ≈ '+fmtSeconds(tau)+' s'+period+dense;

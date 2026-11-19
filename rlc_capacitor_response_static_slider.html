@@ -243,6 +243,12 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
  .time-figure-row .readouts{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:480px){.pole-zero-panel{display:block}}
+
+/* Equal distance along the input slider represents a decade in frequency. */
+.freq-decade-labels{justify-content:space-between;gap:3px;white-space:nowrap}
+.freq-decade-labels span{flex:1;text-align:center;font-variant-numeric:tabular-nums}
+.freq-decade-labels span:first-child{text-align:left}
+.freq-decade-labels span:last-child{text-align:right}
 </style>
 </head>
 <body>
@@ -288,7 +294,7 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
  <p class="sidebar-guide">Move the sliders while watching the response plots alongside.</p>
  <p class="sidebar-parameter-title">Input and circuit parameters</p>
  <div class="control-grid studio-control-grid">
-  <div><div class="control-head"><label for="freq">Input frequency</label><span class="number-wrap"><input id="freqNum" type="number" min="0.2" max="12" step="0.05" value="1.50"><span>Hz</span></span></div><input id="freq" type="range" min="0.2" max="12" step="0.05" value="1.50"><div class="range-label"><span>0.2 Hz</span><span>12 Hz</span></div></div>
+  <div><div class="control-head"><label for="freq">Input frequency</label><span class="number-wrap"><input id="freqNum" type="number" min="0.01" max="100" step="any" value="1.5"><span>Hz</span></span></div><input id="freq" type="range" min="-2" max="2" step="0.001" value="0.176091" aria-label="Logarithmic input frequency, 0.01 to 100 Hz"><div class="range-label freq-decade-labels"><span>0.01</span><span>0.1</span><span>1</span><span>10</span><span>100 Hz</span></div></div>
   <div><div class="control-head"><label for="res">Resistance R</label><span class="number-wrap"><input id="resNum" type="number" min="0.1" max="120" step="any" value="3"><span>Ω</span></span></div><input id="res" type="range" min="0.1" max="120" step="any" value="3"><div class="range-label"><span>0.1 Ω</span><span>120 Ω</span></div></div>
   <div><div class="control-head"><label for="ind">Inductance L</label><span class="number-wrap"><input id="indNum" type="number" min="0.1" max="1.5" step="0.01" value="0.4"><span>H</span></span></div><input id="ind" type="range" min="0.1" max="1.5" step="0.01" value="0.4"><div class="range-label"><span>0.10 H</span><span>1.50 H</span></div></div>
   <div><div class="control-head"><label for="cap">Capacitance C</label><span class="number-wrap"><input id="capNum" type="number" min="2" max="80" step="0.5" value="15"><span>mF</span></span></div><input id="cap" type="range" min="2" max="80" step="0.5" value="15"><div class="range-label"><span>2 mF</span><span>80 mF</span></div></div>
@@ -297,7 +303,7 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
  </div>
  <div class="initial-options time-only-control"><label class="cancel-toggle"><input id="cancelTransient" type="checkbox" aria-describedby="initialHelp">Cancel net transient for all six outputs</label><div class="matched-values"><span>Match V<sub>C</sub>(0<sup>−</sup>): <strong id="matchV">—</strong></span><span>Match i<sub>L</sub>(0<sup>−</sup>): <strong id="matchI">—</strong></span></div><p class="initial-help" id="initialHelp">Match both stored-energy states to their steady-state values at t = 0.</p><p class="initial-help range-note" id="matchedRangeNote" hidden>Near resonance, the required stored voltage or current can exceed the usual manual ranges. The matching values are applied without clipping.</p></div>
  <div class="preset-row"><span class="preset-title">Damping examples:</span><button class="preset" type="button" data-zeta="0.3">Underdamped</button><button class="preset" type="button" data-zeta="1">Critical damping</button><button class="preset" type="button" data-zeta="2">Overdamped</button><span class="stat" style="margin-left:auto">Input amplitude: <b>1 V</b></span></div>
- <div class="statbar"><span class="regime" id="regime">Underdamped</span><span class="stat">ζ = <b id="zetaStat">0.290</b></span><span class="stat">Input ω₀ = <b id="omegaStat">—</b></span><span class="stat">Natural ωₙ = <b id="wnStat">—</b></span><span class="stat">fₙ = <b id="fnStat">2.055 Hz</b></span><span class="stat">r = ω₀/ωₙ = <b id="ratioStat">—</b></span><span class="stat">R<sub>crit</sub> = <b id="rcritStat">10.328 Ω</b></span><span class="stat">|H(jω₀)| = <b id="gainStat">0.000</b></span><span class="stat">Phase = <b id="phaseStat">0°</b></span></div>
+ <div class="statbar"><span class="regime" id="regime">Underdamped</span><span class="stat">ζ = <b id="zetaStat">0.290</b></span><span class="stat">Input ω₀ = <b id="omegaStat">—</b></span><span class="stat">Input period = <b id="inputPeriodStat">—</b></span><span class="stat">Natural ωₙ = <b id="wnStat">—</b></span><span class="stat">fₙ = <b id="fnStat">2.055 Hz</b></span><span class="stat">r = ω₀/ωₙ = <b id="ratioStat">—</b></span><span class="stat">R<sub>crit</sub> = <b id="rcritStat">10.328 Ω</b></span><span class="stat">|H(jω₀)| = <b id="gainStat">0.000</b></span><span class="stat">Phase = <b id="phaseStat">0°</b></span></div>
  <p class="parameter-note"><math><msub><mi>ω</mi><mn>0</mn></msub><mo>=</mo><mn>2</mn><mi>π</mi><mi>f</mi></math> is the input angular frequency; <math><msub><mi>ω</mi><mi>n</mi></msub><mo>=</mo><mfrac><mn>1</mn><msqrt><mrow><mi>L</mi><mi>C</mi></mrow></msqrt></mfrac></math> is the natural angular frequency; ζ = (R/2)√(C/L). The frequency ratio r = ω₀/ωₙ is dimensionless.</p>
 </aside>
 <div class="studio-figures">
@@ -452,7 +458,10 @@ function drawPlot(plotId,series,height){
  if(compact)height=Math.min(height,250);
  el.setAttribute('viewBox',`0 0 ${W} ${height}`);
  const left=compact?58:75,right=compact?20:25,top=16,bottom=42,pw=W-left-right,ph=height-top-bottom;
- const N=1300,samples=Array.from({length:N+1},(_,i)=>currentModel.values(state.T*i/N));
+ // Keep high-frequency sine waves correctly sampled rather than aliasing them
+ // onto a coarse 1300-point time grid. At very high f, the plot becomes dense.
+ const N=Math.min(16000,Math.max(1300,Math.ceil(32*state.f*state.T)));
+ const samples=Array.from({length:N+1},(_,i)=>currentModel.values(state.T*i/N));
  let maximum=0;for(const x of samples)for(const s of series)maximum=Math.max(maximum,Math.abs(x[s]));
  const ym=niceMax(Math.max(.25,maximum*1.1)),xx=t=>left+pw*t/state.T,yy=v=>top+ph*(ym-v)/(2*ym);
  svg('rect',{x:left,y:top,width:pw,height:ph,fill:'#fff'},el);
@@ -790,7 +799,7 @@ function drawBode(){
 function updateStats(){
  const m=currentModel,label=m.zeta<1-1e-6?'Underdamped':m.zeta>1+1e-6?'Overdamped':'Critically damped';
  $('regime').textContent=label;$('zetaStat').textContent=fixed(m.zeta);
- $('omegaStat').textContent=fixed(m.omega0,2)+' rad/s';$('wnStat').textContent=fixed(m.wn,2)+' rad/s';
+ $('omegaStat').textContent=fixed(m.omega0,2)+' rad/s';$('inputPeriodStat').textContent=fixed(1/state.f,state.f<.1?2:3)+' s';$('wnStat').textContent=fixed(m.wn,2)+' rad/s';
  $('fnStat').textContent=fixed(m.wn/(2*Math.PI),2)+' Hz';$('ratioStat').textContent=fixed(m.ratio);
  $('rcritStat').textContent=fixed(m.Rcrit,2)+' Ω';$('gainStat').textContent=fixed(m.M);$('phaseStat').textContent=fixed(m.phase*180/Math.PI,1)+'°';
  $('matchV').textContent=precise(m.matchV).replace('-','−')+' V';$('matchI').textContent=precise(m.matchI).replace('-','−')+' A';
@@ -799,7 +808,7 @@ function updateStats(){
  document.querySelectorAll('[data-zeta]').forEach(btn=>{const active=Math.abs(+btn.dataset.zeta-m.zeta)<.005;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active));});
 }
 function changeParameters(){
- for(const [id,def] of Object.entries(paramDefs))if(id!=='vc'&&id!=='il')state[def.key]=Number($(id).value)*(def.scale||1);
+ for(const [id,def] of Object.entries(paramDefs))if(id!=='freq'&&id!=='vc'&&id!=='il')state[def.key]=Number($(id).value)*(def.scale||1);
  state.output=$('output').value;state.cancel=$('cancelTransient').checked;
  if(state.cancel){const p=RLCMath.parameters(state);state.V0=p.matchV;state.I0=p.matchI;}
  else{state.V0=+$('vc').value;state.I0=+$('il').value;state.manualV0=state.V0;state.manualI0=state.I0;}
@@ -809,6 +818,36 @@ function changeParameters(){
 for(const [id,def] of Object.entries(paramDefs)){
  const slider=$(id),num=$(id+'Num');
  num.setAttribute('aria-label',({freq:'Input frequency',res:'Resistance',ind:'Inductance',cap:'Capacitance',vc:'Initial capacitor voltage',il:'Initial inductor current'})[id]+' number');
+ // The input-frequency slider runs over log10(f) in [-2,2], while the
+ // numerical field remains in Hz. Keep state.f as the exact source of truth.
+ if(id==='freq'){
+  slider.addEventListener('input',()=>{
+   state.f=Math.pow(10,Number(slider.value));
+   num.value=Number(state.f.toPrecision(5)).toString();
+   changeParameters();
+  });
+  const commitFrequency=()=>{
+   const raw=num.value.trim(),v=Number(raw);
+   if(raw===''||!Number.isFinite(v)){
+    num.value=Number(state.f.toPrecision(8)).toString();
+    return;
+   }
+   state.f=Math.max(.01,Math.min(100,v));
+   slider.value=String(Math.log10(state.f));
+   num.value=String(state.f);
+   changeParameters();
+  };
+  num.addEventListener('input',()=>{
+   const raw=num.value.trim(),v=Number(raw);
+   if(raw===''||!Number.isFinite(v)||v<.01||v>100)return;
+   state.f=v;
+   slider.value=String(Math.log10(v));
+   changeParameters();
+  });
+  num.addEventListener('change',commitFrequency);
+  num.addEventListener('blur',commitFrequency);
+  continue;
+ }
  slider.addEventListener('input',()=>{num.value=slider.value;changeParameters();});
  const commit=()=>{const v=num.valueAsNumber;if(!Number.isFinite(v)){num.value=slider.value;return;}const n=Math.min(+num.max,Math.max(+num.min,v));slider.value=String(n);num.value=slider.value;changeParameters();};
  num.addEventListener('input',()=>{const v=num.valueAsNumber;if(!Number.isFinite(v)||v<+num.min||v>+num.max)return;slider.value=String(v);changeParameters();});

@@ -271,9 +271,10 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
 /* Flexible time inspection spanning the expanded 0.01–100 Hz input range. */
 .time-window-controls{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-left:auto}
 .time-window-controls label{font-size:11px;color:#526f86;font-weight:750;white-space:nowrap}
-.time-window-controls select,.time-window-controls input{font:600 11px/1.3 inherit;border:1px solid #bfd5e3;border-radius:7px;background:#f9fcfe;color:var(--navy);padding:5px 7px;min-width:0}
+.time-window-controls select,.time-window-controls input{font-family:inherit;font-size:11px;font-weight:600;line-height:1.3;border:1px solid #bfd5e3;border-radius:7px;background:#f9fcfe;color:var(--navy);padding:5px 7px;min-width:0}
 .time-window-controls select{max-width:180px}
 .time-window-controls input{width:72px;max-width:72px;text-align:right;font-variant-numeric:tabular-nums}
+.time-figure-row .bottom-row .time-window-controls input{min-width:72px;width:72px;flex:0 0 72px}
 .time-window-controls .window-unit{font-size:11px;color:#66849a}
 .time-window-note{font-size:10.5px;color:#587d91;margin:0 13px 12px;line-height:1.45}
 @media(max-width:1050px){.time-window-controls{margin-left:0}}
@@ -520,32 +521,84 @@ function drawPlot(plotId,series,height){
  if(compact)height=Math.min(height,250);
  el.setAttribute('viewBox',`0 0 ${W} ${height}`);
  const left=compact?58:75,right=compact?20:25,top=16,bottom=42,pw=W-left-right,ph=height-top-bottom;
- // Keep high-frequency sine waves correctly sampled rather than aliasing them
- // onto a coarse 1300-point time grid. At very high f, the plot becomes dense.
- const N=state.inputType==='step'?1300:Math.min(16000,Math.max(1300,Math.ceil(32*state.f*state.T)));
- const samples=Array.from({length:N+1},(_,i)=>currentModel.values(state.T*i/N));
- let maximum=0;for(const x of samples)for(const s of series)maximum=Math.max(maximum,Math.abs(x[s]));
+ // A time interval containing hundreds of periods cannot be rendered as a
+ // resolved waveform at the available pixel resolution. Display the exact
+ // upper and lower sinusoidal envelopes instead of an aliased line.
+ const envelope=state.inputType==='sine'&&state.f*state.T>200;
+ const N=state.inputType==='step'?1300:envelope?Math.max(600,Math.min(1400,Math.ceil(pw*2))):
+   Math.min(16000,Math.max(1300,Math.ceil(32*state.f*state.T)));
+ const times=Array.from({length:N+1},(_,i)=>state.T*i/N);
+ if(envelope){
+  // Extra logarithmically spaced samples near t=0 retain fast transients
+  // when a very long window is selected.
+  const from=Math.max(1e-9,state.T*1e-8),logRatio=state.T/from;
+  for(let i=0;i<=240;i++)times.push(from*Math.pow(logRatio,i/240));
+  times.sort((x,y)=>x-y);
+ }
+ const samples=times.map(t=>({t,...currentModel.values(t)}));
+ const oscillatory=key=>envelope&&(key==='input'||key==='steady'||key==='total');
+ const amplitude=key=>key==='input'?1:currentModel.M;
+ const centre=(v,key)=>key==='total'?v.transient+v.initial:0;
+ let maximum=0;
+ for(const v of samples)for(const key of series){
+  if(oscillatory(key))maximum=Math.max(maximum,Math.abs(centre(v,key))+amplitude(key));
+  else maximum=Math.max(maximum,Math.abs(v[key]));
+ }
  const ym=niceMax(Math.max(.25,maximum*1.1)),xx=t=>left+pw*t/state.T,yy=v=>top+ph*(ym-v)/(2*ym);
  svg('rect',{x:left,y:top,width:pw,height:ph,fill:'#fff'},el);
- for(let i=0;i<=4;i++){const v=ym-i*ym/2,y=yy(v);svg('line',{x1:left,y1:y,x2:left+pw,y2:y,stroke:Math.abs(v)<1e-10?'#aabfcf':'#e8eff4','stroke-width':Math.abs(v)<1e-10?1.5:1},el);text(el,left-10,y+4,fixed(v,ym>=3?1:2),{'text-anchor':'end'});}
+ for(let i=0;i<=4;i++){
+  const v=ym-i*ym/2,y=yy(v);
+  svg('line',{x1:left,y1:y,x2:left+pw,y2:y,stroke:Math.abs(v)<1e-10?'#aabfcf':'#e8eff4','stroke-width':Math.abs(v)<1e-10?1.5:1},el);
+  text(el,left-10,y+4,fixed(v,ym>=3?1:2),{'text-anchor':'end'});
+ }
  const tickCount=compact?4:8;
- for(let i=0;i<=tickCount;i++){const t=state.T*i/tickCount,x=xx(t);svg('line',{x1:x,y1:top,x2:x,y2:top+ph,stroke:'#edf2f6'},el);text(el,x,top+ph+21,fixed(t,state.T>=10?1:2),{'text-anchor':'middle'});}
- svg('line',{x1:left,y1:top,x2:left,y2:top+ph,stroke:'#a6becf','stroke-width':1.2},el);svg('line',{x1:left,y1:top+ph,x2:left+pw,y2:top+ph,stroke:'#a6becf','stroke-width':1.2},el);
- text(el,W/2,height-5,'Time (s)',{'text-anchor':'middle',fill:'#496d85'});const vl=text(el,19,top+ph/2,'Voltage (V)',{'text-anchor':'middle',fill:'#496d85'});vl.setAttribute('transform',`rotate(-90 19 ${top+ph/2})`);
+ for(let i=0;i<=tickCount;i++){
+  const t=state.T*i/tickCount,x=xx(t);
+  svg('line',{x1:x,y1:top,x2:x,y2:top+ph,stroke:'#edf2f6'},el);
+  text(el,x,top+ph+21,fixed(t,state.T>=10?1:2),{'text-anchor':'middle'});
+ }
+ svg('line',{x1:left,y1:top,x2:left,y2:top+ph,stroke:'#a6becf','stroke-width':1.2},el);
+ svg('line',{x1:left,y1:top+ph,x2:left+pw,y2:top+ph,stroke:'#a6becf','stroke-width':1.2},el);
+ text(el,W/2,height-5,'Time (s)',{'text-anchor':'middle',fill:'#496d85'});
+ const vl=text(el,19,top+ph/2,'Voltage (V)',{'text-anchor':'middle',fill:'#496d85'});
+ vl.setAttribute('transform',`rotate(-90 19 ${top+ph/2})`);
  const paths=[],points=[];
- for(const s of series){
-  const d=samples.map((v,i)=>`${i?'L':'M'}${xx(state.T*i/N).toFixed(2)},${yy(v[s]).toFixed(2)}`).join(' ');
-  const attrs={d,fill:'none',stroke:clr[s],'stroke-width':s==='total'?3.3:2.6,'stroke-linejoin':'round','stroke-linecap':'round'};
-  if(s==='steady')attrs['stroke-dasharray']='10 6';if(s==='input')attrs['stroke-dasharray']='2 7';
-  const path=svg('path',attrs,el),circle=svg('circle',{cx:xx(0),cy:yy(0),r:s==='total'?5.7:4.5,fill:clr[s],stroke:'#fff','stroke-width':2},el);
-  paths.push({s,path});points.push({s,circle});
+ for(const key of series){
+  let path;
+  if(oscillatory(key)){
+   const amp=amplitude(key);
+   const upper=samples.map((v,i)=>
+     `${i?'L':'M'}${xx(v.t).toFixed(2)},${yy(centre(v,key)+amp).toFixed(2)}`).join(' ');
+   const lower=samples.map((v,i)=>
+     `L${xx(v.t).toFixed(2)},${yy(centre(v,key)-amp).toFixed(2)}`).join(' ');
+   const group=svg('g',{},el);
+   const reversedLower=samples.slice().reverse().map(v=>
+     `L${xx(v.t).toFixed(2)},${yy(centre(v,key)-amp).toFixed(2)}`).join(' ');
+   const polygon=upper+' '+reversedLower+' Z';
+   svg('path',{d:polygon,fill:clr[key],opacity:.16,stroke:'none'},group);
+   svg('path',{d:upper,fill:'none',stroke:clr[key],'stroke-width':1.5,opacity:.85},group);
+   svg('path',{d:`M${xx(samples[0].t).toFixed(2)},${yy(centre(samples[0],key)-amp).toFixed(2)} ${lower}`,
+     fill:'none',stroke:clr[key],'stroke-width':1.5,opacity:.85},group);
+   path=group;
+  }else{
+   const d=samples.map((v,i)=>`${i?'L':'M'}${xx(v.t).toFixed(2)},${yy(v[key]).toFixed(2)}`).join(' ');
+   const attrs={d,fill:'none',stroke:clr[key],'stroke-width':key==='total'?3.3:2.6,'stroke-linejoin':'round','stroke-linecap':'round'};
+   if(key==='steady')attrs['stroke-dasharray']='10 6';
+   if(key==='input')attrs['stroke-dasharray']='2 7';
+   path=svg('path',attrs,el);
+  }
+  const circle=svg('circle',{cx:xx(0),cy:yy(0),r:key==='total'?5.7:4.5,fill:clr[key],stroke:'#fff','stroke-width':2},el);
+  paths.push({s:key,path});points.push({s:key,circle});
  }
  const cursor=svg('line',{x1:xx(state.t),x2:xx(state.t),y1:top,y2:top+ph,stroke:'#6689a3','stroke-dasharray':'4 5','stroke-width':1.7},el);
  const track=svg('rect',{x:left,y:top,width:pw,height:ph,fill:'transparent','pointer-events':'all'},el);
- track.addEventListener('click',e=>{const r=el.getBoundingClientRect();const px=(e.clientX-r.left)*W/r.width;state.t=Math.max(0,Math.min(state.T,(px-left)/pw*state.T));updateCursor();});
+ track.addEventListener('click',e=>{
+  const r=el.getBoundingClientRect(),px=(e.clientX-r.left)*W/r.width;
+  state.t=Math.max(0,Math.min(state.T,(px-left)/pw*state.T));
+  updateCursor();
+ });
  refs.push({paths,points,cursor,xx,yy});
 }
-
 /** Poles from D(s)=LCs²+RCs+1; zeros from the selected output numerator. */
 function poleZeroLocations(){
  const {R,L,C,output}=state,wn=1/Math.sqrt(L*C),alpha=R/(2*L),disc=wn*wn-alpha*alpha,omegaInput=2*Math.PI*state.f;
@@ -719,9 +772,9 @@ function syncTimeWindow(){
  if(document.activeElement!==windowField||state.timeMode!=='manual')
   windowField.value=Number(state.T.toPrecision(8)).toString();
  const fmtSeconds=value=>value<.1?value.toPrecision(3):value<10?Number(value.toPrecision(4)).toString():Number(value.toPrecision(5)).toString();
- const desc=state.timeMode==='manual'?'Custom duration':state.timeMode==='auto'?'At least 3 input cycles and 5 slow-pole time constants':state.timeMode==='cycles'?'Three input cycles':'Five slow-pole time constants';
+ const desc=state.timeMode==='manual'?'Custom duration':state.timeMode==='auto'?(state.inputType==='step'?'Five slow-pole time constants (step input)':'At least 3 input cycles and 5 slow-pole time constants'):state.timeMode==='cycles'?'Three input cycles':'Five slow-pole time constants';
  const period=state.inputType==='sine'?' · input period '+fmtSeconds(1/state.f)+' s':' · step input';
- const dense=state.inputType==='sine'&&state.T*state.f>200?' · Many cycles are compressed; choose “3 input cycles” for waveform detail.':'';
+ const dense=state.inputType==='sine'&&state.T*state.f>200?' · More than 200 cycles: shaded oscillation envelopes replace densely packed waveforms. Select “3 input cycles” for detail.':'';
  $('timeWindowNote').textContent=desc+' · window '+fmtSeconds(state.T)+' s · slow-pole τ ≈ '+fmtSeconds(tau)+' s'+period+dense;
 }
 function redraw(){

@@ -128,6 +128,72 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
 .bode-feature .feature-detail{font-size:11px;color:var(--muted);line-height:1.45}
 .bode-explanation{font-size:12px;color:#59768b;line-height:1.6;margin:12px 0 0}
 @media(max-width:680px){.bode-introduction,.bode-landmarks{padding:13px}.bode-readouts{grid-template-columns:repeat(2,minmax(0,1fr))}.studio-tab{padding:9px 12px;font-size:12px}}
+
+/* PWM-style RLC workspace: architecture above; live sliders beside the active plots. */
+.architecture-row{display:grid;grid-template-columns:minmax(300px,.95fr) minmax(390px,1.05fr);gap:12px;align-items:stretch;margin:0 0 8px}
+.architecture-choice{padding:12px 16px;display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:0}
+.architecture-choice .section-name{margin:0 0 4px}
+.architecture-copy{font-size:11px;color:var(--muted);line-height:1.45;margin:0 0 6px}
+.architecture-choice .output-row{margin:0;gap:8px}
+.architecture-choice .output-row select{flex:0 1 300px;min-width:160px}
+.architecture-row .schematic{display:grid;grid-template-columns:158px minmax(0,1fr);grid-template-rows:repeat(3,auto);gap:0 12px;justify-content:unset;align-items:center;padding:8px 15px;min-width:0}
+.architecture-row .schematic svg{width:158px;max-width:158px;grid-column:1;grid-row:1/4;align-self:center}
+.architecture-row .schematic .section-name{grid-column:2;grid-row:1;font-size:12px;align-self:end!important}
+.architecture-row .schematic .schematic-caption{grid-column:2;text-align:left;line-height:1.5}
+.architecture-row .schematic .schematic-caption:last-child{align-self:start}
+.studio-workspace{display:grid;grid-template-columns:minmax(270px,320px) minmax(0,1fr);gap:14px;align-items:start}
+.studio-figures{min-width:0}
+.studio-sidebar{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#b7d1db transparent;padding:13px 15px;min-width:0}
+.studio-sidebar .section-name{font-size:15px;margin-bottom:4px}
+.sidebar-guide{font-size:11px;line-height:1.45;color:#698497;margin:0 0 11px}
+.sidebar-parameter-title{font-size:10px;letter-spacing:.055em;text-transform:uppercase;font-weight:790;color:#548197;margin:0 0 8px}
+.studio-control-grid{grid-template-columns:minmax(0,1fr);gap:9px}
+.studio-control-grid>div{min-width:0}
+.studio-sidebar .control-head{min-height:24px;margin-bottom:2px}
+.studio-sidebar .control-head label{font-size:11.5px}
+.studio-sidebar .number-wrap input{font-size:13px;width:74px;padding:3px 5px}
+.studio-sidebar #vcNum,.studio-sidebar #ilNum{width:88px}
+.studio-sidebar .range-label{font-size:10px;line-height:1.3}
+.studio-sidebar input[type=range]{height:15px}
+.studio-sidebar .initial-options{margin-top:10px;padding:9px 10px}
+.studio-sidebar .preset-row{margin-top:9px;padding-top:10px;gap:6px}
+.studio-sidebar .preset{font-size:10px;padding:5px 8px}
+.studio-sidebar .preset-title{width:100%}
+.studio-sidebar .statbar{margin-top:10px;gap:6px 9px;border-top:1px solid #edf3f7;padding-top:9px}
+.studio-sidebar .stat{font-size:10.5px}
+.studio-sidebar .parameter-note{border-top:1px solid #edf3f7;padding-top:8px;margin-top:9px;font-size:10.5px}
+.studio-workspace.frequency-active .time-only-control{display:none!important}
+.studio-figures #rlcFrequencyPanel{gap:11px}
+.studio-figures .bode-introduction{padding:12px 17px 10px}
+.studio-figures .bode-introduction h2{margin:0 0 5px;font-size:15px}
+.studio-figures .bode-introduction p{line-height:1.45;margin:0 0 7px}
+.studio-figures .bode-readouts strong{font-size:14px}
+.studio-figures .bode-readouts>div{padding:6px 9px}
+.studio-figures .bode-card .chart-head{padding:10px 17px 3px}
+.studio-figures .bode-card .chart-head h2{font-size:14px}
+.studio-workspace.frequency-active .studio-sidebar .parameter-note{display:none}
+@media(max-width:1050px){
+ .architecture-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .architecture-row .schematic{display:grid;grid-template-columns:118px minmax(0,1fr);padding:7px 9px;gap:0 6px}
+ .architecture-row .schematic svg{width:118px;max-width:118px}
+ .studio-workspace{grid-template-columns:minmax(245px,290px) minmax(0,1fr);gap:11px}
+ .studio-sidebar{padding:11px}
+}
+@media(max-width:820px){
+ .architecture-row{grid-template-columns:minmax(0,1fr)}
+ .architecture-row .schematic{display:grid;grid-template-columns:126px minmax(0,1fr)}
+ .architecture-row .schematic svg{width:126px;max-width:126px}
+ .studio-workspace{grid-template-columns:minmax(0,1fr)}
+ .studio-sidebar{position:relative;top:auto;overflow:visible;max-height:none}
+ .studio-control-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 16px}
+ .studio-sidebar .preset-title{width:auto}
+}
+@media(max-width:500px){
+ .studio-control-grid{grid-template-columns:minmax(0,1fr)}
+ .architecture-row .schematic{grid-template-columns:100px minmax(0,1fr)}
+ .architecture-row .schematic svg{width:100px;max-width:100px}
+ .architecture-choice .output-row select{min-width:180px}
+}
 </style>
 </head>
 <body>
@@ -140,24 +206,13 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
  <div><div class="eyebrow">Signals &amp; Systems · series RLC circuit</div><div class="title-row"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 64 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h6l2-4 4 8 4-8 4 8 2-4h4c0-10 6-10 6 0 0-10 6-10 6 0 0-10 6-10 6 0h7v12M47 25h14M47 30h14M54 30v12H3"/></svg></span><h1>RLC Studio</h1></div><p class="subtitle">Select the voltage across C, R or L, or the combined voltages across RC, LC or RL. Compare time responses and frequency-domain Bode plots using the same R, L and C values.</p></div>
  <div class="formula"><span class="orange">H<sub id="transferSub">C</sub></span>(s) = <span class="frac"><span class="num" id="transferNumerator">1</span><span class="den">LCs² + RCs + 1</span></span></div>
 </header>
-<div class="top-row">
-<section class="panel controls" aria-label="RLC circuit parameters">
- <h2 class="section-name">Output, parameters and initial conditions</h2>
- <div class="output-row"><label for="output">Measured output</label><select id="output"><option value="capacitor">Capacitor voltage · low-pass</option><option value="resistor">Resistor voltage · band-pass</option><option value="inductor">Inductor voltage · high-pass</option><option value="rc">R + C voltage sum · finite zero</option><option value="lc">L + C voltage sum · notch</option><option value="rl">R + L voltage sum · finite zero</option></select><span class="filter-type" id="filterType">Low-pass</span></div>
- <div class="control-grid">
-  <div><div class="control-head"><label for="freq">Input frequency</label><span class="number-wrap"><input id="freqNum" type="number" min="0.2" max="12" step="0.05" value="1.50"><span>Hz</span></span></div><input id="freq" type="range" min="0.2" max="12" step="0.05" value="1.50"><div class="range-label"><span>0.2 Hz</span><span>12 Hz</span></div></div>
-  <div><div class="control-head"><label for="res">Resistance R</label><span class="number-wrap"><input id="resNum" type="number" min="0.1" max="120" step="any" value="3"><span>Ω</span></span></div><input id="res" type="range" min="0.1" max="120" step="any" value="3"><div class="range-label"><span>0.1 Ω</span><span>120 Ω</span></div></div>
-  <div><div class="control-head"><label for="ind">Inductance L</label><span class="number-wrap"><input id="indNum" type="number" min="0.1" max="1.5" step="0.01" value="0.4"><span>H</span></span></div><input id="ind" type="range" min="0.1" max="1.5" step="0.01" value="0.4"><div class="range-label"><span>0.10 H</span><span>1.50 H</span></div></div>
-  <div><div class="control-head"><label for="cap">Capacitance C</label><span class="number-wrap"><input id="capNum" type="number" min="2" max="80" step="0.5" value="15"><span>mF</span></span></div><input id="cap" type="range" min="2" max="80" step="0.5" value="15"><div class="range-label"><span>2 mF</span><span>80 mF</span></div></div>
-  <div><div class="control-head"><label for="vc">Initial capacitor voltage</label><span class="number-wrap"><input id="vcNum" aria-label="Initial capacitor voltage number" type="number" min="-2" max="2" step="0.05" value="0.45"><span>V</span></span></div><input id="vc" type="range" min="-2" max="2" step="0.05" value="0.45"><div class="range-label"><span id="vcMinLabel">−2 V</span><span id="vcMaxLabel">+2 V</span></div></div>
-  <div><div class="control-head"><label for="il">Initial inductor current</label><span class="number-wrap"><input id="ilNum" aria-label="Initial inductor current number" type="number" min="-0.3" max="0.3" step="0.01" value="0"><span>A</span></span></div><input id="il" type="range" min="-0.3" max="0.3" step="0.01" value="0"><div class="range-label"><span id="ilMinLabel">−0.3 A</span><span id="ilMaxLabel">+0.3 A</span></div></div>
+<div class="architecture-row" aria-label="Series RLC architecture and measured voltage">
+ <div class="panel architecture-choice">
+  <h2 class="section-name">Circuit architecture and measured output</h2>
+  <p class="architecture-copy">The circuit is a fixed <strong>series R–L–C</strong>. Choose the voltage across a single element or the algebraic sum across two elements.</p>
+  <div class="output-row"><label for="output">Measured output</label><select id="output"><option value="capacitor">Capacitor voltage · low-pass</option><option value="resistor">Resistor voltage · band-pass</option><option value="inductor">Inductor voltage · high-pass</option><option value="rc">R + C voltage sum · finite zero</option><option value="lc">L + C voltage sum · notch</option><option value="rl">R + L voltage sum · finite zero</option></select><span class="filter-type" id="filterType">Low-pass</span></div>
  </div>
- <div class="initial-options"><label class="cancel-toggle"><input id="cancelTransient" type="checkbox" aria-describedby="initialHelp">Cancel net transient for all six outputs</label><div class="matched-values"><span>Match V<sub>C</sub>(0<sup>−</sup>): <strong id="matchV">—</strong></span><span>Match i<sub>L</sub>(0<sup>−</sup>): <strong id="matchI">—</strong></span></div><p class="initial-help" id="initialHelp">Match both stored-energy states to their steady-state values at t = 0.</p><p class="initial-help range-note" id="matchedRangeNote" hidden>Near resonance, the required stored voltage or current can exceed the usual manual ranges. The matching values are applied without clipping.</p></div>
- <div class="preset-row"><span class="preset-title">Damping examples:</span><button class="preset" type="button" data-zeta="0.3">Underdamped</button><button class="preset" type="button" data-zeta="1">Critical damping</button><button class="preset" type="button" data-zeta="2">Overdamped</button><span class="stat" style="margin-left:auto">Input amplitude: <b>1 V</b></span></div>
- <div class="statbar"><span class="regime" id="regime">Underdamped</span><span class="stat">ζ = <b id="zetaStat">0.290</b></span><span class="stat">Input ω₀ = <b id="omegaStat">—</b></span><span class="stat">Natural ωₙ = <b id="wnStat">—</b></span><span class="stat">fₙ = <b id="fnStat">2.055 Hz</b></span><span class="stat">r = ω₀/ωₙ = <b id="ratioStat">—</b></span><span class="stat">R<sub>crit</sub> = <b id="rcritStat">10.328 Ω</b></span><span class="stat">|H(jω₀)| = <b id="gainStat">0.000</b></span><span class="stat">Phase = <b id="phaseStat">0°</b></span></div>
- <p class="parameter-note"><math><msub><mi>ω</mi><mn>0</mn></msub><mo>=</mo><mn>2</mn><mi>π</mi><mi>f</mi></math> is the input angular frequency; <math><msub><mi>ω</mi><mi>n</mi></msub><mo>=</mo><mfrac><mn>1</mn><msqrt><mrow><mi>L</mi><mi>C</mi></mrow></msqrt></mfrac></math> is the natural angular frequency; ζ = (R/2)√(C/L). The frequency ratio r = ω₀/ωₙ is dimensionless.</p>
-</section>
-<section class="panel schematic" id="schematicPanel" aria-label="Series RLC schematic, capacitor-voltage output">
+ <section class="panel schematic" id="schematicPanel" aria-label="Series RLC schematic, capacitor-voltage output">
  <div class="section-name" id="schematicTitle" style="align-self:start;margin:0">Series RLC · capacitor output</div>
  <svg id="circuitDiagram" viewBox="0 0 310 200" role="img" aria-label="Series RLC circuit; output measured across the capacitor.">
  <g fill="none" stroke="#1e4b70" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
@@ -178,6 +233,26 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
  <button type="button" id="rlcTabTime" class="studio-tab active" role="tab" aria-controls="rlcTimePanel" aria-selected="true">Time response</button>
  <button type="button" id="rlcTabFrequency" class="studio-tab" role="tab" aria-controls="rlcFrequencyPanel" aria-selected="false">Frequency response · Bode plots</button>
 </nav>
+<div class="studio-workspace" id="rlcStudioWorkspace">
+<aside class="panel controls studio-sidebar" aria-label="Live controls for RLC response plots">
+ <h2 class="section-name">Interactive controls</h2>
+ <p class="sidebar-guide">Move the sliders while watching the response plots alongside.</p>
+ <p class="sidebar-parameter-title">Input and circuit parameters</p>
+ <div class="control-grid studio-control-grid">
+  <div><div class="control-head"><label for="freq">Input frequency</label><span class="number-wrap"><input id="freqNum" type="number" min="0.2" max="12" step="0.05" value="1.50"><span>Hz</span></span></div><input id="freq" type="range" min="0.2" max="12" step="0.05" value="1.50"><div class="range-label"><span>0.2 Hz</span><span>12 Hz</span></div></div>
+  <div><div class="control-head"><label for="res">Resistance R</label><span class="number-wrap"><input id="resNum" type="number" min="0.1" max="120" step="any" value="3"><span>Ω</span></span></div><input id="res" type="range" min="0.1" max="120" step="any" value="3"><div class="range-label"><span>0.1 Ω</span><span>120 Ω</span></div></div>
+  <div><div class="control-head"><label for="ind">Inductance L</label><span class="number-wrap"><input id="indNum" type="number" min="0.1" max="1.5" step="0.01" value="0.4"><span>H</span></span></div><input id="ind" type="range" min="0.1" max="1.5" step="0.01" value="0.4"><div class="range-label"><span>0.10 H</span><span>1.50 H</span></div></div>
+  <div><div class="control-head"><label for="cap">Capacitance C</label><span class="number-wrap"><input id="capNum" type="number" min="2" max="80" step="0.5" value="15"><span>mF</span></span></div><input id="cap" type="range" min="2" max="80" step="0.5" value="15"><div class="range-label"><span>2 mF</span><span>80 mF</span></div></div>
+  <div class="time-only-control"><div class="control-head"><label for="vc">Initial capacitor voltage</label><span class="number-wrap"><input id="vcNum" aria-label="Initial capacitor voltage number" type="number" min="-2" max="2" step="0.05" value="0.45"><span>V</span></span></div><input id="vc" type="range" min="-2" max="2" step="0.05" value="0.45"><div class="range-label"><span id="vcMinLabel">−2 V</span><span id="vcMaxLabel">+2 V</span></div></div>
+  <div class="time-only-control"><div class="control-head"><label for="il">Initial inductor current</label><span class="number-wrap"><input id="ilNum" aria-label="Initial inductor current number" type="number" min="-0.3" max="0.3" step="0.01" value="0"><span>A</span></span></div><input id="il" type="range" min="-0.3" max="0.3" step="0.01" value="0"><div class="range-label"><span id="ilMinLabel">−0.3 A</span><span id="ilMaxLabel">+0.3 A</span></div></div>
+ </div>
+ <div class="initial-options time-only-control"><label class="cancel-toggle"><input id="cancelTransient" type="checkbox" aria-describedby="initialHelp">Cancel net transient for all six outputs</label><div class="matched-values"><span>Match V<sub>C</sub>(0<sup>−</sup>): <strong id="matchV">—</strong></span><span>Match i<sub>L</sub>(0<sup>−</sup>): <strong id="matchI">—</strong></span></div><p class="initial-help" id="initialHelp">Match both stored-energy states to their steady-state values at t = 0.</p><p class="initial-help range-note" id="matchedRangeNote" hidden>Near resonance, the required stored voltage or current can exceed the usual manual ranges. The matching values are applied without clipping.</p></div>
+ <div class="preset-row"><span class="preset-title">Damping examples:</span><button class="preset" type="button" data-zeta="0.3">Underdamped</button><button class="preset" type="button" data-zeta="1">Critical damping</button><button class="preset" type="button" data-zeta="2">Overdamped</button><span class="stat" style="margin-left:auto">Input amplitude: <b>1 V</b></span></div>
+ <div class="statbar"><span class="regime" id="regime">Underdamped</span><span class="stat">ζ = <b id="zetaStat">0.290</b></span><span class="stat">Input ω₀ = <b id="omegaStat">—</b></span><span class="stat">Natural ωₙ = <b id="wnStat">—</b></span><span class="stat">fₙ = <b id="fnStat">2.055 Hz</b></span><span class="stat">r = ω₀/ωₙ = <b id="ratioStat">—</b></span><span class="stat">R<sub>crit</sub> = <b id="rcritStat">10.328 Ω</b></span><span class="stat">|H(jω₀)| = <b id="gainStat">0.000</b></span><span class="stat">Phase = <b id="phaseStat">0°</b></span></div>
+ <p class="parameter-note"><math><msub><mi>ω</mi><mn>0</mn></msub><mo>=</mo><mn>2</mn><mi>π</mi><mi>f</mi></math> is the input angular frequency; <math><msub><mi>ω</mi><mi>n</mi></msub><mo>=</mo><mfrac><mn>1</mn><msqrt><mrow><mi>L</mi><mi>C</mi></mrow></msqrt></mfrac></math> is the natural angular frequency; ζ = (R/2)√(C/L). The frequency ratio r = ω₀/ωₙ is dimensionless.</p>
+</aside>
+<div class="studio-figures">
+
 <div id="rlcTimePanel" role="tabpanel" aria-labelledby="rlcTabTime">
 <section class="panel chart-card" id="responsePlots" aria-label="Capacitor response plots">
  <div class="chart-head"><h2 id="outputPlotTitle">Input and capacitor output</h2><span>Curves show the whole time interval · click on a plot to inspect a time</span></div>
@@ -230,6 +305,8 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
  </div>
  <div class="panel bode-landmarks"><h2>Poles, zeros and characteristic frequencies</h2><div id="bodeFeatures" class="bode-feature-grid"></div><p id="bodeExplanation" class="bode-explanation"></p></div>
 </section>
+</div>
+</div>
 <footer>Ideal series RLC circuit · u(t) = sin(2πft) V for t ≥ 0 · output selected across C, R, L, RC, LC or RL · static inspection slider · standalone HTML / JavaScript without external libraries</footer>
 </main>
 <script id="rlc-math">
@@ -336,7 +413,17 @@ function drawPlot(plotId,series,height){
  track.addEventListener('click',e=>{const r=el.getBoundingClientRect();const px=(e.clientX-r.left)*W/r.width;state.t=Math.max(0,Math.min(state.T,(px-left)/pw*state.T));updateCursor();});
  refs.push({paths,points,cursor,xx,yy});
 }
-function redraw(){currentModel=model();updateStats();updatePresentation();refs.length=0;drawPlot('mainPlot',['input','steady','total'],325);drawPlot('partsPlot',['steady','transient','initial'],272);updateCursor();if(!$('rlcFrequencyPanel').hidden)drawBode();}
+function redraw(){
+ currentModel=model();updateStats();updatePresentation();
+ // Render only the active plots so slider changes remain responsive.
+ if(!$('rlcTimePanel').hidden){
+  refs.length=0;
+  drawPlot('mainPlot',['input','steady','total'],325);
+  drawPlot('partsPlot',['steady','transient','initial'],272);
+  updateCursor();
+ }
+ if(!$('rlcFrequencyPanel').hidden)drawBode();
+}
 function updateCursor(){
  const v=currentModel.values(state.t);
  for(const ref of refs){const x=ref.xx(state.t);ref.cursor.setAttribute('x1',x);ref.cursor.setAttribute('x2',x);
@@ -558,6 +645,7 @@ $('output').addEventListener('change',changeParameters);
 for(const [button,panel,otherButton,otherPanel] of [['rlcTabTime','rlcTimePanel','rlcTabFrequency','rlcFrequencyPanel'],['rlcTabFrequency','rlcFrequencyPanel','rlcTabTime','rlcTimePanel']]){
  $(button).addEventListener('click',()=>{
   $(panel).hidden=false;$(otherPanel).hidden=true;
+  $('rlcStudioWorkspace').classList.toggle('frequency-active',panel==='rlcFrequencyPanel');
   $(button).classList.add('active');$(otherButton).classList.remove('active');
   $(button).setAttribute('aria-selected','true');$(otherButton).setAttribute('aria-selected','false');
   redraw();

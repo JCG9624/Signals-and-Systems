@@ -274,6 +274,7 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
  <div class="panel architecture-choice">
   <h2 class="section-name">Circuit architecture and measured output</h2>
   <p class="architecture-copy">The circuit is a fixed <strong>series R–L–C</strong>. Choose the voltage across a single element or the algebraic sum across two elements.</p>
+  <div class="output-row input-selector"><label for="inputType">Input waveform</label><select id="inputType" aria-label="Input waveform"><option value="sine" selected>Sinusoid (1 V peak)</option><option value="step">Step (1 V)</option></select><span id="inputTypeHint" class="input-type-hint">u(t) = sin(2πft) V</span></div>
   <div class="output-row"><label for="output">Measured output</label><select id="output"><option value="capacitor">Capacitor voltage · low-pass</option><option value="resistor">Resistor voltage · band-pass</option><option value="inductor">Inductor voltage · high-pass</option><option value="rc">R + C voltage sum · finite zero</option><option value="lc">L + C voltage sum · notch</option><option value="rl">R + L voltage sum · finite zero</option></select><span class="filter-type" id="filterType">Low-pass</span></div>
  </div>
  <section class="panel schematic" id="schematicPanel" aria-label="Series RLC schematic, capacitor-voltage output">
@@ -303,7 +304,7 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
  <p class="sidebar-guide">Move the sliders while watching the response plots alongside.</p>
  <p class="sidebar-parameter-title">Input and circuit parameters</p>
  <div class="control-grid studio-control-grid">
-  <div><div class="control-head"><label for="freq">Input frequency</label><span class="number-wrap"><input id="freqNum" type="number" min="0.01" max="100" step="any" value="1.5"><span>Hz</span></span></div><input id="freq" type="range" min="-2" max="2" step="0.001" value="0.176091" aria-label="Logarithmic input frequency, 0.01 to 100 Hz"><div class="range-label freq-decade-labels"><span>0.01</span><span>0.1</span><span>1</span><span>10</span><span>100 Hz</span></div></div>
+  <div class="frequency-control"><div class="control-head"><label id="frequencyLabel" for="freq">Input frequency</label><span class="number-wrap"><input id="freqNum" type="number" min="0.01" max="100" step="any" value="1.5"><span>Hz</span></span></div><input id="freq" type="range" min="-2" max="2" step="0.001" value="0.176091" aria-label="Logarithmic input frequency, 0.01 to 100 Hz"><div class="range-label freq-decade-labels"><span>0.01</span><span>0.1</span><span>1</span><span>10</span><span>100 Hz</span></div></div>
   <div><div class="control-head"><label for="res">Resistance R</label><span class="number-wrap"><input id="resNum" type="number" min="0.1" max="120" step="any" value="3"><span>Ω</span></span></div><input id="res" type="range" min="0.1" max="120" step="any" value="3"><div class="range-label"><span>0.1 Ω</span><span>120 Ω</span></div></div>
   <div><div class="control-head"><label for="ind">Inductance L</label><span class="number-wrap"><input id="indNum" type="number" min="0.1" max="1.5" step="0.01" value="0.4"><span>H</span></span></div><input id="ind" type="range" min="0.1" max="1.5" step="0.01" value="0.4"><div class="range-label"><span>0.10 H</span><span>1.50 H</span></div></div>
   <div><div class="control-head"><label for="cap">Capacitance C</label><span class="number-wrap"><input id="capNum" type="number" min="2" max="80" step="0.5" value="15"><span>mF</span></span></div><input id="cap" type="range" min="2" max="80" step="0.5" value="15"><div class="range-label"><span>2 mF</span><span>80 mF</span></div></div>
@@ -312,7 +313,7 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
  </div>
  <div class="initial-options time-only-control"><label class="cancel-toggle"><input id="cancelTransient" type="checkbox" aria-describedby="initialHelp">Cancel net transient for all six outputs</label><div class="matched-values"><span>Match V<sub>C</sub>(0<sup>−</sup>): <strong id="matchV">—</strong></span><span>Match i<sub>L</sub>(0<sup>−</sup>): <strong id="matchI">—</strong></span></div><p class="initial-help" id="initialHelp">Match both stored-energy states to their steady-state values at t = 0.</p><p class="initial-help range-note" id="matchedRangeNote" hidden>Near resonance, the required stored voltage or current can exceed the usual manual ranges. The matching values are applied without clipping.</p></div>
  <div class="preset-row"><span class="preset-title">Damping examples:</span><button class="preset" type="button" data-zeta="0.3">Underdamped</button><button class="preset" type="button" data-zeta="1">Critical damping</button><button class="preset" type="button" data-zeta="2">Overdamped</button><span class="stat" style="margin-left:auto">Input amplitude: <b>1 V</b></span></div>
- <div class="statbar"><span class="regime" id="regime">Underdamped</span><span class="stat">ζ = <b id="zetaStat">0.290</b></span><span class="stat">Input ω₀ = <b id="omegaStat">—</b></span><span class="stat">Input period = <b id="inputPeriodStat">—</b></span><span class="stat">Natural ωₙ = <b id="wnStat">—</b></span><span class="stat">fₙ = <b id="fnStat">2.055 Hz</b></span><span class="stat">r = ω₀/ωₙ = <b id="ratioStat">—</b></span><span class="stat">R<sub>crit</sub> = <b id="rcritStat">10.328 Ω</b></span><span class="stat">|H(jω₀)| = <b id="gainStat">0.000</b></span><span class="stat">Phase = <b id="phaseStat">0°</b></span></div>
+ <div class="statbar"><span class="regime" id="regime">Underdamped</span><span class="stat">ζ = <b id="zetaStat">0.290</b></span><span class="stat sine-stat">Input ω₀ = <b id="omegaStat">—</b></span><span class="stat sine-stat">Input period = <b id="inputPeriodStat">—</b></span><span class="stat">Natural ωₙ = <b id="wnStat">—</b></span><span class="stat">fₙ = <b id="fnStat">2.055 Hz</b></span><span class="stat sine-stat">r = ω₀/ωₙ = <b id="ratioStat">—</b></span><span class="stat">R<sub>crit</sub> = <b id="rcritStat">10.328 Ω</b></span><span class="stat sine-stat">|H(jω₀)| = <b id="gainStat">0.000</b></span><span class="stat sine-stat">Phase = <b id="phaseStat">0°</b></span></div>
  <p class="parameter-note"><math><msub><mi>ω</mi><mn>0</mn></msub><mo>=</mo><mn>2</mn><mi>π</mi><mi>f</mi></math> is the input angular frequency; <math><msub><mi>ω</mi><mi>n</mi></msub><mo>=</mo><mfrac><mn>1</mn><msqrt><mrow><mi>L</mi><mi>C</mi></mrow></msqrt></mfrac></math> is the natural angular frequency; ζ = (R/2)√(C/L). The frequency ratio r = ω₀/ωₙ is dimensionless.</p>
 </aside>
 <div class="studio-figures">
@@ -348,7 +349,7 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
 <aside class="panel pole-zero-panel" id="poleZeroPanel" aria-label="Live s-plane map of circuit poles, transfer-function zeros and input poles">
  <div class="pole-zero-heading">
   <h2>Circuit and input: the s-plane</h2>
-  <p>The input x(t) = sin(ω₀t)u(t) has Laplace poles at ±jω₀. Move the input-frequency slider to see them move along the imaginary axis.</p>
+  <p id="inputPoleDescription">The causal sinusoidal input has Laplace poles at ±jω₀. Move the input-frequency slider to see them move along the imaginary axis.</p>
  </div>
  <div class="pz-symbol-key">
   <span><b class="pz-cross">×</b> Circuit poles</span>
@@ -361,24 +362,29 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
   <strong>Exact pole–zero cancellation at the notch.</strong>
   <span>The two input poles coincide with the LC transfer-function zeros. For zero initial conditions, the sinusoidal terms cancel in Y(s): only decaying natural modes remain, with no sustained output sinusoid.</span>
  </div>
+ <div id="stepCancellation" class="pz-cancellation" hidden>
+  <strong>Step-input pole cancellation at s = 0.</strong>
+  <span>The selected output has a zero at the origin, so the pole of the unit-step transform 1/s is cancelled in the zero-state output. There is no persistent DC component; decaying natural modes remain.</span>
+ </div>
  <div id="poleZeroDetails" class="pole-zero-details" aria-live="off"></div>
- <div class="pole-zero-help">System poles depend on R, L, C; zeros depend on the selected voltage. Input poles depend only on the selected frequency. Axis units: rad/s. Exact cancellation of input poles applies to the zero-state response; initial conditions may introduce additional natural transients.</div>
+ <div class="pole-zero-help">System poles depend on R, L, C; zeros depend on the selected voltage. The input has poles at ±jω₀ for a causal sinusoid or at 0 for a causal step. Axis units: rad/s. Pole–zero cancellation applies to the zero-state transform; initial conditions may introduce additional natural transients.</div>
 </aside>
 </div>
 <section class="equations" aria-label="Analytical expressions">
- <div class="eqcard" style="--color:var(--navy)"><h3><span class="eqdot"></span>Sinusoidal steady state</h3><div class="eqtext">y<sub>ss</sub>(t) = M sin(ω₀t + φ)</div><div class="eqsub" id="steadyFormula">M = |HC(jω₀)|; φ = arg HC(jω₀).</div></div>
- <div class="eqcard" style="--color:var(--orange)"><h3><span class="eqdot"></span>Switching transient (zero-state)</h3><div class="eqtext">y<sub>tr</sub>(t) = −v<sub>C,ss</sub>(0) F<sub>V</sub>(t) − i<sub>L,ss</sub>(0) F<sub>I</sub>(t)</div><div class="eqsub">Cancels the two initial circuit states of the steady-state particular solution.</div></div>
+ <div class="eqcard" style="--color:var(--navy)"><h3><span class="eqdot"></span><span id="particularHeading">Sinusoidal steady state</span></h3><div class="eqtext" id="particularEquation">y<sub>ss</sub>(t) = M sin(ω₀t + φ)</div><div class="eqsub" id="steadyFormula">M = |HC(jω₀)|; φ = arg HC(jω₀).</div></div>
+ <div class="eqcard" style="--color:var(--orange)"><h3><span class="eqdot"></span>Switching transient (zero-state)</h3><div class="eqtext" id="transientEquation">y<sub>tr</sub>(t) = −v<sub>C,ss</sub>(0) F<sub>V</sub>(t) − i<sub>L,ss</sub>(0) F<sub>I</sub>(t)</div><div class="eqsub" id="transientExplanation">Cancels the two initial circuit states of the steady-state particular solution.</div></div>
  <div class="eqcard" style="--color:var(--purple)"><h3><span class="eqdot"></span>Initial-condition response (zero-input)</h3><div class="eqtext">y<sub>IC</sub>(t) = V<sub>C</sub>(0<sup>−</sup>) F<sub>V</sub>(t) + i<sub>L</sub>(0<sup>−</sup>) F<sub>I</sub>(t)</div><div class="eqsub" id="basisFormula">FV = g₀; FI = g₁/C.</div><div class="eqsub">F<sub>V</sub> is the selected output per unit initial capacitor voltage; F<sub>I</sub> is the selected output per unit initial inductor current.</div></div>
  <div class="eqcard" style="--color:var(--teal)"><h3><span class="eqdot"></span>Total selected voltage</h3><div class="eqtext">y(t) = y<sub>ss</sub>(t) + y<sub>tr</sub>(t) + y<sub>IC</sub>(t)</div><div class="eqsub" id="outputInitialValue">vC(0⁺) = VC(0⁻).</div><div class="eqsub">g₀(0) = 1, ġ₀(0) = 0; g₁(0) = 0, ġ₁(0) = 1. Both solve g̈ + (R/L)ġ + g/(LC) = 0.</div></div>
 </section>
-<p class="explanation"><b>What to notice:</b> all six outputs belong to the same circuit and share its two stored-energy states. Capacitor voltage gives a low-pass response, resistor voltage a band-pass response, and inductor voltage a high-pass response. Combined element voltages produce additional finite zeros or an LC notch. The <b>switching transient</b> is part of the zero-state response; the <b>initial-condition response</b> comes from stored capacitor and inductor energy. Matching both initial states to steady state cancels the net transient for all three outputs. Their total voltages always satisfy vC + vR + vL = u.</p>
+<p class="explanation" id="timeExplanation"><b>What to notice:</b> all six outputs belong to the same circuit and share its two stored-energy states. Capacitor voltage gives a low-pass response, resistor voltage a band-pass response, and inductor voltage a high-pass response. Combined element voltages produce additional finite zeros or an LC notch. The <b>switching transient</b> is part of the zero-state response; the <b>initial-condition response</b> comes from stored capacitor and inductor energy. Matching both initial states to the particular solution cancels the net transient for all six outputs. Their total voltages always satisfy vC + vR + vL = u.</p>
 </div>
 <section id="rlcFrequencyPanel" role="tabpanel" aria-labelledby="rlcTabFrequency" hidden>
  <div class="panel bode-introduction">
   <h2>Bode plots of the selected output</h2>
-  <p>Vary <strong>R, L and C</strong> above, then choose any of the six outputs. The magnitude and phase plots show the exact sinusoidal steady-state transfer function. Dashed vertical markers identify the circuit's characteristic frequencies; the teal marker identifies the selected sinusoidal input frequency.</p>
+  <p>Vary <strong>R, L and C</strong> above, then choose any of the six outputs. The magnitude and phase plots show the exact sinusoidal frequency response of the circuit. Dashed vertical markers identify characteristic frequencies; the teal marker marks the chosen frequency.</p>
+  <p id="stepBodeNote" class="bode-ic-note" hidden><strong>Step-input experiment:</strong> Bode plots still describe the circuit's response to sinusoidal test signals. The frequency slider is a Bode probe, not a frequency of the step.</p>
   <p class="bode-ic-note"><strong>Frequency response is independent of initial conditions.</strong> Initial capacitor voltage and inductor current affect the transient in the Time response tab, but not these Bode plots.</p>
-  <div class="bode-readouts"><div>Input frequency <strong id="bodeInputFrequency">—</strong></div><div>Magnitude at input <strong id="bodeInputMagnitude">—</strong></div><div>Phase at input <strong id="bodeInputPhase">—</strong></div><div>Natural frequency <strong id="bodeNaturalFrequency">—</strong></div></div>
+  <div class="bode-readouts"><div><span id="bodeProbeLabel">Input frequency</span> <strong id="bodeInputFrequency">—</strong></div><div>Magnitude at input <strong id="bodeInputMagnitude">—</strong></div><div>Phase at input <strong id="bodeInputPhase">—</strong></div><div>Natural frequency <strong id="bodeNaturalFrequency">—</strong></div></div>
  </div>
  <div class="panel bode-card">
   <div class="chart-head"><h2>Magnitude response</h2><span>20 log₁₀ |H(j2πf)| · dB</span></div>
@@ -392,7 +398,7 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
 </section>
 </div>
 </div>
-<footer>Ideal series RLC circuit · u(t) = sin(2πft) V for t ≥ 0 · output selected across C, R, L, RC, LC or RL · static inspection slider · standalone HTML / JavaScript without external libraries</footer>
+<footer>Ideal series RLC circuit · sinusoidal or 1 V step input · output selected across C, R, L, RC, LC or RL · static inspection slider · standalone HTML / JavaScript without external libraries</footer>
 </main>
 <script id="rlc-math">
 (function(root){
@@ -410,7 +416,8 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
     const phasors={capacitor,resistor,inductor,rc,lc,rl},selected=phasors[s.output]||capacitor;
     return {omega0,wn,alpha,zeta,ratio:omega0/wn,Rcrit:2*Math.sqrt(L/C),phasors,
       M:Math.hypot(selected.re,selected.im),phase:Math.atan2(selected.im,selected.re),
-      matchV:capacitor.im,matchI:C*omega0*capacitor.re};
+      matchV:s.inputType==='step'?1:capacitor.im,
+      matchI:s.inputType==='step'?0:C*omega0*capacitor.re};
   }
   function model(s){
     const {R,L,C,V0,I0}=s,p=parameters(s),{omega0,wn,alpha}=p;
@@ -440,15 +447,17 @@ footer{margin-top:14px;color:#8296a7;font-size:11px}
       }
     }
     return {...p,basis,values(t){
-      const sin=Math.sin(omega0*t),cos=Math.cos(omega0*t),h=p.phasors.capacitor;
-      const steadyState={v:h.re*sin+h.im*cos,i:C*omega0*(h.re*cos-h.im*sin)};
-      const b=basis(t),steady=project(steadyState,sin);
+      const isStep=s.inputType==='step',sin=Math.sin(omega0*t),cos=Math.cos(omega0*t),h=p.phasors.capacitor;
+      // For a 1 V step, the particular state is vC = 1 V, iL = 0 A.
+      // The initial mismatch propagates through the same homogeneous RLC modes.
+      const input=isStep?1:sin;
+      const steadyState=isStep?{v:1,i:0}:{v:h.re*sin+h.im*cos,i:C*omega0*(h.re*cos-h.im*sin)};
+      const b=basis(t),steady=project(steadyState,input);
       const transient=-project(natural(b,p.matchV,p.matchI));
       const initial=project(natural(b,V0,I0));
-      // Subtract physical states before propagation. Exact matching therefore
-      // leaves an exactly zero natural response, without display rounding.
+      // The decomposition is exact for sine and step inputs, and for all six outputs.
       const error=natural(b,V0-p.matchV,I0-p.matchI);
-      return {input:sin,steady,transient,initial,total:steady+project(error)};
+      return {input,steady,transient,initial,total:steady+project(error)};
     }};
   }
   root.RLCMath={parameters,model};
@@ -461,7 +470,7 @@ const $=id=>document.getElementById(id);
 const NS='http://www.w3.org/2000/svg';
 const clr={input:'#9aabba',total:'#008e9a',steady:'#173b65',transient:'#e87528',initial:'#8155b6'};
 const enabled={input:true,total:true,steady:true,transient:true,initial:true};
-const state={f:1.5,R:3,L:0.4,C:0.015,V0:0,I0:0,manualV0:0,manualI0:0,output:"capacitor",cancel:false,T:4,t:0};
+const state={f:1.5,R:3,L:0.4,C:0.015,V0:0,I0:0,manualV0:0,manualI0:0,output:"capacitor",inputType:"sine",cancel:false,T:4,t:0};
 const refs=[];
 const paramDefs={freq:{key:'f'},res:{key:'R'},ind:{key:'L'},cap:{key:'C',scale:.001},vc:{key:'V0'},il:{key:'I0'}};
 function svg(tag,props,parent){const el=document.createElementNS(NS,tag); for(const [k,v] of Object.entries(props||{}))el.setAttribute(k,String(v));if(parent)parent.appendChild(el);return el;}
@@ -478,7 +487,7 @@ function drawPlot(plotId,series,height){
  const left=compact?58:75,right=compact?20:25,top=16,bottom=42,pw=W-left-right,ph=height-top-bottom;
  // Keep high-frequency sine waves correctly sampled rather than aliasing them
  // onto a coarse 1300-point time grid. At very high f, the plot becomes dense.
- const N=Math.min(16000,Math.max(1300,Math.ceil(32*state.f*state.T)));
+ const N=state.inputType==='step'?1300:Math.min(16000,Math.max(1300,Math.ceil(32*state.f*state.T)));
  const samples=Array.from({length:N+1},(_,i)=>currentModel.values(state.T*i/N));
  let maximum=0;for(const x of samples)for(const s of series)maximum=Math.max(maximum,Math.abs(x[s]));
  const ym=niceMax(Math.max(.25,maximum*1.1)),xx=t=>left+pw*t/state.T,yy=v=>top+ph*(ym-v)/(2*ym);

@@ -94,7 +94,7 @@
   <header class="top">
     <div class="brand"><div class="brandmark" aria-hidden="true">×○</div><div><div class="eyebrow">Signals &amp; Systems</div><h1>Bode Studio</h1><p class="intro">Build a transfer function directly on the complex plane.</p></div></div>
     <div class="top-actions">
-      <select id="preset" aria-label="Load an example"><option value="">Examples…</option><option value="lecture">Lecture example: zero 2 · poles 10 and 100</option><option value="resonance">Resonance + a zero</option><option value="leadlag">Real pole + zero</option><option value="cancellation">Pole–zero cancellation</option><option value="rhpzero">Right-half-plane zero</option><option value="unstable">Unstable pole pair</option><option value="imaginary">Imaginary-axis poles</option><option value="mixed">All four factor types</option><option value="empty">Empty plane</option></select>
+      <select id="preset" aria-label="Load an example"><option value="">Examples…</option><option value="lecture">Lecture example: zero 2 · poles 10 and 100</option><option value="ogi">Dr Ogi’s example · poles −1 and −100</option><option value="resonance">Resonance + a zero</option><option value="leadlag">Real pole + zero</option><option value="cancellation">Pole–zero cancellation</option><option value="rhpzero">Right-half-plane zero</option><option value="unstable">Unstable pole pair</option><option value="imaginary">Imaginary-axis poles</option><option value="mixed">All four factor types</option><option value="empty">Empty plane</option></select>
       <button id="undo" disabled title="Undo (Ctrl/Cmd+Z)">Undo</button><button id="redo" disabled title="Redo (Ctrl/Cmd+Shift+Z)">Redo</button>
       <button id="download" class="primary download">Download HTML</button>
     </div>
@@ -788,6 +788,7 @@
   ['magnitude','phase'].forEach(function(id){$(id).addEventListener('pointermove',function(e){var r=$(id).getBoundingClientRect(),x=e.clientX-r.left,b=plotBoxes[id];if(x<b.x||x>b.x+b.w)return;hover=Math.pow(10,Math.log10(state.min)+(x-b.x)/b.w*Math.log10(state.max/state.min));drawChart('magnitude','mag','ma');drawChart('phase','phase','pa');updateReadout();});$(id).addEventListener('pointerleave',function(){hover=null;drawChart('magnitude','mag','ma');drawChart('phase','phase','pa');updateReadout();});});
   var presets={
     lecture:{gain:5000,roots:[['zero','real',-2,0],['pole','real',-10,0],['pole','real',-100,0]],analysis:'geometry',domain:130,min:.1,max:1000,dcLock:true,dcTarget:10},
+    ogi:{gain:100,roots:[['pole','real',-1,0],['pole','real',-100,0]],analysis:'geometry',domain:110,min:.01,max:10000,dcLock:true,dcTarget:1},
     resonance:{gain:9,roots:[['pole','pair',-.6,Math.sqrt(8.64)],['zero','real',-1,0]]},
     leadlag:{gain:5,roots:[['pole','real',-5,0],['zero','real',-1,0]]},
     cancellation:{gain:1,roots:[['pole','real',-1,0],['pole','real',-2,0],['zero','real',-2,0]],selectedIndex:2,snap:true,analysis:'frequency',view:'total',example:'cancellation',dcTarget:1},

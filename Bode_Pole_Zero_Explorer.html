@@ -34,6 +34,13 @@
 .geo-grid{padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .geo-grid>div{min-width:0}
 .geo-heading{font-size:12px;font-weight:700;color:#38516b;margin:0 0 6px}
+.geo-heading-row{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap;margin:0 0 6px}
+.geo-heading-row .geo-heading{margin-bottom:0}
+.geo-zoom-controls{display:flex;align-items:center;gap:4px}
+.geo-zoom-controls button{min-height:27px;padding:3px 8px;font-size:12px;line-height:1}
+.geo-zoom-controls button:disabled{opacity:.4}
+.geo-zoom-controls #geo-zoom-label{font-size:11px;min-width:40px;text-align:center;color:#405b75;font-variant-numeric:tabular-nums}
+#geo-plane{cursor:zoom-in}
 .geo-canvas{display:block;width:100%;border:1px solid #e4ebf1;border-radius:8px;background:#fff}
 #geo-plane{height:330px}#geo-magnitude,#geo-phase{height:185px}
 .geo-table{border-collapse:collapse;width:100%;font-size:10px;margin-top:12px}
@@ -151,7 +158,16 @@
         </div>
         <div class="geo-legend" id="geo-legend" aria-live="polite"><span><i class="geo-swatch"></i>Total response</span></div>
         <div class="geo-grid">
-          <div><div class="geo-heading">Distances in the s-plane</div><canvas class="geo-canvas" id="geo-plane" role="img" aria-label="Moving j omega point connected by coloured vectors to all poles and zeros"></canvas>
+          <div>
+            <div class="geo-heading-row"><div class="geo-heading">Distances in the s-plane</div>
+              <div class="geo-zoom-controls" role="group" aria-label="s-plane zoom controls">
+                <button id="geo-zoom-in" title="Zoom in on the origin" aria-label="Zoom in on the s-plane">+</button>
+                <span id="geo-zoom-label" aria-live="polite">1×</span>
+                <button id="geo-zoom-out" title="Zoom out from the origin" aria-label="Zoom out of the s-plane">−</button>
+                <button id="geo-zoom-fit" title="Reset to automatic scale">Fit</button>
+              </div>
+            </div>
+            <canvas class="geo-canvas" id="geo-plane" role="img" aria-label="Moving j omega point connected by coloured vectors to poles and zeros. Use the zoom buttons or mouse wheel to zoom around the origin."></canvas>
             <table class="geo-table" aria-label="Distance, magnitude and angle contributions"><thead><tr><th>Factor</th><th>Distance(s)</th><th>Contribution dB</th><th>Angle °</th></tr></thead><tbody id="geo-table-body"></tbody></table>
           </div>
           <div><div class="geo-heading">Magnitude · dB (constructed progressively)</div><canvas class="geo-canvas" id="geo-magnitude" role="img" aria-label="Progressively constructed Bode magnitude"></canvas>
@@ -807,6 +823,15 @@
 var el=function(id){return document.getElementById(id)},B=window.BodeMath,slider=el('geo-slider'),playing=false,raf=0,last=0,model;
 var palette=['#7756b6','#168c82','#b07627','#477ab6','#bd5e8d','#6b8e35','#b86e52','#6c71ad'];
 var overlayChoice=null,optionsSignature='';
+var geoZoom=1;
+function setGeoZoom(value){
+  geoZoom=Math.max(0.25,Math.min(8,value));
+  el('geo-zoom-label').textContent=Number(geoZoom.toFixed(2)).toString()+'×';
+  el('geo-zoom-in').disabled=geoZoom>=8-1e-9;
+  el('geo-zoom-out').disabled=geoZoom<=.25+1e-9;
+  el('geo-zoom-fit').disabled=Math.abs(geoZoom-1)<1e-9;
+  paint();
+}
 function syncOverlay(){
   var select=el('geo-overlay'),choices=[{value:'none',label:'None · total only'},{value:'gain',label:'K (gain)'}];
   model.roots.forEach(function(g){choices.push({value:'root:'+g.id,label:(g.kind==='pole'?'× P':'○ Z')+g.id+(g.form==='pair'?' (pair)':'')});});
@@ -844,7 +869,10 @@ function geometry(w){
   var cornerRadius=selectedCircleRoot?Math.hypot(selectedCircleRoot.re,selectedCircleRoot.form==='pair'?selectedCircleRoot.im:0):0;
   var lim=Math.max(1,w,cornerRadius);
   rr.forEach(function(g){lim=Math.max(lim,Math.abs(g.x),Math.abs(g.y));});
-  lim*=1.2;
+  // Zoom magnifies around the origin without changing frequency,
+  // pole/zero positions, distances, or the corner-frequency circle.
+  // Automatic fit still follows the moving jω point during animation.
+  lim=lim*1.2/geoZoom;
   var k=s/(2*lim),ox=27+.67*s,oy=17+.57*s,X=function(x){return ox+k*x;},Y=function(y){return oy-k*y;};
   c.fillStyle='#fcfdff';c.fillRect(18,9,s+18,s+18);
   c.fillStyle='#fff8f4';c.fillRect(ox,9,Math.max(0,36+s-ox),s+18);
@@ -948,11 +976,19 @@ el('geo-reset').addEventListener('click',function(){pause();slider.value='0';pai
 el('geo-play').addEventListener('click',function(){if(playing){pause();return;}if(+slider.value>=1000)slider.value='0';playing=true;last=0;el('geo-play').textContent='Ⅱ Pause';raf=requestAnimationFrame(tick);});
 slider.addEventListener('input',function(){pause();paint();});
 el('geo-asym').addEventListener('change',paint);
+el('geo-zoom-in').addEventListener('click',function(){setGeoZoom(geoZoom*1.5);});
+el('geo-zoom-out').addEventListener('click',function(){setGeoZoom(geoZoom/1.5);});
+el('geo-zoom-fit').addEventListener('click',function(){setGeoZoom(1);});
+el('geo-plane').addEventListener('wheel',function(event){
+  if(el('geometry-panel').hidden)return;
+  event.preventDefault();
+  setGeoZoom(geoZoom*(event.deltaY<0?1.2:1/1.2));
+},{passive:false});
 el('geo-overlay').addEventListener('change',paint);
 document.addEventListener('bode:render',function(){if(!el('geometry-panel').hidden)paint();else pause();});
 window.addEventListener('resize',paint);if(typeof ResizeObserver==='function')new ResizeObserver(paint).observe(el('geometry-panel'));
 document.addEventListener('visibilitychange',function(){if(document.hidden)pause();});
-paint();
+setGeoZoom(1);
 })();
 
 </script>

@@ -41,6 +41,12 @@
 .geo-table th:first-child,.geo-table td:first-child{text-align:left}.geo-table th{color:#6b7f92}
 .geo-explain{margin:0 12px 12px;padding:11px 13px;background:#f1f8f7;border:1px solid #d6e8e3;border-radius:8px;color:#315b60;font-size:12px;line-height:1.65}
 .geo-note{color:#60758a;font-size:11px;padding:0 14px 15px;line-height:1.55}
+.geo-controls #geo-overlay{max-width:205px}
+.geo-legend{padding:9px 16px 0;display:flex;flex-wrap:wrap;gap:7px 17px;align-items:center;color:#4a6176;font-size:11px}
+.geo-legend span{display:inline-flex;align-items:center;gap:6px}
+.geo-swatch{display:inline-block;width:23px;height:0;border-top:3px solid #cb464d}
+.geo-swatch.asym{border-top:2px dashed #3265c8}
+.geo-table tr.geo-row-selected td{background:#edf7f4;font-weight:700}
 @media(max-width:1200px){.geo-grid{grid-template-columns:1fr}#geo-plane{height:305px}}
 @media(min-width:801px) and (max-width:1050px){.geo-grid{grid-template-columns:1fr}}
 
@@ -138,8 +144,12 @@
           <button id="geo-reset">↺ Restart</button>
           <label>Speed <select id="geo-speed"><option value=".5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
           <label><input id="geo-asym" type="checkbox"> Asymptotes</label>
+          <label for="geo-overlay">Overlay contribution
+            <select id="geo-overlay" aria-label="Show individual factor contribution alongside total Bode plots"><option value="none">None · total only</option></select>
+          </label>
           <div class="geo-slider-wrap"><label for="geo-slider">ω</label><input type="range" id="geo-slider" min="0" max="1000" step="1" value="0" aria-label="Logarithmic angular-frequency sweep"><output id="geo-omega" for="geo-slider"></output></div>
         </div>
+        <div class="geo-legend" id="geo-legend" aria-live="polite"><span><i class="geo-swatch"></i>Total response</span></div>
         <div class="geo-grid">
           <div><div class="geo-heading">Distances in the s-plane</div><canvas class="geo-canvas" id="geo-plane" role="img" aria-label="Moving j omega point connected by coloured vectors to all poles and zeros"></canvas>
             <table class="geo-table" aria-label="Distance, magnitude and angle contributions"><thead><tr><th>Factor</th><th>Distance(s)</th><th>Contribution dB</th><th>Angle °</th></tr></thead><tbody id="geo-table-body"></tbody></table>
@@ -796,6 +806,29 @@
 'use strict';
 var el=function(id){return document.getElementById(id)},B=window.BodeMath,slider=el('geo-slider'),playing=false,raf=0,last=0,model;
 var palette=['#7756b6','#168c82','#b07627','#477ab6','#bd5e8d','#6b8e35','#b86e52','#6c71ad'];
+var overlayChoice=null,optionsSignature='';
+function syncOverlay(){
+  var select=el('geo-overlay'),choices=[{value:'none',label:'None · total only'},{value:'gain',label:'K (gain)'}];
+  model.roots.forEach(function(g){choices.push({value:'root:'+g.id,label:(g.kind==='pole'?'× P':'○ Z')+g.id+(g.form==='pair'?' (pair)':'')});});
+  var signature=choices.map(function(o){return o.value+':'+o.label;}).join('|');
+  if(signature!==optionsSignature){
+    var previous=select.value;
+    select.replaceChildren();
+    choices.forEach(function(item){var option=document.createElement('option');option.value=item.value;option.textContent=item.label;select.appendChild(option);});
+    select.value=choices.some(function(item){return item.value===previous;})?previous:'none';
+    optionsSignature=signature;
+  }
+  var choice=select.value;
+  if(choice==='gain'){
+    overlayChoice={value:'gain',label:'K (gain)',color:'#657b8f',at:function(w){return B.gain(model.gain);}};
+  }else{
+    var g=model.roots.find(function(root){return choice==='root:'+root.id;});
+    overlayChoice=g?{value:choice,label:(g.kind==='pole'?'× P':'○ Z')+g.id+(g.form==='pair'?' (pair)':''),color:palette[(g.id-1)%palette.length],at:function(w){return B.factor(g,w);}}:null;
+  }
+  el('geo-legend').innerHTML='<span><i class="geo-swatch"></i>Total response</span>'
+    +(overlayChoice?'<span><i class="geo-swatch" style="border-color:'+overlayChoice.color+'"></i>'+overlayChoice.label+' contribution</span>':'')
+    +(el('geo-asym').checked?'<span><i class="geo-swatch asym"></i>Total asymptote</span>':'');
+}
 function fmt(x,d){if(!Number.isFinite(x))return Number.isNaN(x)?'undefined':x>0?'∞':'−∞';if(!x)return '0';if(Math.abs(x)>99999||Math.abs(x)<.001)return x.toExponential(2).replace('e-','e−');return String(Number(x.toFixed(d===undefined?2:d)));}
 function frequency(){return model.min*Math.pow(model.max/model.min,+slider.value/1000);}
 function response(w){return B.total(B.reduce(model.roots).roots,model.gain,w);}
@@ -818,7 +851,8 @@ function geometry(w){
 }
 function graph(id,key,w){
   var v=setup(id);if(!v)return;var c=v.c,box={x:53,y:10,w:v.w-68,h:v.h-41},log0=Math.log10(model.min),log1=Math.log10(model.max),amin=Infinity,amax=-Infinity;
-  for(var i=0;i<=180;i++){var f=Math.pow(10,log0+(log1-log0)*i/180),r=response(f),val=r[key];if(Number.isFinite(val)){amin=Math.min(amin,val);amax=Math.max(amax,val);}if(el('geo-asym').checked){val=r[key==='mag'?'ma':'pa'];if(Number.isFinite(val)){amin=Math.min(amin,val);amax=Math.max(amax,val);}}}
+  for(var i=0;i<=180;i++){var f=Math.pow(10,log0+(log1-log0)*i/180),r=response(f),val=r[key];if(Number.isFinite(val)){amin=Math.min(amin,val);amax=Math.max(amax,val);}if(el('geo-asym').checked){val=r[key==='mag'?'ma':'pa'];if(Number.isFinite(val)){amin=Math.min(amin,val);amax=Math.max(amax,val);}}
+    if(overlayChoice){val=overlayChoice.at(f)[key];if(Number.isFinite(val)){amin=Math.min(amin,val);amax=Math.max(amax,val);}}}
   if(!Number.isFinite(amin)){amin=key==='mag'?-20:-180;amax=key==='mag'?20:180;}if(amax-amin<.001){amin-=key==='mag'?10:45;amax+=key==='mag'?10:45;}
   // Use exact 20 dB ticks for magnitude and 45° ticks for phase.
   // Wider plots can use 40/60 dB or 90/135° without fractional labels.
@@ -833,21 +867,45 @@ function graph(id,key,w){
   for(i=0;i<=Math.round((amax-amin)/tickStep);i++){var u=amin+i*tickStep;c.strokeStyle=u===0?'#bdc9d4':'#e7eef3';c.lineWidth=1;c.beginPath();c.moveTo(box.x,y(u));c.lineTo(box.x+box.w,y(u));c.stroke();c.textAlign='right';c.fillStyle='#5a7187';c.fillText(String(u),box.x-7,y(u));}
   for(i=Math.ceil(log0);i<=Math.floor(log1);i++){var px=x(Math.pow(10,i));c.strokeStyle='#e0e7ef';c.beginPath();c.moveTo(px,box.y);c.lineTo(px,box.y+box.h);c.stroke();c.textAlign='center';c.fillStyle='#75889a';c.fillText('10^'+i,px,box.y+box.h+14);}
   c.textAlign='right';c.fillText('ω (rad/s)',box.x+box.w,v.h-4);
-  function trace(type,color,dashed){c.save();c.beginPath();c.rect(box.x,box.y,box.w,box.h);c.clip();c.strokeStyle=color;c.lineWidth=dashed?1.9:2.6;c.setLineDash(dashed?[5,4]:[]);c.beginPath();var active=false;for(var q=0;q<=Math.max(2,Math.round(+slider.value*.2));q++){var count=Math.max(2,Math.round(+slider.value*.2)),ff=Math.pow(10,log0+(Math.log10(w)-log0)*q/count),vv=response(ff)[type];if(!Number.isFinite(vv)){active=false;continue;}if(active)c.lineTo(x(ff),y(vv));else{c.moveTo(x(ff),y(vv));active=true;}}c.stroke();c.restore();}
-  if(el('geo-asym').checked)trace(key==='mag'?'ma':'pa','#3265c8',true);
-  trace(key,'#cb464d',false);
+  function trace(type,color,dashed,at){
+    c.save();c.beginPath();c.rect(box.x,box.y,box.w,box.h);c.clip();
+    c.strokeStyle=color;c.lineWidth=dashed?1.9:2.6;c.setLineDash(dashed?[5,4]:[]);
+    c.beginPath();var active=false,count=Math.max(2,Math.round(+slider.value*.2));
+    for(var q=0;q<=count;q++){
+      var ff=Math.pow(10,log0+(Math.log10(w)-log0)*q/count),vv=at(ff)[type];
+      if(!Number.isFinite(vv)){active=false;continue;}
+      if(active)c.lineTo(x(ff),y(vv));else{c.moveTo(x(ff),y(vv));active=true;}
+    }
+    c.stroke();c.restore();
+  }
+  if(el('geo-asym').checked)trace(key==='mag'?'ma':'pa','#3265c8',true,response);
+  trace(key,'#cb464d',false,response);
+  if(overlayChoice)trace(key,overlayChoice.color,false,overlayChoice.at);
   var px=x(w),val=response(w)[key];c.setLineDash([3,3]);c.strokeStyle='#aebdcc';c.beginPath();c.moveTo(px,box.y);c.lineTo(px,box.y+box.h);c.stroke();c.setLineDash([]);
   if(Number.isFinite(val)){c.fillStyle='#cb464d';c.beginPath();c.arc(px,y(val),3.8,0,2*Math.PI);c.fill();}
+  if(overlayChoice){
+    var comp=overlayChoice.at(w)[key];
+    if(Number.isFinite(comp)){c.fillStyle=overlayChoice.color;c.beginPath();c.arc(px,y(comp),3.8,0,2*Math.PI);c.fill();}
+  }
 }
 function explain(w){
   var r=response(w),zeros=[],poles=[],rows=[];
-  model.roots.forEach(function(g){var ds=[Math.hypot(-g.re,w-(g.form==='pair'?g.im:0))];if(g.form==='pair')ds.push(Math.hypot(-g.re,w+g.im));var f=B.factor(g,w),c=palette[(g.id-1)%palette.length];rows.push('<tr><td style="color:'+c+'">'+(g.kind==='zero'?'○ Z':'× P')+g.id+(g.form==='pair'?' (pair)':'')+'</td><td>'+ds.map(function(n){return fmt(n,2);}).join(' · ')+'</td><td>'+fmt(f.mag,1)+'</td><td>'+fmt(f.phase,1)+'</td></tr>');(g.kind==='zero'?zeros:poles).push(ds.length===2?'('+ds.map(function(n){return fmt(n,2);}).join(' × ')+')':fmt(ds[0],2));});
-  el('geo-table-body').innerHTML='<tr><td>K</td><td>|'+fmt(model.gain,2)+'|</td><td>'+fmt(B.gain(model.gain).mag,1)+'</td><td>'+fmt(B.gain(model.gain).phase,1)+'</td></tr>'+rows.join('')+'<tr><th>Total</th><th></th><th>'+fmt(r.mag,2)+'</th><th>'+fmt(r.phase,1)+'</th></tr>';
+  model.roots.forEach(function(g){var ds=[Math.hypot(-g.re,w-(g.form==='pair'?g.im:0))];if(g.form==='pair')ds.push(Math.hypot(-g.re,w+g.im));var f=B.factor(g,w),c=palette[(g.id-1)%palette.length];rows.push('<tr'+(overlayChoice&&overlayChoice.value==='root:'+g.id?' class="geo-row-selected"':'')+'><td style="color:'+c+'">'+(g.kind==='zero'?'○ Z':'× P')+g.id+(g.form==='pair'?' (pair)':'')+'</td><td>'+ds.map(function(n){return fmt(n,2);}).join(' · ')+'</td><td>'+fmt(f.mag,1)+'</td><td>'+fmt(f.phase,1)+'</td></tr>');(g.kind==='zero'?zeros:poles).push(ds.length===2?'('+ds.map(function(n){return fmt(n,2);}).join(' × ')+')':fmt(ds[0],2));});
+  el('geo-table-body').innerHTML='<tr'+(overlayChoice&&overlayChoice.value==='gain'?' class="geo-row-selected"':'')+'><td>K</td><td>|'+fmt(model.gain,2)+'|</td><td>'+fmt(B.gain(model.gain).mag,1)+'</td><td>'+fmt(B.gain(model.gain).phase,1)+'</td></tr>'+rows.join('')+'<tr><th>Total</th><th></th><th>'+fmt(r.mag,2)+'</th><th>'+fmt(r.phase,1)+'</th></tr>';
   el('geo-equation').innerHTML='<strong>ω = '+fmt(w,4)+' rad/s</strong> &nbsp; |H(jω)| = |K| × ∏d<sub>zero</sub> / ∏d<sub>pole</sub><div>= '+fmt(Math.abs(model.gain),2)+' × ['+(zeros.join(' × ')||'1')+'] / ['+(poles.join(' × ')||'1')+']</div><strong>Magnitude: '+fmt(r.mag,2)+' dB &nbsp; · &nbsp; Phase: '+fmt(r.phase,1)+'°</strong>';
   var slope=0;model.roots.forEach(function(g){var corner=g.form==='pair'?Math.hypot(g.re,g.im):Math.abs(g.re);if(w>corner)slope+=(g.kind==='zero'?1:-1)*(g.form==='pair'?40:20);});
-  el('geo-takeaway').textContent='The approximate slope in this frequency band is '+(slope>0?'+':'')+slope+' dB/decade. The red line is the exact Bode response; enable Asymptotes to compare the standard straight-line construction. Axes in the s-plane are linear and automatically rescale.';
+  el('geo-takeaway').textContent='The approximate slope in this frequency band is '+(slope>0?'+':'')+slope+' dB/decade. '
+    +(overlayChoice?'The '+overlayChoice.label+' curve is its separate contribution; in dB and degrees, the factor contributions and the gain sum to the red total. ':'')
+    +'The red line is the exact total Bode response; enable Asymptotes to compare the straight-line construction. Axes in the s-plane are linear and automatically rescale.';
 }
-function paint(){if(el('geometry-panel').hidden||!window.BodeStudioGeometryModel)return;model=window.BodeStudioGeometryModel();if(!(model.min>0&&model.max>model.min))return;var w=frequency();el('geo-omega').textContent=fmt(w,4)+' rad/s';geometry(w);graph('geo-magnitude','mag',w);graph('geo-phase','phase',w);explain(w);}
+function paint(){
+  if(el('geometry-panel').hidden||!window.BodeStudioGeometryModel)return;
+  model=window.BodeStudioGeometryModel();
+  if(!(model.min>0&&model.max>model.min))return;
+  syncOverlay();
+  var w=frequency();el('geo-omega').textContent=fmt(w,4)+' rad/s';
+  geometry(w);graph('geo-magnitude','mag',w);graph('geo-phase','phase',w);explain(w);
+}
 function pause(){playing=false;el('geo-play').textContent='▶ Play sweep';if(raf)cancelAnimationFrame(raf);raf=0;}
 function tick(t){if(!playing)return;if(!last)last=t;var delta=Math.min(100,Math.max(0,t-last));last=t;var next=Math.min(1000,+slider.value+delta*1000*Number(el('geo-speed').value)/13500);slider.value=String(next);paint();if(next>=1000)pause();else raf=requestAnimationFrame(tick);}
 el('geo-example').addEventListener('click',function(){pause();slider.value='0';el('preset').value='lecture';el('preset').dispatchEvent(new Event('change',{bubbles:true}));});
@@ -855,6 +913,7 @@ el('geo-reset').addEventListener('click',function(){pause();slider.value='0';pai
 el('geo-play').addEventListener('click',function(){if(playing){pause();return;}if(+slider.value>=1000)slider.value='0';playing=true;last=0;el('geo-play').textContent='Ⅱ Pause';raf=requestAnimationFrame(tick);});
 slider.addEventListener('input',function(){pause();paint();});
 el('geo-asym').addEventListener('change',paint);
+el('geo-overlay').addEventListener('change',paint);
 document.addEventListener('bode:render',function(){if(!el('geometry-panel').hidden)paint();else pause();});
 window.addEventListener('resize',paint);if(typeof ResizeObserver==='function')new ResizeObserver(paint).observe(el('geometry-panel'));
 document.addEventListener('visibilitychange',function(){if(document.hidden)pause();});

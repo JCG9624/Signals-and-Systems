@@ -564,12 +564,16 @@
   function extent(field,approx){
     var vals=[];
     cache.curves.forEach(function(s){s.values.forEach(function(v){if(Number.isFinite(v[field]))vals.push(v[field]);if(Number.isFinite(v[approx]))vals.push(v[approx]);});});
-    if(!vals.length)return {min:field==='phase'?-90:-20,max:field==='phase'?90:20,step:field==='phase'?45:10};
+    var unit=field==='phase'?45:20;
+    if(!vals.length)return {min:-2*unit,max:2*unit,step:unit};
     var min=Math.min.apply(null,vals),max=Math.max.apply(null,vals),span=max-min;
-    if(span<1e-7){min-=field==='phase'?45:10;max+=field==='phase'?45:10;span=max-min;}
-    var step=field==='phase'?[15,30,45,90,180,360,720,1440].find(function(x){return x>=(span*1.12)/5;}):nice(span*1.12/5);
-    step=step||1440;
-    return {min:Math.floor((min-span*.055)/step)*step,max:Math.ceil((max+span*.055)/step)*step,step:step};
+    if(span<1e-7){min-=unit;max+=unit;span=max-min;}
+    // Ticks are at exact multiples of 20 dB or 45 degrees.
+    // For unusually large ranges, skip whole multiples to avoid crowded labels.
+    var step=unit*Math.max(1,Math.ceil(span*1.12/(unit*6)));
+    var lower=Math.floor((min-span*.055)/step)*step,upper=Math.ceil((max+span*.055)/step)*step;
+    if(lower===upper){lower-=step;upper+=step;}
+    return {min:lower,max:upper,step:step};
   }
   function line(c,box,range,values,field,col,width,dash,alpha){
     c.save();c.beginPath();c.rect(box.x,box.y,box.w,box.h);c.clip();c.strokeStyle=col;c.lineWidth=width;c.globalAlpha=alpha===undefined?1:alpha;c.setLineDash(dash||[]);c.lineJoin='round';c.lineCap='round';c.beginPath();
@@ -816,10 +820,17 @@ function graph(id,key,w){
   var v=setup(id);if(!v)return;var c=v.c,box={x:53,y:10,w:v.w-68,h:v.h-41},log0=Math.log10(model.min),log1=Math.log10(model.max),amin=Infinity,amax=-Infinity;
   for(var i=0;i<=180;i++){var f=Math.pow(10,log0+(log1-log0)*i/180),r=response(f),val=r[key];if(Number.isFinite(val)){amin=Math.min(amin,val);amax=Math.max(amax,val);}if(el('geo-asym').checked){val=r[key==='mag'?'ma':'pa'];if(Number.isFinite(val)){amin=Math.min(amin,val);amax=Math.max(amax,val);}}}
   if(!Number.isFinite(amin)){amin=key==='mag'?-20:-180;amax=key==='mag'?20:180;}if(amax-amin<.001){amin-=key==='mag'?10:45;amax+=key==='mag'?10:45;}
-  var margin=(amax-amin)*.07;amin-=margin;amax+=margin;
+  // Use exact 20 dB ticks for magnitude and 45° ticks for phase.
+  // Wider plots can use 40/60 dB or 90/135° without fractional labels.
+  var unit=key==='mag'?20:45,span=amax-amin;
+  var tickStep=unit*Math.max(1,Math.ceil(span*1.14/(unit*5)));
+  var lowTick=Math.floor((amin-span*.07)/tickStep)*tickStep;
+  var highTick=Math.ceil((amax+span*.07)/tickStep)*tickStep;
+  if(lowTick===highTick){lowTick-=tickStep;highTick+=tickStep;}
+  amin=lowTick;amax=highTick;
   var x=function(f){return box.x+(Math.log10(f)-log0)/(log1-log0)*box.w;},y=function(t){return box.y+(amax-t)/(amax-amin)*box.h;};
   c.font='10px system-ui';c.textBaseline='middle';
-  for(i=0;i<=4;i++){var u=amin+(amax-amin)*i/4;c.strokeStyle='#e7eef3';c.lineWidth=1;c.beginPath();c.moveTo(box.x,y(u));c.lineTo(box.x+box.w,y(u));c.stroke();c.textAlign='right';c.fillStyle='#5a7187';c.fillText(fmt(u,1),box.x-7,y(u));}
+  for(i=0;i<=Math.round((amax-amin)/tickStep);i++){var u=amin+i*tickStep;c.strokeStyle=u===0?'#bdc9d4':'#e7eef3';c.lineWidth=1;c.beginPath();c.moveTo(box.x,y(u));c.lineTo(box.x+box.w,y(u));c.stroke();c.textAlign='right';c.fillStyle='#5a7187';c.fillText(String(u),box.x-7,y(u));}
   for(i=Math.ceil(log0);i<=Math.floor(log1);i++){var px=x(Math.pow(10,i));c.strokeStyle='#e0e7ef';c.beginPath();c.moveTo(px,box.y);c.lineTo(px,box.y+box.h);c.stroke();c.textAlign='center';c.fillStyle='#75889a';c.fillText('10^'+i,px,box.y+box.h+14);}
   c.textAlign='right';c.fillText('ω (rad/s)',box.x+box.w,v.h-4);
   function trace(type,color,dashed){c.save();c.beginPath();c.rect(box.x,box.y,box.w,box.h);c.clip();c.strokeStyle=color;c.lineWidth=dashed?1.9:2.6;c.setLineDash(dashed?[5,4]:[]);c.beginPath();var active=false;for(var q=0;q<=Math.max(2,Math.round(+slider.value*.2));q++){var count=Math.max(2,Math.round(+slider.value*.2)),ff=Math.pow(10,log0+(Math.log10(w)-log0)*q/count),vv=response(ff)[type];if(!Number.isFinite(vv)){active=false;continue;}if(active)c.lineTo(x(ff),y(vv));else{c.moveTo(x(ff),y(vv));active=true;}}c.stroke();c.restore();}

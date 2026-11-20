@@ -22,6 +22,28 @@
 @media(max-width:480px){main{padding:14px 10px}.brandmark{width:37px;height:37px;font-size:24px}h1{font-size:25px}.intro{font-size:11px}.top-actions{gap:5px}.top-actions button{font-size:10px;padding:7px 8px}.top-actions select{font-size:10px;width:110px;min-width:0}.top-actions .download{margin:0}.formula{font-size:18px;min-height:43px}.gain-control{font-size:11px;gap:4px}.gain-control input{width:64px;font-size:12px}.plane-wrap canvas{height:310px}.plane-footer{font-size:9px}.mode-sub{font-size:10px}.plane-tools{padding-left:11px;padding-right:11px}.modes button{font-size:11px}.frequency-bar{gap:7px;padding:10px}.frequency-bar input{width:79px}.frequency-bar .units{display:none}.frequency-bar button{font-size:10px}.plot-legend{gap:10px;font-size:10px;padding-left:13px;padding-right:13px}.plot-legend #view-caption{max-width:120px;text-overflow:ellipsis;white-space:nowrap;overflow:hidden}.hover-readout{font-size:10px;padding-left:13px}.notes{grid-template-columns:1fr;gap:12px}.coordinates{gap:6px}.coordinates button{font-size:10px}.bottom{font-size:9px}}
 
 /* Shared navigation back to the Signals & Systems index. */
+
+/* Geometric construction view */
+.geo-intro{padding:12px 16px;color:#40586e;background:#edf7f4;border-bottom:1px solid #d3e5df;font-size:12px}
+.geo-controls{padding:12px 15px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
+.geo-controls button,.geo-controls select{font-size:11px;min-height:31px}
+.geo-controls label{display:inline-flex;gap:5px;align-items:center;font-size:11px;color:#50697d}
+.geo-slider-wrap{display:flex;flex:1 1 100%;align-items:center;gap:10px}
+.geo-slider-wrap input{flex:1;min-width:70px;accent-color:var(--teal)}
+.geo-slider-wrap output{width:123px;text-align:right;color:#08736c;font-size:13px;font-weight:750;font-variant-numeric:tabular-nums}
+.geo-grid{padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.geo-grid>div{min-width:0}
+.geo-heading{font-size:12px;font-weight:700;color:#38516b;margin:0 0 6px}
+.geo-canvas{display:block;width:100%;border:1px solid #e4ebf1;border-radius:8px;background:#fff}
+#geo-plane{height:330px}#geo-magnitude,#geo-phase{height:185px}
+.geo-table{border-collapse:collapse;width:100%;font-size:10px;margin-top:12px}
+.geo-table th,.geo-table td{padding:5px 3px;text-align:right;border-bottom:1px solid #e7edf3;font-variant-numeric:tabular-nums}
+.geo-table th:first-child,.geo-table td:first-child{text-align:left}.geo-table th{color:#6b7f92}
+.geo-explain{margin:0 12px 12px;padding:11px 13px;background:#f1f8f7;border:1px solid #d6e8e3;border-radius:8px;color:#315b60;font-size:12px;line-height:1.65}
+.geo-note{color:#60758a;font-size:11px;padding:0 14px 15px;line-height:1.55}
+@media(max-width:1200px){.geo-grid{grid-template-columns:1fr}#geo-plane{height:305px}}
+@media(min-width:801px) and (max-width:1050px){.geo-grid{grid-template-columns:1fr}}
+
 .site-return-nav {
   box-sizing: border-box;
   position: relative;
@@ -59,7 +81,7 @@
   <header class="top">
     <div class="brand"><div class="brandmark" aria-hidden="true">×○</div><div><div class="eyebrow">Signals &amp; Systems</div><h1>Bode Studio</h1><p class="intro">Build a transfer function directly on the complex plane.</p></div></div>
     <div class="top-actions">
-      <select id="preset" aria-label="Load an example"><option value="">Examples…</option><option value="resonance">Resonance + a zero</option><option value="leadlag">Real pole + zero</option><option value="cancellation">Pole–zero cancellation</option><option value="rhpzero">Right-half-plane zero</option><option value="unstable">Unstable pole pair</option><option value="imaginary">Imaginary-axis poles</option><option value="mixed">All four factor types</option><option value="empty">Empty plane</option></select>
+      <select id="preset" aria-label="Load an example"><option value="">Examples…</option><option value="lecture">Lecture example: zero 2 · poles 10 and 100</option><option value="resonance">Resonance + a zero</option><option value="leadlag">Real pole + zero</option><option value="cancellation">Pole–zero cancellation</option><option value="rhpzero">Right-half-plane zero</option><option value="unstable">Unstable pole pair</option><option value="imaginary">Imaginary-axis poles</option><option value="mixed">All four factor types</option><option value="empty">Empty plane</option></select>
       <button id="undo" disabled title="Undo (Ctrl/Cmd+Z)">Undo</button><button id="redo" disabled title="Redo (Ctrl/Cmd+Shift+Z)">Redo</button>
       <button id="download" class="primary download">Download HTML</button>
     </div>
@@ -96,7 +118,7 @@
       </div>
     </section>
     <section class="card plot-card" id="analysis-card" aria-labelledby="analysis-title">
-      <div class="analysis-nav"><h2 id="analysis-title">System response</h2><div class="view-switch" aria-label="Analysis section"><button data-analysis="frequency" aria-pressed="false">Bode</button><button class="active" data-analysis="time" aria-pressed="true">Time response</button><button data-analysis="both" aria-pressed="false">Both</button></div></div>
+      <div class="analysis-nav"><h2 id="analysis-title">System response</h2><div class="view-switch" aria-label="Analysis section"><button data-analysis="frequency" aria-pressed="false">Bode</button><button class="active" data-analysis="time" aria-pressed="true">Time response</button><button data-analysis="geometry" aria-pressed="false">Vector geometry</button><button data-analysis="both" aria-pressed="false">Both</button></div></div>
       <div class="example-prompt" id="example-prompt" role="note" hidden><strong>Pole–zero cancellation</strong><p>Move the selected zero away from −2 and compare the Bode plots and step response. Return it to −2 to restore exact cancellation. Use <b>Snap to 0.1</b> to align the roots. With <b>Keep DC gain</b> selected, H(0) stays fixed.</p></div>
       <div id="frequency-panel" hidden>
       <div class="plots-head"><h2 id="bode-title">Bode plots</h2><div class="view-switch" aria-label="Bode plot view"><button class="active" data-view="total" aria-pressed="true">Total</button><button data-view="selected" aria-pressed="false">Selected</button><button data-view="all" aria-pressed="false">All factors</button></div></div>
@@ -107,6 +129,28 @@
       <div class="hover-readout" id="readout">Move over either Bode plot to inspect a frequency.</div>
       <div class="frequency-bar"><label for="omega-min">ω min <input id="omega-min" type="number" min="0.00001" step="any" value="0.01"></label><label for="omega-max">ω max <input id="omega-max" type="number" min="0.00001" step="any" value="100"></label><span class="units">rad/s</span><button id="fit-frequency">Fit frequencies</button><button id="clear">Clear roots</button></div>
       </div>
+
+      <section id="geometry-panel" hidden aria-label="Geometric Bode construction">
+        <div class="geo-intro"><strong>Vector geometry.</strong> Move the frequency point <em>s = jω</em> up the imaginary axis. Each coloured segment is a true Euclidean distance from a pole (×) or a zero (○). The exact magnitude multiplies zero distances and divides by pole distances; the phase comes from the same vectors' angles.</div>
+        <div class="geo-controls">
+          <button id="geo-example" class="primary">Load lecture example</button>
+          <button id="geo-play">▶ Play sweep</button>
+          <button id="geo-reset">↺ Restart</button>
+          <label>Speed <select id="geo-speed"><option value=".5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
+          <label><input id="geo-asym" type="checkbox"> Asymptotes</label>
+          <div class="geo-slider-wrap"><label for="geo-slider">ω</label><input type="range" id="geo-slider" min="0" max="1000" step="1" value="0" aria-label="Logarithmic angular-frequency sweep"><output id="geo-omega" for="geo-slider"></output></div>
+        </div>
+        <div class="geo-grid">
+          <div><div class="geo-heading">Distances in the s-plane</div><canvas class="geo-canvas" id="geo-plane" role="img" aria-label="Moving j omega point connected by coloured vectors to all poles and zeros"></canvas>
+            <table class="geo-table" aria-label="Distance, magnitude and angle contributions"><thead><tr><th>Factor</th><th>Distance(s)</th><th>Contribution dB</th><th>Angle °</th></tr></thead><tbody id="geo-table-body"></tbody></table>
+          </div>
+          <div><div class="geo-heading">Magnitude · dB (constructed progressively)</div><canvas class="geo-canvas" id="geo-magnitude" role="img" aria-label="Progressively constructed Bode magnitude"></canvas>
+            <div class="geo-heading" style="margin-top:13px">Phase · degrees (constructed progressively)</div><canvas class="geo-canvas" id="geo-phase" role="img" aria-label="Progressively constructed Bode phase"></canvas>
+          </div>
+        </div>
+        <div class="geo-explain" id="geo-equation" aria-live="off"></div>
+        <p class="geo-note" id="geo-takeaway"></p>
+      </section>
       <section id="time-panel" aria-labelledby="time-title">
         <div class="time-head"><h2 id="time-title">Time-domain response</h2><p>Total transfer function · zero initial conditions</p></div>
         <div class="time-controls">
@@ -418,8 +462,8 @@
     cache.curves.push(primary);cache.primary=primary;
   }
   function renderTime(){
-    var visible=state.analysis!=='frequency',settings=state.time;
-    $('frequency-panel').hidden=state.analysis==='time';$('time-panel').hidden=!visible;
+    var visible=state.analysis==='time'||state.analysis==='both',settings=state.time;
+    $('frequency-panel').hidden=state.analysis==='time'||state.analysis==='geometry';$('time-panel').hidden=!visible;$('geometry-panel').hidden=state.analysis!=='geometry';
     $('analysis-card').classList.toggle('both-views',state.analysis==='both');
     document.querySelectorAll('[data-analysis]').forEach(function(b){var active=b.dataset.analysis===state.analysis;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});
     if(!visible)return;
@@ -477,7 +521,7 @@
     if(document.activeElement!==$('omega-max'))$('omega-max').value=plain(state.max);
     $('view-caption').textContent=state.view==='all'?'Total + individual factors':state.view==='selected'?cache.primary.label+' contribution':'Combined response';
     $('factor-legend').innerHTML=state.view==='all'?cache.curves.filter(function(c){return c.component;}).map(function(c){return '<button class="factor-chip" data-inspect="'+c.id+'"><span class="color-dot" style="background:'+c.col+'"></span>'+c.label+'</button>';}).join(''):'';
-    renderTime();paint();updateReadout();
+    renderTime();paint();updateReadout();document.dispatchEvent(new Event('bode:render'));
   }
   function setup(canvas){
     var b=canvas.getBoundingClientRect(),d=Math.min(window.devicePixelRatio||1,2),w=b.width,h=b.height;
@@ -611,7 +655,7 @@
     if(timeHover===null){$('time-readout').textContent='Move over the time plot to inspect the input and output.';return;}
     var i=timeIndex(timeHover);$('time-readout').textContent='t = '+num(timeCache.times[i],4)+' s  ·  x(t) = '+num(timeCache.input[i],4)+'  ·  y(t) = '+num(timeCache.output[i],4)+(timeCache.impulse?' (regular part; impulses shown separately)':'');
   }
-  function paint(){drawPlane();if(state.analysis!=='time'){drawChart('magnitude','mag','ma');drawChart('phase','phase','pa');}if(state.analysis!=='frequency')drawTime();}
+  function paint(){drawPlane();if(state.analysis==='frequency'||state.analysis==='both'){drawChart('magnitude','mag','ma');drawChart('phase','phase','pa');}if(state.analysis==='time'||state.analysis==='both')drawTime();}
   function updateReadout(){if(hover===null){$('readout').textContent='Move over either Bode plot to inspect a frequency.';return;}var v=getPrimary(hover);$('readout').textContent='ω = '+num(hover,4)+' rad/s  ·  exact: '+num(v.mag)+' dB, '+num(v.phase,2)+'°  ·  asymptote: '+num(v.ma)+' dB, '+num(v.pa,2)+'°';}
   function position(e){var r=$('plane').getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top};}
   function world(p){return {re:(p.x-planeBox.x)/planeBox.w*2*state.domain-state.domain,im:state.domain-(p.y-planeBox.y)/planeBox.h*2*state.domain};}
@@ -714,6 +758,7 @@
   $('fit-frequency').addEventListener('click',function(){var breaks=state.roots.map(function(g){return g.form==='pair'?Math.hypot(g.re,g.im):Math.abs(g.re);}).filter(function(n){return n>0;});state.min=breaks.length?Math.max(1e-8,Math.pow(10,Math.floor(Math.log10(Math.min.apply(null,breaks)/30)))):.01;state.max=breaks.length?Math.min(1e8,Math.pow(10,Math.ceil(Math.log10(Math.max.apply(null,breaks)*30)))):100;hover=null;render();});
   ['magnitude','phase'].forEach(function(id){$(id).addEventListener('pointermove',function(e){var r=$(id).getBoundingClientRect(),x=e.clientX-r.left,b=plotBoxes[id];if(x<b.x||x>b.x+b.w)return;hover=Math.pow(10,Math.log10(state.min)+(x-b.x)/b.w*Math.log10(state.max/state.min));drawChart('magnitude','mag','ma');drawChart('phase','phase','pa');updateReadout();});$(id).addEventListener('pointerleave',function(){hover=null;drawChart('magnitude','mag','ma');drawChart('phase','phase','pa');updateReadout();});});
   var presets={
+    lecture:{gain:5000,roots:[['zero','real',-2,0],['pole','real',-10,0],['pole','real',-100,0]],analysis:'geometry',domain:130,min:.1,max:1000,dcLock:true,dcTarget:10},
     resonance:{gain:9,roots:[['pole','pair',-.6,Math.sqrt(8.64)],['zero','real',-1,0]]},
     leadlag:{gain:5,roots:[['pole','real',-5,0],['zero','real',-1,0]]},
     cancellation:{gain:1,roots:[['pole','real',-1,0],['pole','real',-2,0],['zero','real',-2,0]],selectedIndex:2,snap:true,analysis:'both',view:'total',example:'cancellation',dcTarget:1},
@@ -726,9 +771,9 @@
   $('preset').addEventListener('change',function(){
     var key=$('preset').value,p=presets[key];if(!p)return;remember();
     state.gain=p.gain;state.roots=p.roots.map(function(g){return {id:nextId++,kind:g[0],form:g[1],re:g[2],im:g[3]};});
-    state.domain=5;state.min=.01;state.max=100;state.selected=state.roots.length?state.roots[p.selectedIndex||0].id:'gain';state.mode='move';
+    state.domain=p.domain||5;state.min=p.min||.01;state.max=p.max||100;state.selected=state.roots.length?state.roots[p.selectedIndex||0].id:'gain';state.mode='move';
     state.example=p.example||null;if(typeof p.snap==='boolean')state.snap=p.snap;if(p.analysis)state.analysis=p.analysis;if(p.view)state.view=p.view;
-    if(Number.isFinite(p.dcTarget))state.dcTarget=p.dcTarget;
+    if(Number.isFinite(p.dcTarget))state.dcTarget=p.dcTarget;if(p.dcLock===true)state.dcLock=true;
     if(p.example==='cancellation'){state.time=Object.assign({},state.time,{input:'step',amplitude:1,auto:true});state.timeScale.auto=true;}
     hover=null;$('preset').value='';render();
   });
@@ -736,9 +781,75 @@
   $('fullscreen').addEventListener('click',async function(){try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch(e){message('Full screen is unavailable in this view.');}});
   document.addEventListener('fullscreenchange',function(){$('fullscreen').textContent=document.fullscreenElement?'Exit full screen':'Full screen';render();});
   document.addEventListener('keydown',function(e){if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName))return;if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();$(e.shiftKey?'redo':'undo').click();}else if(e.key==='Escape'){state.mode='move';render();}else if((e.key==='Delete'||e.key==='Backspace')&&selected()){e.preventDefault();remove(state.selected);}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)&&document.activeElement===$('plane')&&selected()){e.preventDefault();var g=selected(),delta=e.shiftKey?1:.1;remember();if(e.key==='ArrowLeft')g.re=M.stepCoordinate(g.re,-delta);if(e.key==='ArrowRight')g.re=M.stepCoordinate(g.re,delta);if(g.form==='pair'&&e.key==='ArrowUp')g.im=M.stepCoordinate(g.im,delta);if(g.form==='pair'&&e.key==='ArrowDown')g.im=Math.max(.0001,M.stepCoordinate(g.im,-delta));render();}});
+  window.BodeStudioGeometryModel=function(){return {roots:state.roots,gain:state.gain,min:state.min,max:state.max,selected:state.selected};};
   new ResizeObserver(function(){if(cache)paint();}).observe(document.querySelector('.workspace'));
   render();
 })();
+</script>
+<script id="bode-geometry">
+
+(function(){
+'use strict';
+var el=function(id){return document.getElementById(id)},B=window.BodeMath,slider=el('geo-slider'),playing=false,raf=0,last=0,model;
+var palette=['#7756b6','#168c82','#b07627','#477ab6','#bd5e8d','#6b8e35','#b86e52','#6c71ad'];
+function fmt(x,d){if(!Number.isFinite(x))return Number.isNaN(x)?'undefined':x>0?'∞':'−∞';if(!x)return '0';if(Math.abs(x)>99999||Math.abs(x)<.001)return x.toExponential(2).replace('e-','e−');return String(Number(x.toFixed(d===undefined?2:d)));}
+function frequency(){return model.min*Math.pow(model.max/model.min,+slider.value/1000);}
+function response(w){return B.total(B.reduce(model.roots).roots,model.gain,w);}
+function setup(id){var e=el(id),r=e.getBoundingClientRect(),w=r.width,h=r.height,d=Math.min(devicePixelRatio||1,2);if(w<10||h<10)return null;if(e.width!==Math.round(w*d)||e.height!==Math.round(h*d)){e.width=Math.round(w*d);e.height=Math.round(h*d);}var c=e.getContext('2d');c.setTransform(d,0,0,d,0,0);c.clearRect(0,0,w,h);return {c:c,w:w,h:h};}
+function geometry(w){
+  var v=setup('geo-plane');if(!v)return;
+  var c=v.c,s=Math.min(v.w-55,v.h-48),rr=model.roots.flatMap(function(g){return g.form==='pair'?[{g:g,x:g.re,y:g.im},{g:g,x:g.re,y:-g.im}]:[{g:g,x:g.re,y:0}];});
+  var lim=Math.max(1,w);rr.forEach(function(g){lim=Math.max(lim,Math.abs(g.x),Math.abs(g.y));});lim*=1.2;
+  var k=s/(2*lim),ox=27+.67*s,oy=17+.57*s,X=function(x){return ox+k*x;},Y=function(y){return oy-k*y;};
+  c.fillStyle='#fcfdff';c.fillRect(18,9,s+18,s+18);
+  c.fillStyle='#fff8f4';c.fillRect(ox,9,Math.max(0,36+s-ox),s+18);
+  c.save();c.beginPath();c.rect(18,9,s+18,s+18);c.clip();c.setLineDash([3,4]);c.strokeStyle='#e1e8ed';c.lineWidth=1;
+  [-1,-.5,0,.5,1].forEach(function(t){c.beginPath();c.moveTo(X(t*lim),9);c.lineTo(X(t*lim),s+27);c.moveTo(18,Y(t*lim));c.lineTo(s+36,Y(t*lim));c.stroke();});
+  c.setLineDash([]);c.strokeStyle='#879daf';c.beginPath();c.moveTo(ox,9);c.lineTo(ox,s+27);c.moveTo(18,oy);c.lineTo(s+36,oy);c.stroke();
+  rr.forEach(function(g){var color=palette[(g.g.id-1)%palette.length];c.strokeStyle=color;c.globalAlpha=.7;c.lineWidth=model.selected===g.g.id?3.5:2;c.beginPath();c.moveTo(X(g.x),Y(g.y));c.lineTo(ox,Y(w));c.stroke();c.globalAlpha=1;});
+  rr.forEach(function(q){var x=X(q.x),y=Y(q.y),g=q.g;c.strokeStyle=palette[(g.id-1)%palette.length];c.lineWidth=2.3;if(g.kind==='zero'){c.fillStyle='#fff';c.beginPath();c.arc(x,y,5,0,2*Math.PI);c.fill();c.stroke();}else{c.beginPath();c.moveTo(x-5,y-5);c.lineTo(x+5,y+5);c.moveTo(x+5,y-5);c.lineTo(x-5,y+5);c.stroke();}});
+  c.fillStyle='#d56d2a';c.beginPath();c.arc(ox,Y(w),5.5,0,2*Math.PI);c.fill();c.restore();
+  c.font='10px system-ui';c.textAlign='left';c.fillStyle='#4d6e85';c.fillText('jω = j'+fmt(w,3),Math.min(v.w-95,ox+8),Math.max(18,Y(w)-9));c.fillText('Im(s)',19,13);c.textAlign='right';c.fillText('Re(s)',Math.min(v.w-5,s+33),v.h-5);
+  c.textAlign='left';c.fillStyle='#778ba1';c.fillText('−'+fmt(lim,1),Math.max(3,X(-lim)-9),Math.min(v.h-6,oy+14));c.fillText('0',ox+4,Math.min(v.h-6,oy+14));
+}
+function graph(id,key,w){
+  var v=setup(id);if(!v)return;var c=v.c,box={x:53,y:10,w:v.w-68,h:v.h-41},log0=Math.log10(model.min),log1=Math.log10(model.max),amin=Infinity,amax=-Infinity;
+  for(var i=0;i<=180;i++){var f=Math.pow(10,log0+(log1-log0)*i/180),r=response(f),val=r[key];if(Number.isFinite(val)){amin=Math.min(amin,val);amax=Math.max(amax,val);}if(el('geo-asym').checked){val=r[key==='mag'?'ma':'pa'];if(Number.isFinite(val)){amin=Math.min(amin,val);amax=Math.max(amax,val);}}}
+  if(!Number.isFinite(amin)){amin=key==='mag'?-20:-180;amax=key==='mag'?20:180;}if(amax-amin<.001){amin-=key==='mag'?10:45;amax+=key==='mag'?10:45;}
+  var margin=(amax-amin)*.07;amin-=margin;amax+=margin;
+  var x=function(f){return box.x+(Math.log10(f)-log0)/(log1-log0)*box.w;},y=function(t){return box.y+(amax-t)/(amax-amin)*box.h;};
+  c.font='10px system-ui';c.textBaseline='middle';
+  for(i=0;i<=4;i++){var u=amin+(amax-amin)*i/4;c.strokeStyle='#e7eef3';c.lineWidth=1;c.beginPath();c.moveTo(box.x,y(u));c.lineTo(box.x+box.w,y(u));c.stroke();c.textAlign='right';c.fillStyle='#5a7187';c.fillText(fmt(u,1),box.x-7,y(u));}
+  for(i=Math.ceil(log0);i<=Math.floor(log1);i++){var px=x(Math.pow(10,i));c.strokeStyle='#e0e7ef';c.beginPath();c.moveTo(px,box.y);c.lineTo(px,box.y+box.h);c.stroke();c.textAlign='center';c.fillStyle='#75889a';c.fillText('10^'+i,px,box.y+box.h+14);}
+  c.textAlign='right';c.fillText('ω (rad/s)',box.x+box.w,v.h-4);
+  function trace(type,color,dashed){c.save();c.beginPath();c.rect(box.x,box.y,box.w,box.h);c.clip();c.strokeStyle=color;c.lineWidth=dashed?1.9:2.6;c.setLineDash(dashed?[5,4]:[]);c.beginPath();var active=false;for(var q=0;q<=Math.max(2,Math.round(+slider.value*.2));q++){var count=Math.max(2,Math.round(+slider.value*.2)),ff=Math.pow(10,log0+(Math.log10(w)-log0)*q/count),vv=response(ff)[type];if(!Number.isFinite(vv)){active=false;continue;}if(active)c.lineTo(x(ff),y(vv));else{c.moveTo(x(ff),y(vv));active=true;}}c.stroke();c.restore();}
+  if(el('geo-asym').checked)trace(key==='mag'?'ma':'pa','#3265c8',true);
+  trace(key,'#cb464d',false);
+  var px=x(w),val=response(w)[key];c.setLineDash([3,3]);c.strokeStyle='#aebdcc';c.beginPath();c.moveTo(px,box.y);c.lineTo(px,box.y+box.h);c.stroke();c.setLineDash([]);
+  if(Number.isFinite(val)){c.fillStyle='#cb464d';c.beginPath();c.arc(px,y(val),3.8,0,2*Math.PI);c.fill();}
+}
+function explain(w){
+  var r=response(w),zeros=[],poles=[],rows=[];
+  model.roots.forEach(function(g){var ds=[Math.hypot(-g.re,w-(g.form==='pair'?g.im:0))];if(g.form==='pair')ds.push(Math.hypot(-g.re,w+g.im));var f=B.factor(g,w),c=palette[(g.id-1)%palette.length];rows.push('<tr><td style="color:'+c+'">'+(g.kind==='zero'?'○ Z':'× P')+g.id+'</td><td>'+ds.map(function(n){return fmt(n,2);}).join(' · ')+'</td><td>'+fmt(f.mag,1)+'</td><td>'+fmt(f.phase,1)+'</td></tr>');(g.kind==='zero'?zeros:poles).push(ds.length===2?'('+ds.map(function(n){return fmt(n,2);}).join(' × ')+')':fmt(ds[0],2));});
+  el('geo-table-body').innerHTML='<tr><td>K</td><td>|'+fmt(model.gain,2)+'|</td><td>'+fmt(B.gain(model.gain).mag,1)+'</td><td>'+fmt(B.gain(model.gain).phase,1)+'</td></tr>'+rows.join('')+'<tr><th>Total</th><th></th><th>'+fmt(r.mag,2)+'</th><th>'+fmt(r.phase,1)+'</th></tr>';
+  el('geo-equation').innerHTML='<strong>ω = '+fmt(w,4)+' rad/s</strong> &nbsp; |H(jω)| = |K| × ∏d<sub>zero</sub> / ∏d<sub>pole</sub><div>= '+fmt(Math.abs(model.gain),2)+' × ['+(zeros.join(' × ')||'1')+'] / ['+(poles.join(' × ')||'1')+']</div><strong>Magnitude: '+fmt(r.mag,2)+' dB &nbsp; · &nbsp; Phase: '+fmt(r.phase,1)+'°</strong>';
+  var slope=0;model.roots.forEach(function(g){var corner=g.form==='pair'?Math.hypot(g.re,g.im):Math.abs(g.re);if(w>corner)slope+=(g.kind==='zero'?1:-1)*(g.form==='pair'?40:20);});
+  el('geo-takeaway').textContent='The approximate slope in this frequency band is '+(slope>0?'+':'')+slope+' dB/decade. The red line is the exact Bode response; enable Asymptotes to compare the standard straight-line construction. Axes in the s-plane are linear and automatically rescale.';
+}
+function paint(){if(el('geometry-panel').hidden||!window.BodeStudioGeometryModel)return;model=window.BodeStudioGeometryModel();if(!(model.min>0&&model.max>model.min))return;var w=frequency();el('geo-omega').textContent=fmt(w,4)+' rad/s';geometry(w);graph('geo-magnitude','mag',w);graph('geo-phase','phase',w);explain(w);}
+function pause(){playing=false;el('geo-play').textContent='▶ Play sweep';if(raf)cancelAnimationFrame(raf);raf=0;}
+function tick(t){if(!playing)return;if(!last)last=t;var delta=Math.min(100,Math.max(0,t-last));last=t;var next=Math.min(1000,+slider.value+delta*1000*Number(el('geo-speed').value)/13500);slider.value=String(next);paint();if(next>=1000)pause();else raf=requestAnimationFrame(tick);}
+el('geo-example').addEventListener('click',function(){pause();slider.value='0';el('preset').value='lecture';el('preset').dispatchEvent(new Event('change',{bubbles:true}));});
+el('geo-reset').addEventListener('click',function(){pause();slider.value='0';paint();});
+el('geo-play').addEventListener('click',function(){if(playing){pause();return;}if(+slider.value>=1000)slider.value='0';playing=true;last=0;el('geo-play').textContent='Ⅱ Pause';raf=requestAnimationFrame(tick);});
+slider.addEventListener('input',function(){pause();paint();});
+el('geo-asym').addEventListener('change',paint);
+document.addEventListener('bode:render',function(){if(!el('geometry-panel').hidden)paint();else pause();});
+window.addEventListener('resize',paint);if(typeof ResizeObserver==='function')new ResizeObserver(paint).observe(el('geometry-panel'));
+document.addEventListener('visibilitychange',function(){if(document.hidden)pause();});
+paint();
+})();
+
 </script>
 </body>
 </html>

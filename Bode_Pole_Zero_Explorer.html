@@ -8,6 +8,8 @@
 <style>
 :root{color-scheme:light;--navy:#192e45;--muted:#617187;--teal:#0b7775;--teal-bg:#eaf5f2;--line:#dde4ec;--bg:#f3f5f7;--red:#cb464d;--blue:#3265c8;--white:#fff;--shadow:0 2px 8px #10243d04}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--navy);font:14px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer;border:1px solid #ccd5df;background:#fff;color:var(--navy);border-radius:7px;padding:7px 11px;font-weight:600;min-height:34px;line-height:1.25}button:hover{background:#f0f4f7}button:disabled{opacity:.4;cursor:default}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,canvas:focus-visible{outline:3px solid #699bcf;outline-offset:3px}button.primary{background:var(--teal);border-color:var(--teal);color:white}button.primary:hover{background:#095e5d}button.active{background:var(--teal-bg);border-color:#88bcb1;color:#075f5e}input[type=number],select{border:1px solid #ccd5df;border-radius:6px;background:#fff;color:var(--navy);padding:6px 8px;min-height:33px;min-width:0}input[type=number]{font-variant-numeric:tabular-nums}input[type=checkbox]{accent-color:var(--teal)}h1,h2,h3,p{margin:0}h1{font-size:27px;line-height:1.12;letter-spacing:-.04em;font-weight:750}h2{font-size:15px;font-weight:700;letter-spacing:-.01em}h3{font-size:13px}main{max-width:1536px;margin:auto;padding:21px 25px}.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:16px}.brand{display:flex;align-items:center;gap:13px}.brandmark{background:var(--navy);border-radius:10px;width:43px;height:43px;color:#fff;display:grid;place-items:center;font-size:27px;letter-spacing:-.11em;padding-right:3px}.eyebrow{font-size:9px;letter-spacing:.17em;color:var(--teal);font-weight:750;margin-bottom:5px;text-transform:uppercase}.top-actions{display:flex;align-items:center;gap:7px}.top-actions select{max-width:190px;font-size:12px}.top-actions button{font-size:12px}.top-actions .download{margin-left:4px}.intro{color:var(--muted);font-size:12px;margin-top:6px}.card{border:1px solid var(--line);background:white;border-radius:12px;box-shadow:var(--shadow)}.formula-card{display:flex;align-items:center;gap:19px;padding:13px 18px;margin-bottom:15px}.formula-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;white-space:nowrap}.formula{font:21px/1.2 Cambria,"Times New Roman",serif;display:flex;align-items:center;gap:8px;overflow:auto;min-height:49px;flex:1;padding:1px 0 3px}.formula .frac{display:inline-flex;flex-direction:column;text-align:center;white-space:nowrap}.formula .frac>span:first-child{border-bottom:1px solid var(--navy);padding:0 8px 5px}.formula .frac>span:last-child{padding:5px 8px 0}.formula .factor{display:inline-block;margin:0 2px}.gain-control{border-left:1px solid var(--line);padding-left:18px;display:flex;align-items:center;gap:8px;font-size:12px;white-space:nowrap}.gain-control input{width:88px}.workspace{display:grid;grid-template-columns:minmax(340px,.88fr) minmax(0,1.35fr);gap:15px;align-items:start}.plane-card{overflow:hidden}.card-title{padding:14px 17px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px}.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:650;white-space:nowrap;border-radius:20px;background:#eef2f7;padding:3px 8px;color:#617187}.badge.warn{background:#fff0e7;color:#9c4b22}.badge.axis{background:#fff7d9;color:#81641a}.plane-tools{padding:0 15px 10px}.modes{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.modes button{font-size:12px;min-height:34px;padding:7px 5px}.pole-icon{font-size:20px;line-height:10px;vertical-align:-1px;margin-right:2px;color:#8450bc}.zero-icon{font-size:18px;line-height:10px;vertical-align:-1px;margin-right:2px;color:#09837b}.mode-sub{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;color:var(--muted);font-size:11px}.mode-sub label{display:flex;align-items:center;gap:5px}.mode-sub select{min-height:29px;font-size:11px;padding:3px 6px}.mode-sub .snap{margin-left:auto}.plane-wrap{margin:0 11px;position:relative}.plane-wrap canvas{display:block;width:100%;height:330px;touch-action:none;cursor:grab;border-radius:8px}.plane-wrap canvas.add{cursor:crosshair}.plane-wrap canvas.erase{cursor:crosshair}.plane-footer{display:flex;align-items:center;justify-content:space-between;padding:6px 16px 11px;gap:9px;color:var(--muted);font-size:10px}.zoom{display:flex;gap:4px;align-items:center}.zoom button{font-size:12px;min-height:26px;padding:3px 8px}.zoom span{font-variant-numeric:tabular-nums;min-width:43px;text-align:center}.hint{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#f8fafb;padding:9px 16px;color:var(--muted);font-size:11px;min-height:36px}.factors-title{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 5px}.factors-title span{color:var(--muted);font-size:10px}.factor-list{max-height:169px;overflow:auto;padding:0 9px 7px}.factor-row{display:flex;align-items:center;gap:6px;border:1px solid transparent;border-radius:7px;margin:2px 0;min-height:33px}.factor-row.selected{background:#f0f7f5;border-color:#c6e0d9}.factor-pick{border:0;background:transparent!important;flex:1;display:flex;align-items:center;gap:8px;min-width:0;min-height:31px;padding:5px 7px;text-align:left;font-size:12px}.factor-pick .name{font-weight:700;min-width:20px}.factor-pick .coord{color:var(--muted);font-weight:400;font-family:Cambria,serif;font-size:15px}.factor-pick .cancelled{font-size:9px;color:#936a2c;font-weight:500;margin-left:auto}.factor-row .remove{border:0;background:transparent;color:#758395;padding:4px 8px;min-height:28px;font-size:16px;font-weight:400}.color-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}.inspector{background:#f8fafb;padding:12px 15px;border-top:1px solid var(--line)}.inspector-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}.inspector-head span{font-size:10px;color:var(--muted)}.coordinates{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}.coordinates label{font-size:10px;color:var(--muted);display:flex;flex-direction:column;gap:4px}.coordinates input{width:100%;font-size:12px;background:white}.coordinates button{font-size:11px;min-height:33px;padding:6px 8px}.factor-details{color:var(--muted);font-size:11px;line-height:1.6;margin-top:8px;font-variant-numeric:tabular-nums}.plot-card{overflow:hidden}.plots-head{padding:14px 18px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px}.view-switch{display:flex;border:1px solid var(--line);border-radius:7px;padding:2px;gap:2px}.view-switch button{border:0;font-size:11px;min-height:27px;padding:5px 9px;font-weight:600}.view-switch button.active{background:var(--navy);color:#fff}.plot-legend{display:flex;flex-wrap:wrap;gap:13px;padding:0 18px 7px;align-items:center;font-size:11px;color:var(--muted);min-height:24px}.plot-legend span{display:flex;align-items:center;gap:6px}.line{width:23px;display:inline-block;height:0;border-top:2px solid}.line.exact{border-color:var(--red)}.line.asym{border-color:var(--blue);border-top-style:dashed}.plot-legend #view-caption{margin-left:auto;font-size:10px}.chart{position:relative;margin:0 9px}.chart canvas{display:block;width:100%;height:224px;touch-action:pan-y}.chart-label{padding:5px 18px 0;font-size:11px;font-weight:700;color:#384c63;display:flex;align-items:center;justify-content:space-between}.chart-label span{font-size:10px;font-weight:400;color:var(--muted)}.chart-rule{border-top:1px solid #edf0f4;margin:0 17px}.factor-legend{display:flex;gap:8px;flex-wrap:wrap;padding:3px 18px 7px;max-height:59px;overflow:auto}.factor-legend:empty{display:none}.factor-chip{font-size:10px;border:0;min-height:22px;padding:2px 6px;background:#f2f5f8;font-weight:500;display:flex;gap:4px;align-items:center}.hover-readout{padding:6px 18px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;min-height:29px;background:#fafbfc;border-top:1px solid #edf0f4}.frequency-bar{display:flex;align-items:end;gap:10px;padding:11px 17px;border-top:1px solid var(--line);background:#f8fafb}.frequency-bar label{display:flex;flex-direction:column;gap:3px;font-size:10px;color:var(--muted)}.frequency-bar input{width:91px;font-size:12px}.frequency-bar button{font-size:11px;min-height:32px;padding:6px 10px}.frequency-bar .units{font-size:10px;color:var(--muted);padding-bottom:8px;margin-right:auto}.notes{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:15px 2px 0;color:var(--muted);font-size:11px}.notes strong{color:#3c5268;font-weight:650}.notes p{margin-top:4px;line-height:1.65}.note-title{font-size:11px;font-weight:650;color:#425b70}.bottom{display:flex;justify-content:space-between;gap:12px;color:#7c8897;font-size:10px;padding:14px 1px 2px}.bottom button{font-size:10px;min-height:23px;padding:3px 6px}.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);padding:10px 16px;border-radius:9px;background:var(--navy);color:#fff;font-size:12px;z-index:5;box-shadow:0 4px 20px #18304b22;max-width:90vw}.toast[hidden]{display:none}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}[hidden]{display:none!important}
 .gain-settings{border-left:1px solid var(--line);padding-left:18px;flex:0 0 195px;min-width:0}.gain-settings .gain-control{border:0;padding:0;justify-content:space-between}.gain-control input:disabled{background:#f1f5f7;color:#53687b;opacity:1}.dc-lock-control{display:flex;align-items:center;gap:6px;margin:7px 0 3px;font-size:11px;cursor:pointer}.dc-lock-control input{margin:0}.dc-readout{font-size:11px;color:var(--teal);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.dc-status{font-size:10px;color:#925623;margin-top:4px;line-height:1.45}.dc-readout.warn{color:#925623}
+.transfer-forms{flex:1;min-width:0}.transfer-form-row{display:flex;align-items:center;gap:15px;min-width:0}.transfer-form-row+.transfer-form-row{border-top:1px solid #edf0f4;margin-top:8px;padding-top:8px}.transfer-form-row .formula-label{flex:0 0 104px;white-space:normal}.transfer-symbol{color:#d87518}.normalisation-note{font-size:11px;color:var(--muted);margin-top:7px;line-height:1.5}.factor-normalisation{padding:0 17px 10px;display:flex;align-items:center;flex-wrap:wrap;gap:5px 14px;font-size:11px;color:var(--muted)}.factor-normalisation label{display:inline-flex;align-items:center;gap:5px;color:var(--navy);cursor:pointer}.factor-normalisation input{margin:0}.formula .normalised-factor{white-space:nowrap}
+@media(max-width:600px){.formula-card{flex-wrap:wrap}.transfer-forms{flex-basis:100%}.formula-card .gain-settings{flex:1 1 100%;border-left:0;border-top:1px solid var(--line);padding:10px 0 0;display:flex;align-items:center;flex-wrap:wrap;gap:5px 15px}.gain-settings .dc-lock-control{margin:0}.gain-settings .dc-status{flex-basis:100%}.normalisation-note{font-size:10px}.transfer-form-row{gap:8px}}
 @media(max-width:480px){.gain-settings{flex-basis:145px;padding-left:10px}.dc-lock-control,.dc-readout{font-size:10px}.gain-settings .gain-control input{width:75px}}
 .analysis-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 17px;border-bottom:1px solid var(--line);background:#f8fafb}.analysis-nav h2{font-size:14px}.analysis-nav .view-switch button{font-size:11px}.time-head{padding:15px 18px 10px}.time-head p{color:var(--muted);font-size:11px;margin-top:3px}.time-controls{display:flex;align-items:end;flex-wrap:wrap;gap:9px;padding:0 17px 13px}.time-controls label{display:flex;flex-direction:column;gap:4px;font-size:10px;color:var(--muted)}.time-controls input{width:90px;font-size:12px}.time-controls select{font-size:12px;min-width:127px}.time-controls button{font-size:11px;min-height:33px}.time-controls .auto-duration{display:flex;flex-direction:row;align-items:center;gap:5px;margin-left:auto;min-height:32px}
 .time-controls .show-time-input{display:flex;flex-direction:row;align-items:center;gap:5px;min-height:32px}
@@ -102,7 +104,11 @@
     </div>
   </header>
   <section class="card formula-card" aria-label="Current transfer function">
-    <div class="formula-label">Transfer function</div><div class="formula" id="formula" aria-live="polite"></div>
+    <div class="transfer-forms">
+      <div class="transfer-form-row"><div class="formula-label">Root factors</div><div class="formula" id="formula" aria-live="polite"></div></div>
+      <div class="transfer-form-row"><div class="formula-label">DC-normalised form</div><div class="formula" id="normalised-formula" aria-live="polite"></div></div>
+      <p class="normalisation-note" id="normalisation-note"></p>
+    </div>
     <div class="gain-settings">
       <label class="gain-control" for="gain">Gain K <input id="gain" type="number" step="any" value="9" aria-describedby="gain-description"></label>
       <label class="dc-lock-control" for="dc-lock"><input id="dc-lock" type="checkbox" checked aria-describedby="dc-readout dc-status">Keep DC gain</label>
@@ -137,6 +143,7 @@
       <div class="example-prompt" id="example-prompt" role="note" hidden><strong>Pole–zero cancellation</strong><p>Move the selected zero away from −2 and compare the Bode plots and step response. Return it to −2 to restore exact cancellation. Use <b>Snap to 0.1</b> to align the roots. With <b>Keep DC gain</b> selected, H(0) stays fixed.</p></div>
       <div id="frequency-panel" hidden>
       <div class="plots-head"><h2 id="bode-title">Bode plots</h2><div class="view-switch" aria-label="Bode plot view"><button class="active" data-view="total" aria-pressed="true">Total</button><button data-view="selected" aria-pressed="false">Selected</button><button data-view="all" aria-pressed="false">All factors</button></div></div>
+      <div class="factor-normalisation"><label for="normalise-factors"><input id="normalise-factors" type="checkbox" aria-describedby="factor-normalisation-help"> DC-normalised factors</label><span id="factor-normalisation-help">For Selected and All factors: non-origin factors have 0 dB DC gain; constants move into Kₙ.</span></div>
       <div class="plot-legend"><span><i class="line exact"></i>Exact</span><span><i class="line asym"></i>Asymptotic</span><span id="view-caption">Combined response</span></div>
       <div id="factor-legend" class="factor-legend"></div>
       <div class="chart-label">Magnitude <span>dB</span></div><div class="chart"><canvas id="magnitude" role="img" aria-label="Bode magnitude plot comparing the exact response in red and the asymptotic approximation in dashed blue.">Magnitude versus logarithmic angular frequency, in decibels.</canvas></div>
@@ -153,6 +160,7 @@
           <button id="geo-reset">↺ Restart</button>
           <label>Speed <select id="geo-speed"><option value=".5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
           <label><input id="geo-asym" type="checkbox"> Asymptotes</label>
+          <label title="Use factors with unit DC gain for individual contributions; constants move into Kₙ. Origin factors stay explicit."><input id="geo-normalise-factors" type="checkbox"> DC-normalised factors</label>
           <label for="geo-overlay">Overlay contribution
             <select id="geo-overlay" aria-label="Show individual factor contribution alongside total Bode plots"><option value="none">None · total only</option></select>
           </label>
@@ -170,7 +178,7 @@
               </div>
             </div>
             <canvas class="geo-canvas" id="geo-plane" role="img" aria-label="Moving j omega point connected by coloured vectors to poles and zeros. Use the zoom buttons or mouse wheel to zoom around the origin."></canvas>
-            <table class="geo-table" aria-label="Distance, magnitude and angle contributions"><thead><tr><th>Factor</th><th>Distance(s)</th><th>Contribution dB</th><th>Angle °</th></tr></thead><tbody id="geo-table-body"></tbody></table>
+            <table class="geo-table" aria-label="Distance, magnitude and angle contributions"><thead><tr><th>Factor</th><th id="geo-distance-heading">Distance(s)</th><th>Contribution dB</th><th>Angle °</th></tr></thead><tbody id="geo-table-body"></tbody></table>
           </div>
           <div><div class="geo-heading">Magnitude · dB (constructed progressively)</div><canvas class="geo-canvas" id="geo-magnitude" role="img" aria-label="Progressively constructed Bode magnitude"></canvas>
             <div class="geo-heading" style="margin-top:13px">Phase · degrees (constructed progressively)</div><canvas class="geo-canvas" id="geo-phase" role="img" aria-label="Progressively constructed Bode phase"></canvas>
@@ -255,6 +263,23 @@
     return {mag:sign*mag,phase:sign*phase,ma:sign*ma,pa:sign*pa};
   }
   function gain(k){return k===0?{mag:-Infinity,phase:NaN,ma:-Infinity,pa:NaN}:{mag:20*log10(Math.abs(k)),phase:k<0?180:0,ma:20*log10(Math.abs(k)),pa:k<0?180:0};}
+  // Divide each non-origin polynomial by its signed constant term. Keeping
+  // the signed phase offset in the gain preserves the total continuous branch.
+  function factorConstant(g){
+    var sign=g.kind==='zero'?1:-1;
+    if(g.form==='real')return g.re===0?{mag:0,phase:0,sign:1,origin:true}:{mag:sign*20*log10(Math.abs(g.re)),phase:g.re>0?sign*180:0,sign:g.re>0?-1:1,origin:false};
+    return {mag:sign*40*log10(Math.hypot(g.re,g.im)),phase:0,sign:1,origin:false};
+  }
+  function normalisedFactor(g,w){
+    var f=factor(g,w),constant=factorConstant(g);
+    return {mag:f.mag-constant.mag,phase:f.phase-constant.phase,ma:f.ma-constant.mag,pa:f.pa-constant.phase};
+  }
+  function normalisedGain(roots,k){
+    var f=gain(k),sign=Math.sign(k);
+    roots.forEach(function(g){var constant=factorConstant(g);f.mag+=constant.mag;f.ma+=constant.mag;f.phase+=constant.phase;f.pa+=constant.phase;sign*=constant.sign;});
+    f.sign=sign;f.log10Abs=f.mag/20;f.value=k===0?0:sign*Math.pow(10,f.log10Abs);
+    return f;
+  }
   function same(a,b){return a.form===b.form&&Math.abs(a.re-b.re)<=EPS*Math.max(1,Math.abs(a.re),Math.abs(b.re))&&Math.abs(a.im-b.im)<=EPS*Math.max(1,Math.abs(a.im),Math.abs(b.im));}
   function reduce(roots){
     var removed=new Set();
@@ -302,7 +327,7 @@
     });
     return Array.from(new Set(a)).sort(function(a,b){return a-b;});
   }
-  root.BodeMath={factor:factor,gain:gain,reduce:reduce,total:total,frequencies:frequencies,clamp:clamp,stepCoordinate:stepCoordinate,pairParameters:pairParameters,pairFromParameters:pairFromParameters,dcGain:dcGain,gainForDC:gainForDC};
+  root.BodeMath={factor:factor,gain:gain,normalisedFactor:normalisedFactor,normalisedGain:normalisedGain,factorConstant:factorConstant,reduce:reduce,total:total,frequencies:frequencies,clamp:clamp,stepCoordinate:stepCoordinate,pairParameters:pairParameters,pairFromParameters:pairFromParameters,dcGain:dcGain,gainForDC:gainForDC};
 })(typeof globalThis!=='undefined'?globalThis:this);
 </script>
 <script id="time-math">
@@ -412,7 +437,7 @@
   var $=function(id){return document.getElementById(id);}, M=BodeMath;
   var palette=['#7756b6','#168c82','#b07627','#477ab6','#bd5e8d','#6b8e35','#b86e52','#6c71ad'];
   var initial=JSON.parse($('initial-model').textContent);
-  var state={roots:initial.roots,gain:initial.gain,domain:initial.domain,min:initial.min,max:initial.max,showTimeInput:initial.showTimeInput!==false,selected:initial.roots.length?initial.roots[0].id:'gain',mode:'move',form:'pair',snap:initial.snap===true,example:initial.example==='cancellation'?'cancellation':null,view:'total',pairEditor:initial.pairEditor==='natural'?'natural':'cartesian',analysis:['time','frequency','geometry'].includes(initial.analysis)?initial.analysis:'time',time:Object.assign({input:'step',amplitude:1,omega:1,duration:12,auto:true},initial.time||{}),timeScale:Object.assign({auto:true,min:-1,max:1},initial.timeScale||{}),dcLock:initial.dcLock===true&&Number.isFinite(initial.dcTarget),dcTarget:Number.isFinite(initial.dcTarget)?initial.dcTarget:null};
+  var state={roots:initial.roots,gain:initial.gain,domain:initial.domain,min:initial.min,max:initial.max,showTimeInput:initial.showTimeInput!==false,normaliseFactors:initial.normaliseFactors===true,selected:initial.roots.length?initial.roots[0].id:'gain',mode:'move',form:'pair',snap:initial.snap===true,example:initial.example==='cancellation'?'cancellation':null,view:'total',pairEditor:initial.pairEditor==='natural'?'natural':'cartesian',analysis:['time','frequency','geometry'].includes(initial.analysis)?initial.analysis:'time',time:Object.assign({input:'step',amplitude:1,omega:1,duration:12,auto:true},initial.time||{}),timeScale:Object.assign({auto:true,min:-1,max:1},initial.timeScale||{}),dcLock:initial.dcLock===true&&Number.isFinite(initial.dcTarget),dcTarget:Number.isFinite(initial.dcTarget)?initial.dcTarget:null};
   var nextId=state.roots.reduce(function(n,g){return Math.max(n,g.id+1);},1),past=[],future=[],drag=null,rootEdit=null,planeBox=null,plotBoxes={},cache=null,hover=null,toastTimer=0,renderPending=false,timeCache=null,timeKey='',timeBox=null,timeHover=null,dcNotice='';
   function num(n,d){if(!Number.isFinite(n))return Number.isNaN(n)?'undefined':n>0?'+∞':'−∞';if(n===0)return '0';if(Math.abs(n)>=1e4||Math.abs(n)<.001)return n.toExponential(2).replace('-','−');return Number(n.toFixed(d===undefined?3:d)).toString().replace('-','−');}
   function plain(n){return Number(n.toPrecision(8)).toString();}
@@ -420,8 +445,16 @@
   function name(g){return (g.kind==='pole'?'P':'Z')+g.id;}
   function color(g){return palette[(g.id-1)%palette.length];}
   function selected(){return state.roots.find(function(g){return g.id===state.selected;})||null;}
+  function factorContribution(g,w){return state.normaliseFactors?M.normalisedFactor(g,w):M.factor(g,w);}
+  function gainContribution(){return state.normaliseFactors?M.normalisedGain(state.roots,state.gain):M.gain(state.gain);}
+  function gainLabel(){return state.normaliseFactors?'Kₙ':'K';}
+  function normalisedGainText(g){
+    if(g.sign===0)return '0';
+    if(Number.isFinite(g.value)&&g.value!==0)return num(g.value,6);
+    return (g.sign<0?'−':'')+'10^('+num(g.log10Abs,6)+')';
+  }
   function coord(g){return num(g.re)+(g.form==='pair'?' ± j'+num(g.im):'');}
-  function snapshot(){return JSON.stringify({roots:state.roots,gain:state.gain,domain:state.domain,min:state.min,max:state.max,selected:state.selected,nextId:nextId,time:state.time,timeScale:state.timeScale,showTimeInput:state.showTimeInput,pairEditor:state.pairEditor,analysis:state.analysis,view:state.view,snap:state.snap,example:state.example,dcLock:state.dcLock,dcTarget:state.dcTarget});}
+  function snapshot(){return JSON.stringify({roots:state.roots,gain:state.gain,domain:state.domain,min:state.min,max:state.max,selected:state.selected,nextId:nextId,time:state.time,timeScale:state.timeScale,showTimeInput:state.showTimeInput,normaliseFactors:state.normaliseFactors,pairEditor:state.pairEditor,analysis:state.analysis,view:state.view,snap:state.snap,example:state.example,dcLock:state.dcLock,dcTarget:state.dcTarget});}
   function remember(before){past.push(before||snapshot());if(past.length>80)past.shift();future=[];}
   function restore(s){var v=JSON.parse(s);Object.assign(state,v);nextId=v.nextId;render();}
   function message(t){$('toast').textContent=t;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(function(){$('toast').hidden=true;},2800);}
@@ -431,11 +464,21 @@
     var a=-2*g.re,b=g.re*g.re+g.im*g.im;
     return '(s²'+(a===0?'':' '+(a<0?'−':'+')+' '+num(Math.abs(a))+'s')+' + '+num(b)+')';
   }
+  function normalisedFactorHTML(g){
+    if(g.form==='real')return g.re===0?'s':'(1 '+(g.re<0?'+':'−')+' s/'+num(Math.abs(g.re),6)+')';
+    var p=M.pairParameters(g),ratio='(s/'+num(p.wn,6)+')',damping=2*p.zeta;
+    return '(1'+(damping===0?'':' '+(damping<0?'−':'+')+' '+num(Math.abs(damping),6)+ratio)+' + '+ratio+'²)';
+  }
   function renderFormula(){
     var zeros=state.roots.filter(function(g){return g.kind==='zero';}),poles=state.roots.filter(function(g){return g.kind==='pole';});
     var product=function(a){return a.length?a.map(function(g){return '<span class="factor">'+factorHTML(g)+'</span>';}).join(' '):'1';};
-    $('formula').innerHTML='<i>H</i>(s) = '+num(state.gain)+' × <span class="frac"><span>'+product(zeros)+'</span><span>'+product(poles)+'</span></span>';
+    $('formula').innerHTML='<i class="transfer-symbol">H</i>(s) = '+num(state.gain)+' × <span class="frac"><span>'+product(zeros)+'</span><span>'+product(poles)+'</span></span>';
     $('formula').setAttribute('aria-label','H of s equals '+state.gain+' times the product of '+zeros.length+' zero factors divided by '+poles.length+' pole factors.');
+    var normalisedProduct=function(a){return a.length?a.map(function(g){return '<span class="factor normalised-factor">'+normalisedFactorHTML(g)+'</span>';}).join(' '):'1';},normalisedGain=M.normalisedGain(state.roots,state.gain),gainText=normalisedGainText(normalisedGain);
+    $('normalised-formula').innerHTML='<i class="transfer-symbol">H</i>(s) = '+gainText+' × <span class="frac"><span>'+normalisedProduct(zeros)+'</span><span>'+normalisedProduct(poles)+'</span></span>';
+    $('normalised-formula').setAttribute('aria-label','DC-normalised transfer function. Leading gain '+gainText+'. Each factor away from the origin has unit DC gain.');
+    var hasOrigin=state.roots.some(function(g){return M.factorConstant(g).origin;});
+    $('normalisation-note').textContent='Each non-origin factor equals 1 at DC (0 dB). Constants are collected in the leading gain Kₙ.'+(hasOrigin?' Factors at s = 0 stay explicit; they cannot be normalised to 0 dB at DC.':' Here Kₙ = H(0).');
     if(document.activeElement!==$('gain'))$('gain').value=plain(state.gain);
     var pc=poles.reduce(function(n,g){return n+(g.form==='pair'?2:1);},0),zc=zeros.reduce(function(n,g){return n+(g.form==='pair'?2:1);},0);
     $('factor-count').textContent=pc+' pole'+(pc===1?'':'s')+' · '+zc+' zero'+(zc===1?'':'s')+' · '+(pc>zc?'strictly proper':pc===zc?'proper':'improper');
@@ -445,7 +488,7 @@
   }
   function renderList(){
     var cancelled=cache.reduced.cancelled;
-    var gainRow='<div class="factor-row'+(state.selected==='gain'?' selected':'')+'"><button class="factor-pick" data-select="gain"><span class="color-dot" style="background:#8a95a3"></span><span class="name">K</span><span class="coord">'+num(state.gain)+'</span></button></div>';
+    var gainRow='<div class="factor-row'+(state.selected==='gain'?' selected':'')+'"><button class="factor-pick" data-select="gain"><span class="color-dot" style="background:#8a95a3"></span><span class="name">'+gainLabel()+'</span><span class="coord">'+(state.normaliseFactors?normalisedGainText(gainContribution()):num(state.gain))+'</span></button></div>';
     $('factor-list').innerHTML=gainRow+state.roots.map(function(g){return '<div class="factor-row'+(g.id===state.selected?' selected':'')+'"><button class="factor-pick" data-select="'+g.id+'" aria-label="Select '+name(g)+', '+g.kind+' '+(g.form==='pair'?'pair ':'')+coord(g)+'"><span class="color-dot" style="background:'+color(g)+'"></span><span class="name">'+name(g)+'</span><span class="coord">'+coord(g)+'</span>'+(cancelled.has(g.id)?'<span class="cancelled">cancels</span>':'')+'</button><button class="remove" data-remove="'+g.id+'" aria-label="Remove '+name(g)+'">×</button></div>';}).join('');
   }
   function renderInspector(){
@@ -454,8 +497,9 @@
     $('pair-editor-choice').hidden=!pair;$('pair-editor').value=state.pairEditor;
     $('pair-parameters').hidden=!natural;$('pair-help').hidden=!natural;
     if(!g){
-      $('selected-title').textContent='Constant gain K';$('selected-form').textContent='No roots';
-      $('factor-details').textContent=state.gain===0?'K = 0 gives the zero transfer function. Its magnitude is −∞ dB and its phase is undefined.':'Magnitude: '+num(M.gain(state.gain).mag)+' dB · phase: '+num(M.gain(state.gain).phase)+'°. K is the factor gain, not generally H(0).';
+      $('selected-title').textContent='Constant gain '+gainLabel();$('selected-form').textContent=state.normaliseFactors?'DC-normalised form':'Root-factor form';
+      var contribution=gainContribution();
+      $('factor-details').textContent=state.gain===0?'K = 0 gives the zero transfer function. Its magnitude is −∞ dB and its phase is undefined.':'Magnitude: '+num(contribution.mag)+' dB · phase: '+num(contribution.phase)+'°. '+(state.normaliseFactors?'Kₙ collects the constants from the normalised factors; factors at the origin stay explicit.':'K is the factor gain, not generally H(0).');
       return;
     }
     $('selected-title').textContent=name(g)+' · '+(g.kind==='pole'?'Pole':'Zero')+(g.form==='pair'?' pair':'');
@@ -474,19 +518,20 @@
       if(z!==0&&Math.abs(z)<1/Math.sqrt(2))text+=' '+(g.kind==='pole'?'Peak':'Dip')+' at '+num(wn*Math.sqrt(1-2*z*z))+' rad/s.';
     }else text=g.re===0?'Root at the origin: the magnitude and phase asymptotes are exact.':'Break frequency: '+num(Math.abs(g.re))+' rad/s · phase transition: '+num(Math.abs(g.re)/10)+' to '+num(Math.abs(g.re)*10)+' rad/s.';
     if(cache.reduced.cancelled.has(g.id))text+=' This factor cancels in the total transfer function.';
+    if(state.normaliseFactors)text+=M.factorConstant(g).origin?' This origin factor is unchanged; it cannot have unit DC gain.':' Its plotted contribution is DC-normalised: 0 dB and 0° at DC.';
     $('factor-details').textContent=text;
   }
-  function getPrimary(w){var g=selected();return state.view==='selected'?(g?M.factor(g,w):M.gain(state.gain)):M.total(cache.reduced.roots,state.gain,w);}
+  function getPrimary(w){var g=selected();return state.view==='selected'?(g?factorContribution(g,w):gainContribution()):M.total(cache.reduced.roots,state.gain,w);}
   function calculate(){
     var reduced=M.reduce(state.roots),freq=M.frequencies(state.roots,state.min,state.max,720);
     cache={reduced:reduced,freq:freq,curves:[]};
     var primary={id:'total',label:'Total',col:'#192e45',values:freq.map(function(w){return M.total(reduced.roots,state.gain,w);})};
     if(state.view==='selected'){
       var g=selected();
-      primary={id:g?g.id:'gain',label:g?name(g):'Gain K',col:g?color(g):'#8a95a3',values:freq.map(function(w){return g?M.factor(g,w):M.gain(state.gain);})};
+      primary={id:g?g.id:'gain',label:g?name(g):'Gain '+gainLabel(),col:g?color(g):'#8a95a3',values:freq.map(function(w){return g?factorContribution(g,w):gainContribution();})};
     }else if(state.view==='all'){
-      cache.curves.push({id:'gain',label:'K',col:'#8a95a3',values:freq.map(function(){return M.gain(state.gain);}),component:true});
-      state.roots.forEach(function(g){cache.curves.push({id:g.id,label:name(g),col:color(g),values:freq.map(function(w){return M.factor(g,w);}),component:true});});
+      cache.curves.push({id:'gain',label:gainLabel(),col:'#8a95a3',values:freq.map(function(){return gainContribution();}),component:true});
+      state.roots.forEach(function(g){cache.curves.push({id:g.id,label:name(g),col:color(g),values:freq.map(function(w){return factorContribution(g,w);}),component:true});});
     }
     cache.curves.push(primary);cache.primary=primary;
   }
@@ -552,7 +597,8 @@
     $('plane-range').textContent='±'+num(state.domain);
     if(document.activeElement!==$('omega-min'))$('omega-min').value=plain(state.min);
     if(document.activeElement!==$('omega-max'))$('omega-max').value=plain(state.max);
-    $('view-caption').textContent=state.view==='all'?'Total + individual factors':state.view==='selected'?cache.primary.label+' contribution':'Combined response';
+    $('normalise-factors').checked=state.normaliseFactors;$('geo-normalise-factors').checked=state.normaliseFactors;
+    $('view-caption').textContent=(state.view==='all'?'Total + individual factors':state.view==='selected'?cache.primary.label+' contribution':'Combined response')+(state.normaliseFactors&&state.view!=='total'?' · DC-normalised':'');
     $('factor-legend').innerHTML=state.view==='all'?cache.curves.filter(function(c){return c.component;}).map(function(c){return '<button class="factor-chip" data-inspect="'+c.id+'"><span class="color-dot" style="background:'+c.col+'"></span>'+c.label+'</button>';}).join(''):'';
     renderTime();paint();updateReadout();document.dispatchEvent(new Event('bode:render'));
   }
@@ -639,7 +685,7 @@
     });
     if(state.view==='selected'&&selected()&&selected().form==='pair'&&field==='mag'){
       var g=selected(),wn=Math.hypot(g.re,g.im),z=-g.re/wn;
-      if(z!==0&&Math.abs(z)<1/Math.sqrt(2)){var wr=wn*Math.sqrt(1-2*z*z),val=M.factor(g,wr).mag;if(wr>=state.min&&wr<=state.max){var xx=box.x+(Math.log10(wr)-lo)/(hi-lo)*box.w,yy=box.y+(range.max-val)/(range.max-range.min)*box.h;c.strokeStyle='#263e54';c.lineWidth=1.5;c.beginPath();c.moveTo(xx-4,yy-4);c.lineTo(xx+4,yy+4);c.moveTo(xx+4,yy-4);c.lineTo(xx-4,yy+4);c.stroke();}}
+      if(z!==0&&Math.abs(z)<1/Math.sqrt(2)){var wr=wn*Math.sqrt(1-2*z*z),val=factorContribution(g,wr).mag;if(wr>=state.min&&wr<=state.max){var xx=box.x+(Math.log10(wr)-lo)/(hi-lo)*box.w,yy=box.y+(range.max-val)/(range.max-range.min)*box.h;c.strokeStyle='#263e54';c.lineWidth=1.5;c.beginPath();c.moveTo(xx-4,yy-4);c.lineTo(xx+4,yy+4);c.moveTo(xx+4,yy-4);c.lineTo(xx-4,yy+4);c.stroke();}}
     }
     if(!cache.primary.values.some(function(v){return Number.isFinite(v[field]);})){c.fillStyle='#6f8193';c.textAlign='center';c.font='12px system-ui';c.fillText(field==='phase'?'Phase undefined (K = 0)':'Zero transfer function: magnitude −∞ dB',box.x+box.w/2,box.y+box.h/2);}
     if(hover!==null&&hover>=state.min&&hover<=state.max){var xx=box.x+(Math.log10(hover)-lo)/(hi-lo)*box.w;c.strokeStyle='#90a1b3';c.lineWidth=1;c.setLineDash([3,4]);c.beginPath();c.moveTo(xx,box.y);c.lineTo(xx,box.y+box.h);c.stroke();c.setLineDash([]);var val=getPrimary(hover)[field];if(Number.isFinite(val)&&val>=range.min&&val<=range.max){c.fillStyle='#cb464d';c.beginPath();c.arc(xx,box.y+(range.max-val)/(range.max-range.min)*box.h,3.2,0,2*Math.PI);c.fill();}}
@@ -721,6 +767,7 @@
   document.querySelectorAll('[data-mode]').forEach(function(b){b.addEventListener('click',function(){state.mode=b.dataset.mode;render();});});
   document.querySelectorAll('[data-view]').forEach(function(b){b.addEventListener('click',function(){state.view=b.dataset.view;render();});});
   document.querySelectorAll('[data-analysis]').forEach(function(b){b.addEventListener('click',function(){state.analysis=b.dataset.analysis;render();});});
+  ['normalise-factors','geo-normalise-factors'].forEach(function(id){$(id).addEventListener('change',function(){remember();state.normaliseFactors=$(id).checked;render();});});
   $('input-type').addEventListener('change',function(){remember();state.time.input=$('input-type').value;render();});
   $('show-time-input').addEventListener('change',function(){
     remember();state.showTimeInput=$('show-time-input').checked;render();
@@ -821,11 +868,11 @@
     if(p.example==='cancellation'){state.time=Object.assign({},state.time,{input:'step',amplitude:1,auto:true});state.timeScale.auto=true;}
     hover=null;$('preset').value='';render();
   });
-  $('download').addEventListener('click',function(){var clone=document.documentElement.cloneNode(true),data={gain:state.gain,domain:state.domain,min:state.min,max:state.max,roots:state.roots,analysis:state.analysis,time:state.time,timeScale:state.timeScale,showTimeInput:state.showTimeInput,pairEditor:state.pairEditor,snap:state.snap,example:state.example,dcLock:state.dcLock,dcTarget:state.dcTarget};clone.querySelector('#initial-model').textContent=JSON.stringify(data);clone.querySelector('#toast').hidden=true;var blob=new Blob(['<!doctype html>\n'+clone.outerHTML],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Bode_Pole_Zero_Explorer.html';a.click();setTimeout(function(){URL.revokeObjectURL(url);},2000);message('Downloaded a self-contained HTML tool with this model and input.');});
+  $('download').addEventListener('click',function(){var clone=document.documentElement.cloneNode(true),data={gain:state.gain,domain:state.domain,min:state.min,max:state.max,roots:state.roots,analysis:state.analysis,time:state.time,timeScale:state.timeScale,showTimeInput:state.showTimeInput,normaliseFactors:state.normaliseFactors,pairEditor:state.pairEditor,snap:state.snap,example:state.example,dcLock:state.dcLock,dcTarget:state.dcTarget};clone.querySelector('#initial-model').textContent=JSON.stringify(data);clone.querySelector('#toast').hidden=true;var blob=new Blob(['<!doctype html>\n'+clone.outerHTML],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Bode_Pole_Zero_Explorer.html';a.click();setTimeout(function(){URL.revokeObjectURL(url);},2000);message('Downloaded a self-contained HTML tool with this model and input.');});
   $('fullscreen').addEventListener('click',async function(){try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch(e){message('Full screen is unavailable in this view.');}});
   document.addEventListener('fullscreenchange',function(){$('fullscreen').textContent=document.fullscreenElement?'Exit full screen':'Full screen';render();});
   document.addEventListener('keydown',function(e){if(['INPUT','SELECT','TEXTAREA'].includes(document.activeElement.tagName))return;if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();$(e.shiftKey?'redo':'undo').click();}else if(e.key==='Escape'){state.mode='move';render();}else if((e.key==='Delete'||e.key==='Backspace')&&selected()){e.preventDefault();remove(state.selected);}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)&&document.activeElement===$('plane')&&selected()){e.preventDefault();var g=selected(),delta=e.shiftKey?1:.1;remember();if(e.key==='ArrowLeft')g.re=M.stepCoordinate(g.re,-delta);if(e.key==='ArrowRight')g.re=M.stepCoordinate(g.re,delta);if(g.form==='pair'&&e.key==='ArrowUp')g.im=M.stepCoordinate(g.im,delta);if(g.form==='pair'&&e.key==='ArrowDown')g.im=Math.max(.0001,M.stepCoordinate(g.im,-delta));render();}});
-  window.BodeStudioGeometryModel=function(){return {roots:state.roots,gain:state.gain,min:state.min,max:state.max,selected:state.selected};};
+  window.BodeStudioGeometryModel=function(){return {roots:state.roots,gain:state.gain,min:state.min,max:state.max,selected:state.selected,normaliseFactors:state.normaliseFactors};};
   new ResizeObserver(function(){if(cache)paint();}).observe(document.querySelector('.workspace'));
   render();
 })();
@@ -847,7 +894,7 @@ function setGeoZoom(value){
   paint();
 }
 function syncOverlay(){
-  var select=el('geo-overlay'),choices=[{value:'none',label:'None · total only'},{value:'gain',label:'K (gain)'}];
+  var select=el('geo-overlay'),choices=[{value:'none',label:'None · total only'},{value:'gain',label:model.normaliseFactors?'Kₙ (normalised gain)':'K (gain)'}];
   model.roots.forEach(function(g){choices.push({value:'root:'+g.id,label:(g.kind==='pole'?'× P':'○ Z')+g.id+(g.form==='pair'?' (pair)':'')});});
   var signature=choices.map(function(o){return o.value+':'+o.label;}).join('|');
   if(signature!==optionsSignature){
@@ -859,10 +906,11 @@ function syncOverlay(){
   }
   var choice=select.value;
   if(choice==='gain'){
-    overlayChoice={value:'gain',label:'K (gain)',color:'#657b8f',at:function(w){return B.gain(model.gain);}};
+    var constant=model.normaliseFactors?B.normalisedGain(model.roots,model.gain):B.gain(model.gain);
+    overlayChoice={value:'gain',label:model.normaliseFactors?'Kₙ (normalised gain)':'K (gain)',color:'#657b8f',at:function(w){return constant;}};
   }else{
     var g=model.roots.find(function(root){return choice==='root:'+root.id;});
-    overlayChoice=g?{value:choice,label:(g.kind==='pole'?'× P':'○ Z')+g.id+(g.form==='pair'?' (pair)':''),color:palette[(g.id-1)%palette.length],at:function(w){return B.factor(g,w);}}:null;
+    overlayChoice=g?{value:choice,label:(g.kind==='pole'?'× P':'○ Z')+g.id+(g.form==='pair'?' (pair)':'')+(model.normaliseFactors?' · DC-normalised':''),color:palette[(g.id-1)%palette.length],at:function(w){return model.normaliseFactors?B.normalisedFactor(g,w):B.factor(g,w);}}:null;
   }
   el('geo-legend').innerHTML='<span><i class="geo-swatch"></i>Total response</span>'
     +(overlayChoice?'<span><i class="geo-swatch" style="border-color:'+overlayChoice.color+'"></i>'+overlayChoice.label+' contribution</span>':'')
@@ -967,11 +1015,23 @@ function graph(id,key,w){
 }
 function explain(w){
   var r=response(w),zeros=[],poles=[],rows=[];
-  model.roots.forEach(function(g){var ds=[Math.hypot(-g.re,w-(g.form==='pair'?g.im:0))];if(g.form==='pair')ds.push(Math.hypot(-g.re,w+g.im));var f=B.factor(g,w),c=palette[(g.id-1)%palette.length];rows.push('<tr'+(overlayChoice&&overlayChoice.value==='root:'+g.id?' class="geo-row-selected"':'')+'><td style="color:'+c+'">'+(g.kind==='zero'?'○ Z':'× P')+g.id+(g.form==='pair'?' (pair)':'')+'</td><td>'+ds.map(function(n){return fmt(n,2);}).join(' · ')+'</td><td>'+fmt(f.mag,1)+'</td><td>'+fmt(f.phase,1)+'</td></tr>');(g.kind==='zero'?zeros:poles).push(ds.length===2?'('+ds.map(function(n){return fmt(n,2);}).join(' × ')+')':fmt(ds[0],2));});
-  el('geo-table-body').innerHTML='<tr'+(overlayChoice&&overlayChoice.value==='gain'?' class="geo-row-selected"':'')+'><td>K</td><td>|'+fmt(model.gain,2)+'|</td><td>'+fmt(B.gain(model.gain).mag,1)+'</td><td>'+fmt(B.gain(model.gain).phase,1)+'</td></tr>'+rows.join('')+'<tr><th>Total</th><th></th><th>'+fmt(r.mag,2)+'</th><th>'+fmt(r.phase,1)+'</th></tr>';
-  el('geo-equation').innerHTML='<strong>ω = '+fmt(w,4)+' rad/s</strong> &nbsp; |H(jω)| = |K| × ∏d<sub>zero</sub> / ∏d<sub>pole</sub><div>= '+fmt(Math.abs(model.gain),2)+' × ['+(zeros.join(' × ')||'1')+'] / ['+(poles.join(' × ')||'1')+']</div><strong>Magnitude: '+fmt(r.mag,2)+' dB &nbsp; · &nbsp; Phase: '+fmt(r.phase,1)+'°</strong>';
+  model.roots.forEach(function(g){
+    var ds=[Math.hypot(-g.re,w-(g.form==='pair'?g.im:0))];if(g.form==='pair')ds.push(Math.hypot(-g.re,w+g.im));
+    var radius=Math.hypot(g.re,g.form==='pair'?g.im:0);
+    if(model.normaliseFactors&&radius>0)ds=ds.map(function(d){return d/radius;});
+    var f=model.normaliseFactors?B.normalisedFactor(g,w):B.factor(g,w),c=palette[(g.id-1)%palette.length];
+    rows.push('<tr'+(overlayChoice&&overlayChoice.value==='root:'+g.id?' class="geo-row-selected"':'')+'><td style="color:'+c+'">'+(g.kind==='zero'?'○ Z':'× P')+g.id+(g.form==='pair'?' (pair)':'')+'</td><td>'+ds.map(function(n){return fmt(n,2);}).join(' · ')+'</td><td>'+fmt(f.mag,1)+'</td><td>'+fmt(f.phase,1)+'</td></tr>');
+    (g.kind==='zero'?zeros:poles).push(ds.length===2?'('+ds.map(function(n){return fmt(n,2);}).join(' × ')+')':fmt(ds[0],2));
+  });
+  var gain=model.normaliseFactors?B.normalisedGain(model.roots,model.gain):B.gain(model.gain),gainName=model.normaliseFactors?'Kₙ':'K';
+  var absGain=model.normaliseFactors?(gain.sign===0?'0':Number.isFinite(gain.value)&&gain.value!==0?fmt(Math.abs(gain.value),4):'10^('+fmt(gain.log10Abs,4)+')'):fmt(Math.abs(model.gain),4);
+  el('geo-distance-heading').textContent=model.normaliseFactors?'Distance ratio(s)':'Distance(s)';
+  el('geo-table-body').innerHTML='<tr'+(overlayChoice&&overlayChoice.value==='gain'?' class="geo-row-selected"':'')+'><td>'+gainName+'</td><td>'+absGain+'</td><td>'+fmt(gain.mag,1)+'</td><td>'+fmt(gain.phase,1)+'</td></tr>'+rows.join('')+'<tr><th>Total</th><th></th><th>'+fmt(r.mag,2)+'</th><th>'+fmt(r.phase,1)+'</th></tr>';
+  var distanceName=model.normaliseFactors?'r':'d';
+  el('geo-equation').innerHTML='<strong>ω = '+fmt(w,4)+' rad/s</strong> &nbsp; |<i class="transfer-symbol">H</i>(jω)| = |'+gainName+'| × ∏'+distanceName+'<sub>zero</sub> / ∏'+distanceName+'<sub>pole</sub><div>= '+absGain+' × ['+(zeros.join(' × ')||'1')+'] / ['+(poles.join(' × ')||'1')+']</div><strong>Magnitude: '+fmt(r.mag,2)+' dB &nbsp; · &nbsp; Phase: '+fmt(r.phase,1)+'°</strong>';
   var slope=0;model.roots.forEach(function(g){var corner=g.form==='pair'?Math.hypot(g.re,g.im):Math.abs(g.re);if(w>corner)slope+=(g.kind==='zero'?1:-1)*(g.form==='pair'?40:20);});
   el('geo-takeaway').textContent='The approximate slope in this frequency band is '+(slope>0?'+':'')+slope+' dB/decade. '
+    +(model.normaliseFactors?'Each non-origin factor has 0 dB DC gain; its distance ratios r divide each vector length by the root’s distance from the origin. Constants are included in Kₙ. Origin factors stay explicit. ':'')
     +(overlayChoice?'The '+overlayChoice.label+' curve is its separate contribution; in dB and degrees, the factor contributions and the gain sum to the red total. ':'')
     +'The red line is the exact total Bode response; enable Asymptotes to compare the straight-line construction. Axes in the s-plane are linear and automatically rescale.';
 }
@@ -1008,4 +1068,5 @@ setGeoZoom(1);
 </script>
 </body>
 </html>
+
 

@@ -1,0 +1,467 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      -->
+<title>Bode Quiz: MATLAB Checks | Signals &amp; Systems</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="MATLAB 26.1">
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
+<meta name="DC.date" content="2026-11-25">
+<meta name="DC.source" content="Mentimeter_Bode_Checks.m">
+<style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style>
+<style type="text/css">
+.site-nav { margin: 0 0 24px; padding: 16px; border: 1px solid #dce6f0; border-radius: 8px; background: #f2f6fb; }
+.site-nav h1 { margin: 12px 0; color: #003b5c; font-size: 1.8em; line-height: 1.3; }
+.site-nav p { margin: 0 0 10px; }
+.site-nav .download { display: inline-block; padding: 8px 12px; border-radius: 5px; background: #003b5c; color: #fff; font-weight: bold; }
+img { max-width: 100%; height: auto; }
+pre { overflow-x: auto; }
+a:focus-visible { outline: 3px solid #ffb648; outline-offset: 3px; }
+</style>
+</head>
+<body>
+<div class="site-nav" role="navigation" aria-label="Course resources">
+<a href="../index.html">&larr; Back to index</a>
+<h1>Bode Quiz: MATLAB Checks</h1>
+<p>MATLAB code, numerical results and plots for the Mentimeter questions. Try each question by hand, then use these checks to review your answer.</p>
+<p>Prompts provided by Joaquin Carrasco &middot; Code produced by ChatGPT.</p>
+<a class="download" href="Mentimeter_Bode_Checks.m" download>Download MATLAB code (.m)</a>
+<p style="margin:10px 0 0;">Running the script requires MATLAB and Control System Toolbox.</p>
+</div>
+
+<div class="content">
+<h2>Contents</h2>
+<div>
+<ul>
+<li>
+<a href="#2">2&ndash;3. Convert amplitude gains into decibels</a>
+</li>
+<li>
+<a href="#3">4. DC gain</a>
+</li>
+<li>
+<a href="#4">5. Multiplication by -1</a>
+</li>
+<li>
+<a href="#5">6. Integrator</a>
+</li>
+<li>
+<a href="#6">7. Left- and right-half-plane zeros</a>
+</li>
+<li>
+<a href="#7">8&ndash;9. Second-order phase, damping and resonance</a>
+</li>
+<li>
+<a href="#8">10. Successive asymptotic magnitude slopes</a>
+</li>
+</ul>
+</div>
+<pre class="codeinput">
+<span class="comment">% Check the examples from the Bode Mentimeter quiz.</span>
+<span class="comment">% Requires Control System Toolbox.</span>
+
+clear; close <span class="string">all</span>; clc;
+s = tf(<span class="string">'s'</span>);
+w = logspace(-3,4,5000);       <span class="comment">% Frequency in rad/s</span>
+</pre>
+<h2 id="2">2&ndash;3. Convert amplitude gains into decibels</h2>
+<pre class="codeinput">gain = [10; 5];
+gain_dB = 20*log10(gain);
+
+disp(table(gain,gain_dB));
+<span class="comment">% Answers: 20 dB and approximately 14 dB.</span>
+</pre>
+<pre class="codeoutput">    gain    gain_dB
+    ____    _______
+
+     10         20 
+      5     13.979 
+
+</pre>
+<h2 id="3">4. DC gain</h2>
+<pre class="codeinput">H = 5*(s+2)/(s+10);
+
+fprintf(<span class="string">'DC gain = %.4f\n'</span>,dcgain(H));
+<span class="comment">% Answer: 1, corresponding to 0 dB.</span>
+
+figure;
+bode(H,w); grid <span class="string">on</span>;
+title(<span class="string">'DC gain: H(s) = 5(s+2)/(s+10)'</span>);
+</pre>
+<pre class="codeoutput">DC gain = 1.0000
+</pre>
+<img vspace="5" hspace="5" src="Mentimeter_Bode_Checks_01.png" alt=""> <h2 id="4">5. Multiplication by -1</h2>
+<pre class="codeinput">figure;
+bode(H,-H,w); grid <span class="string">on</span>;
+legend(<span class="string">'H(s)'</span>,<span class="string">'-H(s)'</span>,<span class="string">'Location'</span>,<span class="string">'best'</span>);
+title(<span class="string">'Multiplication by -1'</span>);
+
+response = squeeze(freqresp(H,w));
+negative_response = squeeze(freqresp(-H,w));
+
+magnitude_difference = 20*log10(abs(negative_response./response));
+phase_difference = angle(negative_response./response)*180/pi;
+
+fprintf(<span class="string">'Maximum magnitude difference = %.3g dB\n'</span>, <span class="keyword">...</span>
+    max(abs(magnitude_difference)));
+fprintf(<span class="string">'Phase difference = %.1f degrees (modulo 360)\n'</span>, <span class="keyword">...</span>
+    phase_difference(1));
+<span class="comment">% Answer: unchanged magnitude and a 180-degree phase shift.</span>
+</pre>
+<pre class="codeoutput">Maximum magnitude difference = 0 dB
+Phase difference = 180.0 degrees (modulo 360)
+</pre>
+<img vspace="5" hspace="5" src="Mentimeter_Bode_Checks_02.png" alt=""> <h2 id="5">6. Integrator</h2>
+<pre class="codeinput">Hi = 1/s;
+
+mag_at_1  = abs(evalfr(Hi,1i));
+mag_at_10 = abs(evalfr(Hi,10i));
+
+slope = 20*log10(mag_at_10/mag_at_1);
+phase = angle(evalfr(Hi,1i))*180/pi;
+
+fprintf(<span class="string">'Integrator slope = %.1f dB/decade\n'</span>,slope);
+fprintf(<span class="string">'Integrator phase = %.1f degrees\n'</span>,phase);
+
+figure;
+bode(Hi,w); grid <span class="string">on</span>;
+title(<span class="string">'Integrator: H(s) = 1/s'</span>);
+<span class="comment">% Answer: -20 dB/decade and -90 degrees.</span>
+</pre>
+<pre class="codeoutput">Integrator slope = -20.0 dB/decade
+Integrator phase = -90.0 degrees
+</pre>
+<img vspace="5" hspace="5" src="Mentimeter_Bode_Checks_03.png" alt=""> <h2 id="6">7. Left- and right-half-plane zeros</h2>
+<pre class="codeinput">H1 = 1+s/10;
+H2 = 1-s/10;
+
+figure;
+bode(H1,H2,w); grid <span class="string">on</span>;
+legend(<span class="string">'1+s/10'</span>,<span class="string">'1-s/10'</span>,<span class="string">'Location'</span>,<span class="string">'best'</span>);
+title(<span class="string">'Left- and right-half-plane zeros'</span>);
+
+R1 = squeeze(freqresp(H1,w));
+R2 = squeeze(freqresp(H2,w));
+
+fprintf(<span class="string">'Maximum magnitude difference = %.3g dB\n'</span>, <span class="keyword">...</span>
+    max(abs(20*log10(abs(R1./R2)))));
+fprintf(<span class="string">'Phases at omega = 10 rad/s: %.1f and %.1f degrees\n'</span>, <span class="keyword">...</span>
+    angle(evalfr(H1,10i))*180/pi, <span class="keyword">...</span>
+    angle(evalfr(H2,10i))*180/pi);
+<span class="comment">% Answer: identical magnitudes and opposite phase contributions.</span>
+</pre>
+<pre class="codeoutput">Maximum magnitude difference = 2.89e-15 dB
+Phases at omega = 10 rad/s: 45.0 and -45.0 degrees
+</pre>
+<img vspace="5" hspace="5" src="Mentimeter_Bode_Checks_04.png" alt=""> <h2 id="7">8&ndash;9. Second-order phase, damping and resonance</h2>
+<pre class="codeinput">wn = 1;                      <span class="comment">% Normalised natural frequency</span>
+zeta = [0.05; 0.25; 0.8; 1.2];
+
+systems = cell(numel(zeta),1);
+phase_at_wn = zeros(size(zeta));
+underdamped = false(size(zeta));
+resonant_peak = false(size(zeta));
+peak_dB = zeros(size(zeta));
+
+<span class="keyword">for</span> k = 1:numel(zeta)
+    systems{k} = wn^2/(s^2 + 2*zeta(k)*wn*s + wn^2);
+
+    phase_at_wn(k) = angle(evalfr(systems{k},1i*wn))*180/pi;
+
+    <span class="comment">% Complex poles indicate an underdamped system.</span>
+    p = pole(systems{k});
+    underdamped(k) = any(abs(imag(p)) &gt; 1e-10);
+
+    <span class="comment">% Include omega = 0 when checking the maximum magnitude.</span>
+    R = squeeze(freqresp(systems{k},[0,w]));
+    peak_dB(k) = 20*log10(max(abs(R)));
+
+    <span class="comment">% A resonant peak exceeds the DC magnitude.</span>
+    resonant_peak(k) = max(abs(R)) &gt; abs(R(1))*(1+1e-6);
+<span class="keyword">end</span>
+
+disp(table(zeta,phase_at_wn,underdamped,resonant_peak,peak_dB));
+
+figure;
+bode(systems{:},w); grid <span class="string">on</span>;
+legend(<span class="string">'zeta = 0.05'</span>,<span class="string">'zeta = 0.25'</span>,<span class="string">'zeta = 0.8'</span>,<span class="string">'zeta = 1.2'</span>, <span class="keyword">...</span>
+    <span class="string">'Location'</span>,<span class="string">'best'</span>);
+title(<span class="string">'Second-order factors: omega_n = 1 rad/s'</span>);
+
+<span class="comment">% Phase at omega_n: -90 degrees for every positive zeta.</span>
+<span class="comment">% Underdamped without a resonant peak: zeta = 0.8.</span>
+</pre>
+<pre class="codeoutput">    zeta    phase_at_wn    underdamped    resonant_peak    peak_dB
+    ____    ___________    ___________    _____________    _______
+
+    0.05        -90           true            true         20.009 
+    0.25        -90           true            true         6.3008 
+     0.8        -90           true            false             0 
+     1.2        -90           false           false             0 
+
+</pre>
+<img vspace="5" hspace="5" src="Mentimeter_Bode_Checks_05.png" alt=""> <h2 id="8">10. Successive asymptotic magnitude slopes</h2>
+<pre class="codeinput">Hs = 10*(1+s/10)/((1+s/1)*(1+s/100));
+
+<span class="comment">% Corner frequencies: 1, 10 and 100 rad/s.</span>
+<span class="comment">% Slope changes: pole -20, zero +20, pole -20 dB/decade.</span>
+slope_changes = [-20,20,-20];
+successive_slopes = [0,cumsum(slope_changes)];
+
+disp(<span class="string">'Successive asymptotic slopes (dB/decade):'</span>);
+disp(successive_slopes);
+<span class="comment">% Answer: 0, -20, 0, -20.</span>
+
+R = squeeze(freqresp(Hs,w));
+exact_dB = 20*log10(abs(R));
+
+<span class="comment">% Construct the magnitude asymptotes from the individual factors.</span>
+asymptote_dB = 20 <span class="keyword">...</span>
+    - 20*max(0,log10(w/1)) <span class="keyword">...</span>
+    + 20*max(0,log10(w/10)) <span class="keyword">...</span>
+    - 20*max(0,log10(w/100));
+
+figure;
+semilogx(w,exact_dB(:).',<span class="string">'LineWidth'</span>,1.5);
+hold <span class="string">on</span>;
+semilogx(w,asymptote_dB,<span class="string">'--'</span>,<span class="string">'LineWidth'</span>,1.5);
+xline(1,<span class="string">':'</span>);
+xline(10,<span class="string">':'</span>);
+xline(100,<span class="string">':'</span>);
+grid <span class="string">on</span>;
+xlabel(<span class="string">'\omega (rad/s)'</span>);
+ylabel(<span class="string">'Magnitude (dB)'</span>);
+legend(<span class="string">'Exact'</span>,<span class="string">'Asymptotic'</span>,<span class="string">'Location'</span>,<span class="string">'best'</span>);
+title(<span class="string">'Successive asymptotic magnitude slopes'</span>);
+</pre>
+<pre class="codeoutput">Successive asymptotic slopes (dB/decade):
+     0   -20     0   -20
+
+</pre>
+<img vspace="5" hspace="5" src="Mentimeter_Bode_Checks_06.png" alt=""> <p class="footer">
+<br>
+<a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2026a</a>
+<br>
+</p>
+</div>
+<!--
+##### SOURCE BEGIN #####
+% Check the examples from the Bode Mentimeter quiz.
+% Requires Control System Toolbox.
+
+clear; close all; clc;
+s = tf('s');
+w = logspace(-3,4,5000);       % Frequency in rad/s
+
+
+%% 2–3. Convert amplitude gains into decibels
+gain = [10; 5];
+gain_dB = 20*log10(gain);
+
+disp(table(gain,gain_dB));
+% Answers: 20 dB and approximately 14 dB.
+
+%% 4. DC gain
+H = 5*(s+2)/(s+10);
+
+fprintf('DC gain = %.4f\n',dcgain(H));
+% Answer: 1, corresponding to 0 dB.
+
+figure;
+bode(H,w); grid on;
+title('DC gain: H(s) = 5(s+2)/(s+10)');
+
+%% 5. Multiplication by -1
+figure;
+bode(H,-H,w); grid on;
+legend('H(s)','-H(s)','Location','best');
+title('Multiplication by -1');
+
+response = squeeze(freqresp(H,w));
+negative_response = squeeze(freqresp(-H,w));
+
+magnitude_difference = 20*log10(abs(negative_response./response));
+phase_difference = angle(negative_response./response)*180/pi;
+
+fprintf('Maximum magnitude difference = %.3g dB\n', ...
+    max(abs(magnitude_difference)));
+fprintf('Phase difference = %.1f degrees (modulo 360)\n', ...
+    phase_difference(1));
+% Answer: unchanged magnitude and a 180-degree phase shift.
+
+%% 6. Integrator
+Hi = 1/s;
+
+mag_at_1  = abs(evalfr(Hi,1i));
+mag_at_10 = abs(evalfr(Hi,10i));
+
+slope = 20*log10(mag_at_10/mag_at_1);
+phase = angle(evalfr(Hi,1i))*180/pi;
+
+fprintf('Integrator slope = %.1f dB/decade\n',slope);
+fprintf('Integrator phase = %.1f degrees\n',phase);
+
+figure;
+bode(Hi,w); grid on;
+title('Integrator: H(s) = 1/s');
+% Answer: -20 dB/decade and -90 degrees.
+
+%% 7. Left- and right-half-plane zeros
+H1 = 1+s/10;
+H2 = 1-s/10;
+
+figure;
+bode(H1,H2,w); grid on;
+legend('1+s/10','1-s/10','Location','best');
+title('Left- and right-half-plane zeros');
+
+R1 = squeeze(freqresp(H1,w));
+R2 = squeeze(freqresp(H2,w));
+
+fprintf('Maximum magnitude difference = %.3g dB\n', ...
+    max(abs(20*log10(abs(R1./R2)))));
+fprintf('Phases at omega = 10 rad/s: %.1f and %.1f degrees\n', ...
+    angle(evalfr(H1,10i))*180/pi, ...
+    angle(evalfr(H2,10i))*180/pi);
+% Answer: identical magnitudes and opposite phase contributions.
+
+%% 8–9. Second-order phase, damping and resonance
+wn = 1;                      % Normalised natural frequency
+zeta = [0.05; 0.25; 0.8; 1.2];
+
+systems = cell(numel(zeta),1);
+phase_at_wn = zeros(size(zeta));
+underdamped = false(size(zeta));
+resonant_peak = false(size(zeta));
+peak_dB = zeros(size(zeta));
+
+for k = 1:numel(zeta)
+    systems{k} = wn^2/(s^2 + 2*zeta(k)*wn*s + wn^2);
+
+    phase_at_wn(k) = angle(evalfr(systems{k},1i*wn))*180/pi;
+
+    % Complex poles indicate an underdamped system.
+    p = pole(systems{k});
+    underdamped(k) = any(abs(imag(p)) > 1e-10);
+
+    % Include omega = 0 when checking the maximum magnitude.
+    R = squeeze(freqresp(systems{k},[0,w]));
+    peak_dB(k) = 20*log10(max(abs(R)));
+
+    % A resonant peak exceeds the DC magnitude.
+    resonant_peak(k) = max(abs(R)) > abs(R(1))*(1+1e-6);
+end
+
+disp(table(zeta,phase_at_wn,underdamped,resonant_peak,peak_dB));
+
+figure;
+bode(systems{:},w); grid on;
+legend('zeta = 0.05','zeta = 0.25','zeta = 0.8','zeta = 1.2', ...
+    'Location','best');
+title('Second-order factors: omega_n = 1 rad/s');
+
+% Phase at omega_n: -90 degrees for every positive zeta.
+% Underdamped without a resonant peak: zeta = 0.8.
+
+%% 10. Successive asymptotic magnitude slopes
+Hs = 10*(1+s/10)/((1+s/1)*(1+s/100));
+
+% Corner frequencies: 1, 10 and 100 rad/s.
+% Slope changes: pole -20, zero +20, pole -20 dB/decade.
+slope_changes = [-20,20,-20];
+successive_slopes = [0,cumsum(slope_changes)];
+
+disp('Successive asymptotic slopes (dB/decade):');
+disp(successive_slopes);
+% Answer: 0, -20, 0, -20.
+
+R = squeeze(freqresp(Hs,w));
+exact_dB = 20*log10(abs(R));
+
+% Construct the magnitude asymptotes from the individual factors.
+asymptote_dB = 20 ...
+    - 20*max(0,log10(w/1)) ...
+    + 20*max(0,log10(w/10)) ...
+    - 20*max(0,log10(w/100));
+
+figure;
+semilogx(w,exact_dB(:).','LineWidth',1.5);
+hold on;
+semilogx(w,asymptote_dB,'REPLACE_WITH_DASH_DASH','LineWidth',1.5);
+xline(1,':');
+xline(10,':');
+xline(100,':');
+grid on;
+xlabel('\omega (rad/s)');
+ylabel('Magnitude (dB)');
+legend('Exact','Asymptotic','Location','best');
+title('Successive asymptotic magnitude slopes');
+##### SOURCE END #####
+-->
+</body>
+</html>
